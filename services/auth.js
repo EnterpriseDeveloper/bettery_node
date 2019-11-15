@@ -14,7 +14,7 @@ const registration = (req, res) => {
             throw err;
         }
         let dbo = db.db("Quize");
-        dbo.collection("users").findOne({ email: req.body.email }, (err, result) => {
+        dbo.collection("users").findOne({ nickName: req.body.nickName }, (err, result) => {
             if (err) {
                 res.status(400);
                 res.send("error database connection");
@@ -22,8 +22,8 @@ const registration = (req, res) => {
             }
             if (result === null) {
                 let data = {
+                    nickName: req.body.nickName,
                     email: req.body.email,
-                    password: req.body.password,
                     wallet: req.body.wallet
                 }
                 dbo.collection("users").insertOne(data, function (err, response) {
@@ -44,7 +44,7 @@ const registration = (req, res) => {
     });
 }
 
-const login = (req, res) => {
+const validate = (req, res) => {
     MongoClient.connect(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -56,33 +56,27 @@ const login = (req, res) => {
         }
         let dbo = db.db("Quize");
 
-        dbo.collection("users").findOne({ email: req.body.email }, (err, result) => {
+        dbo.collection("users").findOne({ wallet: req.body.wallet }, (err, result) => {
             if (err) {
                 res.status(400);
                 res.send("error database connection");
                 throw err;
             }
             if (result === null) {
+                let data = {
+                    nickName: undefined,
+                    email: undefined,
+                    wallet: undefined
+                }
 
-                res.status(400);
-                res.send("user not found");
+                res.status(200);
+                res.send(data);
                 db.close();
 
             } else {
-                if (result.password !== req.body.password) {
-                    res.status(400);
-                    res.send("password not correct");
-                    db.close();
-                } else {
-                    let data = {
-                        email: result.email,
-                        password: result.password,
-                        wallet: result.wallet
-                    }
-                    res.status(200);
-                    res.send(data);
-                    db.close();
-                }
+                res.status(200);
+                res.send(result);
+                db.close();
             }
         })
     });
@@ -90,5 +84,5 @@ const login = (req, res) => {
 
 module.exports = {
     registration,
-    login
+    validate
 }

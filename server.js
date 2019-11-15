@@ -42,8 +42,8 @@ app.use(bodyParser.urlencoded({
 }));
 
 
-app.post("/user/auth", async (req, res) => {
-    auth.login(req, res);
+app.post("/user/validate", async (req, res) => {
+    auth.validate(req, res);
 })
 
 app.post("/user/regist", async (req, res) => {
