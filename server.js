@@ -2,7 +2,8 @@ var express = require('express');
 var bodyParser = require('body-parser')
 var app = express();
 
-const auth = require("./services/auth");
+const auth = require("./services/users");
+const questions = require("./services/qestion");
 
 const multer = require('multer');
 const upload = multer();
@@ -48,6 +49,14 @@ app.post("/user/validate", async (req, res) => {
 
 app.post("/user/regist", async (req, res) => {
     auth.registration(req, res);
+})
+
+app.get("/user/all", async (req, res) => {
+    auth.allUsers(req, res);
+})
+
+app.post("/questions", async (req, res) => {
+    questions.setQuestion(req, res);
 })
 
 

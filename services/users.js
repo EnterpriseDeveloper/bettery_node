@@ -1,7 +1,9 @@
 
 const MongoClient = require('mongodb').MongoClient;
+const keys = require("../key");
 
-const uri = 'mongodb+srv://hiThere:hithere123456@cluster0-ddoj5.mongodb.net/test?retryWrites=true&w=majority'
+const uri = keys.mongoKey;
+const fromDB = "Quize";
 
 const registration = (req, res) => {
     MongoClient.connect(uri, {
@@ -11,14 +13,14 @@ const registration = (req, res) => {
         if (err) {
             res.status(400);
             res.send("error database connection");
-            throw err;
+            console.log("DB error: " + err)
         }
-        let dbo = db.db("Quize");
+        let dbo = db.db(fromDB);
         dbo.collection("users").findOne({ nickName: req.body.nickName }, (err, result) => {
             if (err) {
                 res.status(400);
                 res.send("error database connection");
-                throw err;
+                console.log("DB error: " + err)
             }
             if (result === null) {
                 let data = {
@@ -30,7 +32,7 @@ const registration = (req, res) => {
                     if (err) {
                         res.status(400);
                         res.send("error database connection");
-                        throw err;
+                        console.log("DB error: " + err)
                     }
                     res.status(200).end();
                     db.close();
@@ -52,15 +54,15 @@ const validate = (req, res) => {
         if (err) {
             res.status(400);
             res.send("error database connection");
-            throw err;
+            console.log("DB error: " + err)
         }
-        let dbo = db.db("Quize");
+        let dbo = db.db(fromDB);
 
         dbo.collection("users").findOne({ wallet: req.body.wallet }, (err, result) => {
             if (err) {
                 res.status(400);
                 res.send("error database connection");
-                throw err;
+                console.log("DB error: " + err)
             }
             if (result === null) {
                 let data = {
@@ -82,7 +84,35 @@ const validate = (req, res) => {
     });
 }
 
+const allUsers = (req, res) => {
+    MongoClient.connect(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }, function (err, db) {
+        if (err) {
+            res.status(400);
+            res.send("error database connection");
+            console.log("DB error: " + err)
+        }
+        let dbo = db.db(fromDB);
+
+        dbo.collection("users").find({}).toArray((err, result) => {
+            if (err) {
+                res.status(400);
+                res.send("error database connection");
+                console.log("DB error: " + err)
+            }
+
+            res.status(200);
+            res.send(result);
+            db.close();
+
+        })
+    });
+}
+
 module.exports = {
     registration,
-    validate
+    validate,
+    allUsers
 }
