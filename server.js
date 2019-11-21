@@ -55,8 +55,16 @@ app.get("/user/all", async (req, res) => {
     auth.allUsers(req, res);
 })
 
-app.post("/questions", async (req, res) => {
+app.post("/question/set", async (req, res) => {
     questions.setQuestion(req, res);
+})
+
+app.post("/question/get_by_id", async (req, res) => {
+    questions.getById(req, res);
+})
+
+app.get("/question/get_all_private", async (req, res) => {
+    questions.getAll(req, res);
 })
 
 
