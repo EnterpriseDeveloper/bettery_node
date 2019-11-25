@@ -4,6 +4,7 @@ var app = express();
 
 const auth = require("./services/users");
 const questions = require("./services/qestion");
+const hashtags = require("./services/hashtags");
 
 const multer = require('multer');
 const upload = multer();
@@ -65,6 +66,10 @@ app.post("/question/get_by_id", async (req, res) => {
 
 app.get("/question/get_all_private", async (req, res) => {
     questions.getAll(req, res);
+})
+
+app.get("/hashtags/get_all", async (req, res) => {
+    hashtags.getAllHashtags(req, res);
 })
 
 

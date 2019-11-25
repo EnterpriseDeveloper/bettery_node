@@ -26,7 +26,10 @@ const registration = (req, res) => {
                 let data = {
                     nickName: req.body.nickName,
                     email: req.body.email,
-                    wallet: req.body.wallet
+                    wallet: req.body.wallet,
+                    listHostEvents: [],
+                    listParticipantEvents: [],
+                    listValidatorEvents: []
                 }
                 dbo.collection("users").insertOne(data, function (err, response) {
                     if (err) {
