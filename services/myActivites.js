@@ -24,19 +24,19 @@ const getAllActivites = (req, res) => {
                 console.log("DB error: " + err)
             }
             if (result.listHostEvents.length !== 0) {
-                let active = await this.getActivites(result.listHostEvents, dbo, res, "host");
+                let active = await this.getActivites(result.listHostEvents, dbo, res, "Host");
                 active.forEach(element => {
                     activites.push(element)
                 });
             }
             if (result.listParticipantEvents.length !== 0) {
-                let active = await this.getActivites(result.listParticipantEvents, dbo, res, "participant");
+                let active = await this.getActivites(result.listParticipantEvents, dbo, res, "Participant");
                 active.forEach(element => {
                     activites.push(element)
                 });
             }
             if (result.listValidatorEvents.length !== 0) {
-                let active = await this.getActivites(result.listValidatorEvents, dbo, res, "validator");
+                let active = await this.getActivites(result.listValidatorEvents, dbo, res, "Validator");
                 active.forEach(element => {
                     activites.push(element)
                 });
@@ -65,7 +65,7 @@ getActivites = (data, dbo, res, from) => {
             }
 
             for (i in result) {
-                result[i].from = [from];
+                result[i].from = from;
             }
 
             resolve(result)
