@@ -6,6 +6,7 @@ const auth = require("./services/users");
 const questions = require("./services/qestion");
 const hashtags = require("./services/hashtags");
 const myActivites = require("./services/myActivites");
+const answer = require("./services/answers");
 
 const multer = require('multer');
 const upload = multer();
@@ -75,6 +76,10 @@ app.get("/hashtags/get_all", async (req, res) => {
 
 app.post("/my_activites", async (req, res) =>{
     myActivites.getAllActivites(req, res);
+})
+
+app.post("/answer", async (req, res) =>{
+    answer.setAnswer(req, res)
 })
 
 
