@@ -54,7 +54,7 @@ const setMultyAnswer = (dbo, db, req, res) => {
                 console.log("DB error: " + err)
             }
             if (i + 1 === quantity) {
-                setQuantityAnswer(dbo, db, req, res)
+                setQuantityAnswer(dbo, db, req, res, from)
             }
         })
     });
@@ -86,18 +86,19 @@ const setOneAnswer = (dbo, db, req, res) => {
             res.send("error database connection");
             console.log("DB error: " + err)
         }
-        setQuantityAnswer(dbo, db, req, res)
+        setQuantityAnswer(dbo, db, req, res, from)
     })
 }
 
-const setQuantityAnswer = (dbo, db, req, res) => {
+const setQuantityAnswer = (dbo, db, req, res , from) => {
+    var to = from === "parcipiantAnswers" ? "answerQuantity" : "validatorsQuantity";
     let question = {
         id: req.body.event_id
     };
 
     let answer = {
         $set: {
-            answerQuantity: req.body.answerQuantity
+            [to]: req.body[to]
         }
     }
 
