@@ -7,6 +7,7 @@ const questions = require("./services/qestion");
 const hashtags = require("./services/hashtags");
 const myActivites = require("./services/myActivites");
 const answer = require("./services/answers");
+const Contract = require("./contract/contract");
 
 const multer = require('multer');
 const upload = multer();
@@ -89,6 +90,8 @@ var httpServer = http.createServer(app);
 //httpsServer.listen(443);
 
 httpServer.listen(80, async () => {
+    let contract = new Contract.Contract();
+    contract.loadContract();
    console.log("server run port 80")
 });
 
