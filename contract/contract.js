@@ -4,6 +4,7 @@ const {
 const BN = require('bn.js');
 const Web3 = require('web3');
 const Quize = require('./Quize.json');
+const setAnswer = require("../services/event_is_finish");
 
 class Contract {
     async loadContract() {
@@ -50,27 +51,15 @@ class Contract {
             from: this.currentUserAddress
         })
 
-        // this.QuizeInstance.events.NewValueSet({ filter: { _value: 10 } }, (err, event) => {
-        //     if (err) console.error('Error on event', err)
-        //     else {
-        //         if (this.onEvent) {
-        //             this.onEvent(event.returnValues)
-        //         }
-        //     }
-        // })
-
-        // this.QuizeInstance.events.NewValueSetAgain({ filter: { _value: 47 } }, (err, event) => {
-        //     if (err) console.error('Error on event', err)
-        //     else {
-        //         setTimeout(() => alert("Loooomy help me :)"))
-        //         if (this.onEvent) {
-        //             this.onEvent(event.returnValues)
-        //         }
-        //     }
-        // })
-
-        let infoData = await this.QuizeInstance.methods.getQuestion(620133451934880).call();
-        console.log(infoData);
+        this.QuizeInstance.events.eventIsFinish( async (err, event) => {
+            if (err) console.error('Error on event', err)
+            else {
+                let eventId = event.returnValues.question_id;
+                let eventData = await this.QuizeInstance.methods.getQuestion(Number(eventId)).call();
+                // set to Db
+                setAnswer.setCorrectAnswer(eventData, eventId);
+            }
+        })
     }
 
     _getCurrentNetwork() {
