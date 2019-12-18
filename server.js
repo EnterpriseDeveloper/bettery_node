@@ -8,6 +8,7 @@ const hashtags = require("./services/hashtags");
 const myActivites = require("./services/myActivites");
 const answer = require("./services/answers");
 const Contract = require("./contract/contract");
+const deleteEvent = require("./services/deleteEvent");
 
 const multer = require('multer');
 const upload = multer();
@@ -81,6 +82,11 @@ app.post("/my_activites", async (req, res) =>{
 
 app.post("/answer", async (req, res) =>{
     answer.setAnswer(req, res)
+})
+
+
+app.post("/delete_event", async (req, res) =>{
+    deleteEvent.deleteEvent(req, res);
 })
 
 

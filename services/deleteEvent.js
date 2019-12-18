@@ -5,11 +5,12 @@ const keys = require("../key");
 const uri = keys.mongoKey;
 
 
-const setCorrectAnswer = (data, id) => {
+const deleteEvent = (req, res) => {
+
     MongoClient.connect(uri, {
         useNewUrlParser: true,
         useUnifiedTopology: true
-    }, function (err, db) {
+    }, (err, db) => {
         if (err) {
             res.status(400);
             res.send("error database connection");
@@ -17,27 +18,25 @@ const setCorrectAnswer = (data, id) => {
         }
         let dbo = db.db(fromDB);
 
-        let question = {
-            id: Number(id)
+        let event = {
+            id: Number(req.body.id)
         };
 
-        let correctAnswer = {
-            $set: {
-                finalAnswers: Number(data.correctAnswer)
-            }
-        };
-
-        dbo.collection("questions").updateOne(question, correctAnswer, (err, result) => {
-            if (err) {
+        dbo.collection("questions").deleteOne(event, (err, obj) => {
+            if (err){
+                res.status(400);
+                res.send("error database connection");
                 console.log("DB error: " + err)
             }
+
+            res.status(200);
+            res.send({deleted: 'ok'});
             db.close();
         })
     })
-
 }
 
 
 module.exports = {
-    setCorrectAnswer
+    deleteEvent
 }
