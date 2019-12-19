@@ -14,7 +14,8 @@ const addToHost = (data, res, dbo) => {
         $push: {
             listHostEvents: {
                 event: event_id,
-                transactionHash: transactionHash
+                transactionHash: transactionHash,
+                date: Number((new Date().getTime() / 1000).toFixed(0))
             }
         }
     }
@@ -40,7 +41,8 @@ const inviteParcipiant = (data, res, dbo) => {
             $push: {
                 listParticipantEvents: {
                     event: event_id,
-                    transactionHash: transactionHash
+                    transactionHash: transactionHash,
+                    date: Number((new Date().getTime() / 1000).toFixed(0))
                 }
             }
         }
@@ -66,7 +68,8 @@ const inviteValidators = (data, res, dbo) => {
             $push: {
                 listValidatorEvents: {
                     event: event_id,
-                    transactionHash: transactionHash
+                    transactionHash: transactionHash,
+                    date: Number((new Date().getTime() / 1000).toFixed(0))
                 }
             }
         }
