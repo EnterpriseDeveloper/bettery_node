@@ -76,9 +76,19 @@ app.get("/hashtags/get_all", async (req, res) => {
     hashtags.getAllHashtags(req, res);
 })
 
-app.post("/my_activites", async (req, res) =>{
+app.post("/my_activites/invites", async (req, res) =>{
     myActivites.getAllActivites(req, res);
 })
+
+app.post("/my_activites/current", async (req, res) =>{
+    myActivites.getCurrentEvent(req, res);
+})
+
+app.post("/my_activites/past", async (req, res) =>{
+    myActivites.getPastEvent(req, res);
+})
+
+
 
 app.post("/answer", async (req, res) =>{
     answer.setAnswer(req, res)
