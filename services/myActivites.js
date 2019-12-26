@@ -25,7 +25,7 @@ const getAllActivites = async (req, res) => {
 
 const getCurrentEvent = async (req, res) => {
     let result = []
-    let data = await fetchData(req, res);
+    let data = await fetchDataUserinvitations(req, res);
     for (let i = 0; i < data.length; i++) {
         let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
         if (reserchPar !== undefined) {
@@ -44,7 +44,7 @@ const getCurrentEvent = async (req, res) => {
 }
 
 const getPastEvent = async (req, res) => {
-    let data = await fetchData(req, res);
+    let data = await fetchDataUserinvitations(req, res);
     let result = _.filter(data, function (o) { return o.finalAnswers !== null; });
     let finish = _.orderBy(result, ['endTime'], ['asc']);
 
@@ -52,31 +52,6 @@ const getPastEvent = async (req, res) => {
     res.send(finish);
 }
 
-
-fetchData = () => {
-    return new Promise((resolve) => {
-        MongoClient.connect(uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        }, function (err, db) {
-            if (err) {
-                res.status(400);
-                res.send("error database connection");
-                console.log("DB error: " + err)
-            }
-            let dbo = db.db(fromDB);
-            dbo.collection("questions").find({}).toArray((err, result) => {
-                if (err) {
-                    res.status(400);
-                    res.send("error database connection");
-                    console.log("DB error: " + err)
-                }
-                resolve(result);
-                db.close();
-            });
-        });
-    })
-}
 
 fetchDataUserinvitations = (req, res) => {
     return new Promise((resolve) => {
