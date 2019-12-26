@@ -17,7 +17,8 @@ const getAllActivites = async (req, res) => {
             }
         }
     }
-    let finish = _.orderBy(result, ['endTime'], ['asc']);
+    let x = _.filter(result, function(o) { return o.finalAnswers === null ; });
+    let finish = _.orderBy(x, ['endTime'], ['asc']);
 
     res.status(200);
     res.send(finish);
@@ -37,7 +38,9 @@ const getCurrentEvent = async (req, res) => {
             }
         }
     }
-    let finish = _.orderBy(result, ['endTime'], ['asc']);
+
+    let x = _.filter(result, function(o) { return o.finalAnswers === null ; });
+    let finish = _.orderBy(x, ['endTime'], ['asc']);
 
     res.status(200);
     res.send(finish);
