@@ -88,6 +88,10 @@ app.post("/my_activites/past", async (req, res) =>{
     myActivites.getPastEvent(req, res);
 })
 
+app.post("/my_activites/host", async (req, res) =>{
+    myActivites.getHostEvent(req, res);
+})
+
 
 
 app.post("/answer", async (req, res) =>{
