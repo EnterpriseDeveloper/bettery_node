@@ -26,7 +26,7 @@ const getAllActivites = async (req, res) => {
         }
     }
     let x = _.filter(result, function (o) { return o.finalAnswers === null; });
-    let finish = _.orderBy(x, ['endTime'], ['asc']);
+    let finish = _.orderBy(x, ['endTime'], ['desc']);
 
     res.status(200);
     res.send(finish);
@@ -50,7 +50,7 @@ const getCurrentEvent = async (req, res) => {
     }
 
     let x = _.filter(result, function (o) { return o.finalAnswers === null; });
-    let finish = _.orderBy(x, ['endTime'], ['asc']);
+    let finish = _.orderBy(x, ['endTime'], ['desc']);
 
     res.status(200);
     res.send(finish);
@@ -75,7 +75,7 @@ const getPastEvent = async (req, res) => {
     }
 
     let x = _.filter(result, function (o) { return o.finalAnswers !== null; });
-    let finish = _.orderBy(x, ['endTime'], ['asc']);
+    let finish = _.orderBy(x, ['endTime'], ['desc']);
 
     res.status(200);
     res.send(finish);
