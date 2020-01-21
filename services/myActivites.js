@@ -6,7 +6,7 @@ const uri = keys.mongoKey;
 const fromDB = "Quize";
 
 const getHostEvent = async (req, res) => {
-    let data = await fetchDataUserinvitations(req, res);
+    let data = await fetchDataUserinvitations(req, res, true);
     let x = _.filter(data, function (o) { return o.hostWallet === req.body.wallet; });
     res.status(200);
     res.send(x);
@@ -15,7 +15,7 @@ const getHostEvent = async (req, res) => {
 
 const getAllActivites = async (req, res) => {
     let result = []
-    let data = await fetchDataUserinvitations(req, res);
+    let data = await fetchDataUserinvitations(req, res, false);
     for (let i = 0; i < data.length; i++) {
         let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
         if (reserchPar === undefined) {
@@ -108,7 +108,7 @@ fetchData = () => {
 
 
 
-fetchDataUserinvitations = (req, res) => {
+fetchDataUserinvitations = (req, res, from) => {
     return new Promise((resolve) => {
         MongoClient.connect(uri, {
             useNewUrlParser: true,
@@ -128,11 +128,13 @@ fetchDataUserinvitations = (req, res) => {
                     res.send("error database connection");
                     console.log("DB error: " + err)
                 }
-                if (result.listHostEvents.length !== 0) {
-                    let active = await this.getActivites(result.listHostEvents, dbo, res, "Host");
-                    active.forEach(element => {
-                        activites.push(element)
-                    });
+                if (from === true) {
+                    if (result.listHostEvents.length !== 0) {
+                        let active = await this.getActivites(result.listHostEvents, dbo, res, "Host");
+                        active.forEach(element => {
+                            activites.push(element)
+                        });
+                    }
                 }
                 if (result.listParticipantEvents.length !== 0) {
                     let active = await this.getActivites(result.listParticipantEvents, dbo, res, "Participant");

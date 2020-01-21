@@ -84,8 +84,48 @@ const inviteValidators = (data, res, dbo) => {
     });
 }
 
+const deleteInvitation = (req, res) =>{
+    MongoClient.connect(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }, (err, db) => {
+        if (err) {
+            res.status(400);
+            res.send("error database connection");
+            console.log("DB error: " + err)
+        }
+        let dbo = db.db(fromDB);
+
+        let user = { wallet: req.body.wallet };
+        let deleteInvites = {
+            $pull: {
+                [req.body.from]: {
+                    event: Number(req.body.id)
+                }
+            }
+        }
+
+        console.log(user)
+        console.log(deleteInvites)
+
+        dbo.collection("users").updateOne(user, deleteInvites, (err, obj) => {
+            if (err){
+                res.status(400);
+                res.send("error database connection");
+                console.log("DB error: " + err)
+            }
+
+            res.status(200);
+            res.send({deleted: 'ok'});
+            db.close();
+        })
+    })
+
+}
+
 module.exports = {
     addToHost,
     inviteParcipiant,
-    inviteValidators
+    inviteValidators,
+    deleteInvitation
 }

@@ -9,6 +9,7 @@ const myActivites = require("./services/myActivites");
 const answer = require("./services/answers");
 const Contract = require("./contract/contract");
 const deleteEvent = require("./services/deleteEvent");
+const invites = require("./services/invites")
 
 const multer = require('multer');
 const upload = multer();
@@ -90,6 +91,10 @@ app.post("/my_activites/past", async (req, res) =>{
 
 app.post("/my_activites/host", async (req, res) =>{
     myActivites.getHostEvent(req, res);
+})
+
+app.post("/invites/delete", async (req, res) =>{
+    invites.deleteInvitation(req, res);
 })
 
 
