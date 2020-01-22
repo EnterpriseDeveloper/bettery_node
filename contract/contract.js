@@ -52,7 +52,7 @@ class Contract {
             from: this.currentUserAddress
         })
 
-        this.QuizeInstance.events.eventIsFinish( async (err, event) => {
+        this.QuizeInstance.events.eventIsFinish(async (err, event) => {
             if (err) console.error('Error on event', err)
             else {
                 let eventId = event.returnValues.question_id;
@@ -60,7 +60,10 @@ class Contract {
                 console.log(eventData)
                 // set to Db
                 setAnswer.setCorrectAnswer(eventData, eventId);
-                history.setReceiveHistory(eventData, eventId);
+                
+                setTimeout(() => {
+                    history.setReceiveHistory(eventData, eventId);
+                }, 1000)
 
             }
         })
