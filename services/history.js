@@ -65,7 +65,7 @@ const setReceiveHistory = (contractData, eventId) => {
             }
 
             if (result !== null) {
-                // host hostory
+                // host history
                 setHistortToUser(result.hostWallet, contractData.persentFeeHost, eventId, dbo, "host")
 
                 // participant history
@@ -79,8 +79,9 @@ const setReceiveHistory = (contractData, eventId) => {
                 findValidator.forEach((x) => {
                     setHistortToUser(x.wallet, contractData.monayForParticipant, eventId, dbo, "validator")
                 })
-            }else{
-                console.log("event not found")            }
+            } else {
+                console.log("event not found")
+            }
 
             db.close();
         })
@@ -90,6 +91,7 @@ const setReceiveHistory = (contractData, eventId) => {
 
 function setHistortToUser(userWallet, amount, eventId, dbo, role) {
 
+    let web3 = new Web3();
     let money = web3.utils.fromWei(String(amount), 'ether')
     let user = {
         wallet: userWallet
