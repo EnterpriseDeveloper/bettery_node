@@ -56,6 +56,7 @@ class Contract {
             else {
                 let eventId = event.returnValues.question_id;
                 let eventData = await this.QuizeInstance.methods.getQuestion(Number(eventId)).call();
+                console.log(eventData)
                 // set to Db
                 setAnswer.setCorrectAnswer(eventData, eventId);
             }

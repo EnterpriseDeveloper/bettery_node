@@ -1,5 +1,6 @@
 const MongoClient = require('mongodb').MongoClient;
 const keys = require("../key");
+const history = require("./history");
 
 const uri = keys.mongoKey;
 const fromDB = "Quize";
@@ -86,11 +87,22 @@ const setOneAnswer = (dbo, db, req, res) => {
             res.send("error database connection");
             console.log("DB error: " + err)
         }
-        setQuantityAnswer(dbo, db, req, res, from)
+        dbo.collection("questions").findOne({ "id": req.body.event_id }, (err, result) => {
+            if (err) {
+                res.status(400);
+                res.send("error database connection");
+                console.log("DB error: " + err)
+            }
+            setQuantityAnswer(dbo, db, req, res, from)
+
+            if(result.length !== 0){
+                history.setHistory(req.body.wallet, result.money, "send", req.body.event_id)
+            }
+        })
     })
 }
 
-const setQuantityAnswer = (dbo, db, req, res , from) => {
+const setQuantityAnswer = (dbo, db, req, res, from) => {
     var to = from === "parcipiantAnswers" ? "answerQuantity" : "validatorsQuantity";
     let question = {
         id: req.body.event_id
