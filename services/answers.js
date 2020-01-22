@@ -96,7 +96,9 @@ const setOneAnswer = (dbo, db, req, res) => {
             setQuantityAnswer(dbo, db, req, res, from)
 
             if(result.length !== 0){
-                history.setHistory(req.body.wallet, result.money, "send", req.body.event_id)
+                if(req.body.from === "participant"){
+                    history.setHistory(req.body.wallet, result.money, "send", req.body.event_id)
+                }
             }
         })
     })
