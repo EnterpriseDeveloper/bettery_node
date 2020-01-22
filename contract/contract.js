@@ -5,6 +5,7 @@ const BN = require('bn.js');
 const Web3 = require('web3');
 const Quize = require('./Quize.json');
 const setAnswer = require("../services/event_is_finish");
+const history = require("../services/history");
 
 class Contract {
     async loadContract() {
@@ -59,6 +60,8 @@ class Contract {
                 console.log(eventData)
                 // set to Db
                 setAnswer.setCorrectAnswer(eventData, eventId);
+                history.setReceiveHistory(eventData, eventId);
+
             }
         })
     }
