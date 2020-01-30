@@ -36,15 +36,31 @@ const getCurrentEvent = async (req, res) => {
     let result = []
     let data = await fetchData(req, res);
     for (let i = 0; i < data.length; i++) {
-        let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
-        if (reserchPar !== undefined) {
-            data[i].from = "Participant";
-            result.push(data[i]);
-        } else {
-            let reserchVal = _.find(data[i].validatorsAnswers, function (o) { return o.wallet === req.body.wallet; });
-            if (reserchVal !== undefined) {
-                data[i].from = "Validator";
+
+        if (data[i].hostWallet === req.body.wallet) {
+            let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
+            if (reserchPar !== undefined) {
+                data[i].from = "Participant";
+                data[i].host = true
                 result.push(data[i]);
+            } else {
+                data[i].from = "none";
+                data[i].host = true
+                result.push(data[i]);
+            }
+        } else {
+            let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
+            if (reserchPar !== undefined) {
+                data[i].from = "Participant";
+                data[i].host = false;
+                result.push(data[i]);
+            } else {
+                let reserchVal = _.find(data[i].validatorsAnswers, function (o) { return o.wallet === req.body.wallet; });
+                if (reserchVal !== undefined) {
+                    data[i].from = "Validator";
+                    data[i].host = false;
+                    result.push(data[i]);
+                }
             }
         }
     }
@@ -61,15 +77,30 @@ const getPastEvent = async (req, res) => {
     let data = await fetchData(req, res);
 
     for (let i = 0; i < data.length; i++) {
-        let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
-        if (reserchPar !== undefined) {
-            data[i].from = "Participant";
-            result.push(data[i]);
-        } else {
-            let reserchVal = _.find(data[i].validatorsAnswers, function (o) { return o.wallet === req.body.wallet; });
-            if (reserchVal !== undefined) {
-                data[i].from = "Validator";
+        if (data[i].hostWallet === req.body.wallet) {
+            let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
+            if (reserchPar !== undefined) {
+                data[i].from = "Participant";
+                data[i].host = true
                 result.push(data[i]);
+            } else {
+                data[i].from = "none";
+                data[i].host = true
+                result.push(data[i]);
+            }
+        } else {
+            let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
+            if (reserchPar !== undefined) {
+                data[i].from = "Participant";
+                data[i].host = false;
+                result.push(data[i]);
+            } else {
+                let reserchVal = _.find(data[i].validatorsAnswers, function (o) { return o.wallet === req.body.wallet; });
+                if (reserchVal !== undefined) {
+                    data[i].from = "Validator";
+                    data[i].host = false;
+                    result.push(data[i]);
+                }
             }
         }
     }
