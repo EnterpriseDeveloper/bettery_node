@@ -63,7 +63,7 @@ class Contract {
                 
                 setTimeout(() => {
                     history.setReceiveHistory(eventData, eventId);
-                }, 1000)
+                }, 3000)
 
             }
         })
