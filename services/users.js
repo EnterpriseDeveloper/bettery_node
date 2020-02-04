@@ -29,7 +29,8 @@ const registration = (req, res) => {
                     wallet: req.body.wallet,
                     listHostEvents: [],
                     listParticipantEvents: [],
-                    listValidatorEvents: []
+                    listValidatorEvents: [],
+                    avatar: req.body.avatar
                 }
                 dbo.collection("users").insertOne(data, function (err, response) {
                     if (err) {
