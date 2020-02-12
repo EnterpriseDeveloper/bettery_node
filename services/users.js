@@ -24,7 +24,7 @@ const registration = (req, res) => {
                 res.status(200).end();
             }).catch((err) => {
                 res.status(400);
-                res.send("error to send new user to DB");
+                res.send(err.response.data.message);
             })
 
         } else {
@@ -32,10 +32,9 @@ const registration = (req, res) => {
             res.send("user already exist");
         }
 
-    }).catch((error) => {
-        console.log("findNickName error:" + error);
+    }).catch((err) => {
         res.status(400);
-        res.send(error);
+        res.send(err.response.data.message);
     })
 }
 
@@ -70,10 +69,9 @@ const validate = (req, res) => {
                 res.status(200);
                 res.send(data);
             }
-        }).catch((error) => {
-            console.log(error);
+        }).catch((err) => {
             res.status(400);
-            res.send(error);
+            res.send(err.response.data.message);
         })
     } else {
         res.status(400);
@@ -92,10 +90,9 @@ const allUsers = (req, res) => {
         console.log(x.data);
         res.status(200);
         res.send(x.data);
-    }).catch((error) => {
-        console.log(error);
+    }).catch((err) => {
         res.status(400);
-        res.send(error);
+        res.send(err);
     })
 }
 
