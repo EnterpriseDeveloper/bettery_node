@@ -1,0 +1,386 @@
+[
+    {
+        "_id": "_collection",
+        "name": "users"
+    },
+    {
+        "_id": "_collection",
+        "name": "invites"
+    },
+    {
+        "_id": "_collection",
+        "name": "activites"
+    },
+    {
+        "_id": "_collection",
+        "name": "historyTransactions"
+    },
+    {
+        "_id": "_collection",
+        "name": "events"
+    },
+    {
+        "_id": "_collection",
+        "name": "answers"
+    },
+    {
+        "_id": "_collection",
+        "name": "comments"
+    },
+    {
+        "_id": "_collection",
+        "name": "hashtags"
+    },
+    {
+        "_id": "_collection",
+        "name": "refunds"
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/nickName",
+        "type": "string",
+        "unique": true
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/email",
+        "type": "string",
+        "unique": true
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/wallet",
+        "type": "string",
+        "unique": true
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/avatar",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/invites",
+        "type": "ref",
+        "multi": true,
+        "restrictCollection": "invites"
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/activites",
+        "type": "ref",
+        "multi": true,
+        "restrictCollection": "activites"
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/historyTransactions",
+        "type": "ref",
+        "multi": true,
+        "restrictCollection": "historyTransactions"
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/friends",
+        "type": "ref",
+        "multi": true,
+        "restrictCollection": "users"
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/hostEvents",
+        "type": "ref",
+        "multi": true,
+        "restrictCollection": "events"
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/publicAccount",
+        "type": "boolean"
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/publicEmail",
+        "type": "boolean"
+    },
+    {
+        "_id": "_predicate",
+        "name": "users/publicWallet",
+        "type": "boolean"
+    },
+    {
+        "_id": "_predicate",
+        "name": "invites/eventId",
+        "type": "ref",
+        "restrictCollection": "events"
+    },
+    {
+        "_id": "_predicate",
+        "name": "invites/transactionHash",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "invites/date",
+        "type": "instant"
+    },
+    {
+        "_id": "_predicate",
+        "name": "invites/from",
+        "type": "ref",
+        "restrictCollection": "users"
+    },
+    {
+        "_id": "_predicate",
+        "name": "invites/role",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "invites/status",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "activites/eventId",
+        "type": "ref",
+        "restrictCollection": "events"
+    },
+    {
+        "_id": "_predicate",
+        "name": "activites/transactionHash",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "activites/date",
+        "type": "instant"
+    },
+    {
+        "_id": "_predicate",
+        "name": "activites/role",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "activites/answer",
+        "type": "int"
+    },
+    {
+        "_id": "_predicate",
+        "name": "activites/from",
+        "type": "ref",
+        "restrictCollection": "users"
+    },
+    {
+        "_id": "_predicate",
+        "name": "historyTransactions/date",
+        "type": "instant"
+    },
+    {
+        "_id": "_predicate",
+        "name": "historyTransactions/paymentWay",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "historyTransactions/amount",
+        "type": "int"
+    },
+    {
+        "_id": "_predicate",
+        "name": "historyTransactions/role",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "historyTransactions/eventId",
+        "type": "ref",
+        "restrictCollection": "events"
+    },
+    {
+        "_id": "_predicate",
+        "name": "comments/comments",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "comments/eventId",
+        "type": "ref",
+        "restrictCollection": "events"
+    },
+    {
+        "_id": "_predicate",
+        "name": "comments/from",
+        "type": "ref",
+        "restrictCollection": "users"
+    },
+    {
+        "_id": "_predicate",
+        "name": "comments/replyTo",
+        "type": "ref",
+        "restrictCollection": "users"
+    },
+    {
+        "_id": "_predicate",
+        "name": "answers/answers",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "answers/eventId",
+        "type": "ref",
+        "restrictCollection": "events"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/status",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/host",
+        "type": "ref",
+        "restrictCollection": "users"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/question",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/answers",
+        "type": "ref",
+        "multi": true,
+        "restrictCollection": "answers"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/startTime",
+        "type": "instant"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/endTime",
+        "type": "instant"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/private",
+        "type": "boolean"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/invites",
+        "type": "ref",
+        "multi": true,
+        "restrictCollection": "invites"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/answerAmount",
+        "type": "int"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/validatorsAmount",
+        "type": "int"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/validated",
+        "type": "int"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/money",
+        "type": "int"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/finalAnswer",
+        "type": "ref",
+        "restrictCollection": "answers"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/finalAnswerNumber",
+        "type": "int"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/transactionHash",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/showDistribution",
+        "type": "boolean"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/parcipiantsAnswer",
+        "type": "ref",
+        "multi": true,
+        "restrictCollection": "activites"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/validatorsAnswer",
+        "type": "ref",
+        "multi": true,
+        "restrictCollection": "activites"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/hashtags",
+        "type": "string",
+        "multi": true
+    },
+
+    {
+        "_id": "_predicate",
+        "name": "events/lastValidator",
+        "type": "instant"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/refundAbility",
+        "type": "boolean"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/refund",
+        "type": "ref",
+        "restrictCollection": "refunds"
+    },
+    {
+        "_id": "_predicate",
+        "name": "hashtags/hashtags",
+        "type": "string",
+        "multi": true
+    },
+    {
+        "_id": "_predicate",
+        "name": "refunds/eventId",
+        "type": "ref",
+        "restrictCollection": "events"
+    },
+    {
+        "_id": "_predicate",
+        "name": "refunds/from",
+        "type": "ref",
+        "restrictCollection": "users"
+    },
+    {
+        "_id": "_predicate",
+        "name": "refunds/reason",
+        "type": "string"
+    },
+    {
+        "_id": "_predicate",
+        "name": "refunds/date",
+        "type": "instant"
+    }
+]
