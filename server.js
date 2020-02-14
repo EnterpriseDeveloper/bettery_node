@@ -65,6 +65,10 @@ app.post("/question/set", async (req, res) => {
     questions.setQuestion(req, res);
 })
 
+app.get("/question/createId", async (req, res) => {
+    questions.createId(req, res);
+})
+
 app.post("/question/get_by_id", async (req, res) => {
     questions.getById(req, res);
 })

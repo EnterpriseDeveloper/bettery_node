@@ -21,10 +21,6 @@
     },
     {
         "_id": "_collection",
-        "name": "answers"
-    },
-    {
-        "_id": "_collection",
         "name": "comments"
     },
     {
@@ -223,17 +219,6 @@
     },
     {
         "_id": "_predicate",
-        "name": "answers/answers",
-        "type": "string"
-    },
-    {
-        "_id": "_predicate",
-        "name": "answers/eventId",
-        "type": "ref",
-        "restrictCollection": "events"
-    },
-    {
-        "_id": "_predicate",
         "name": "events/status",
         "type": "string"
     },
@@ -251,9 +236,8 @@
     {
         "_id": "_predicate",
         "name": "events/answers",
-        "type": "ref",
-        "multi": true,
-        "restrictCollection": "answers"
+        "type": "string",
+        "multi": true
     },
     {
         "_id": "_predicate",
@@ -295,13 +279,12 @@
     {
         "_id": "_predicate",
         "name": "events/money",
-        "type": "int"
+        "type": "float"
     },
     {
         "_id": "_predicate",
         "name": "events/finalAnswer",
-        "type": "ref",
-        "restrictCollection": "answers"
+        "type": "string"
     },
     {
         "_id": "_predicate",
@@ -354,6 +337,11 @@
         "name": "events/refund",
         "type": "ref",
         "restrictCollection": "refunds"
+    },
+    {
+        "_id": "_predicate",
+        "name": "events/multiChoise",
+        "type": "boolean"
     },
     {
         "_id": "_predicate",

@@ -21,7 +21,8 @@ const registration = (req, res) => {
             }]
 
             axios.post(path.path + "/transact", data).then((x) => {
-                res.status(200).end();
+                res.status(200);
+                res.send({ "_id": x.data.tempids['users$newUser'] })
             }).catch((err) => {
                 res.status(400);
                 res.send(err.response.data.message);
@@ -86,13 +87,21 @@ const allUsers = (req, res) => {
         "from": "users"
     }
 
-    axios.post(path.path + "/query", conf).then((x) => {
-        console.log(x.data);
+    axios.post(path.path + "/query", conf).then((o) => {
+        let result = o.data.map((x) => {
+            return {
+                _id: x["_id"],
+                wallet: x["users/wallet"],
+                nickName: x["users/nickName"],
+                avatar: x["users/avatar"],
+                email: x["users/email"]
+            }
+        })
         res.status(200);
-        res.send(x.data);
+        res.send(result);
     }).catch((err) => {
         res.status(400);
-        res.send(err);
+        res.send(err.response.data.message);
     })
 }
 
