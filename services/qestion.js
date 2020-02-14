@@ -1,13 +1,6 @@
-const MongoClient = require('mongodb').MongoClient;
-const keys = require("../key");
-const hashtags = require("./hashtags");
-const invites = require('./invites');
-
-const uri = keys.mongoKey;
-const fromDB = "Quize";
-
 const axios = require("axios");
 const path = require("../config/path");
+const invites = require("./invites");
 
 const createId = (req, res) => {
     let data = {
@@ -26,28 +19,72 @@ const createId = (req, res) => {
 
 const setQuestion = (req, res) => {
     let allData = req.body
+    delete allData['finalAnswers'];
+    allData.invites = []
+    let data = []
 
     // ADD HASHtags
     // ADD to user HOST
-    // ADD Invites
 
     if (allData.parcipiant.length !== 0) {
-        let parc = allData.parcipiant
+        // create obj for Parcipiant
+        let parc = invites.inviteUsers(allData.parcipiant, allData, "Parcipiant")
+
+        parc.forEach((x) => {
+            data.push(x)
+        })
+
+        // add to users table
+        allData.parcipiant.forEach((x, i) => {
+            data.push({
+                _id: x,
+                invites: ["invites$par" + i]
+            })
+        })
+
+        // add to event table
+        parc.forEach((x) => {
+            allData.invites.push(x._id)
+        })
+
+        delete allData['parcipiant'];
+
+    } else {
+        delete allData['parcipiant'];
     }
 
     if (allData.validators.length !== 0) {
-        let valid = allData.validators
+        // create obj for Validate
+        let valid = invites.inviteUsers(allData.validators, allData, "Validate")
 
+        valid.forEach((x) => {
+            data.push(x)
+        })
+
+        // add to users table
+        allData.validators.forEach((x, i) => {
+            data.push({
+                _id: x,
+                invites: ["invites$valid" + i]
+            })
+        })
+
+        // add to event table
+        valid.forEach((x) => {
+            allData.invites.push(x._id)
+        })
+
+        delete allData['validators'];
+
+    } else {
+        delete data['validators'];
     }
 
-    let data = allData
-    delete data['finalAnswers'];
-    delete data['parcipiant'];
-    delete data['validators'];
+    data.push(allData)
 
     console.log(data);
 
-    axios.post(path.path + "/transact", [data]).then((x) => {
+    axios.post(path.path + "/transact", data).then((x) => {
 
         console.log(x)
         res.status(200).send();
@@ -66,16 +103,6 @@ const setQuestion = (req, res) => {
     //      hashtags.updateHashtags(req.body.hashtags, res, dbo)
     //  }
 
-    // invite parcipiant
-    //  if (req.body.parcipiant.length !== 0) {
-    //      invites.inviteParcipiant(req.body, res, dbo)
-    //  }
-
-    // invite validators
-    //  if (req.body.validators.length !== 0) {
-    //      invites.inviteValidators(req.body, res, dbo)
-    //  }
-
 }
 
 const getById = (req, res) => {
@@ -88,8 +115,8 @@ const getById = (req, res) => {
 
     axios.post(path.path + "/query", conf).then((x) => {
         let obj = eventStructure([x.data])
-         res.status(200)
-         res.send(obj[0])
+        res.status(200)
+        res.send(obj[0])
     }).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
@@ -117,7 +144,7 @@ const getAll = (req, res) => {
 }
 
 function eventStructure(data) {
-   return data.map((z) => {
+    return data.map((z) => {
         return {
             answerAmount: z['events/answerAmount'],
             startTime: z['events/startTime'],
