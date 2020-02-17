@@ -37,11 +37,42 @@ const getAllActivites = async (req, res) => {
                     "from": invites
                 }
 
-                axios.post(path.path + "/query", allInvites).then((x) => {
+                axios.post(path.path + "/query", allInvites).then((allInv) => {
+                    console.log(allInv)
+                    let invitesQuery = allInv.data.map((inv) => {
+                        return {
+                            id: inv._id,
+                            event: {
+                                answerAmount: inv['invites/eventId']['events/answerAmount'],
+                                startTime: inv['invites/eventId']['events/startTime'],
+                                id: inv['invites/eventId']._id,
+                                host: inv['invites/eventId']['events/host'],
+                                validated: inv['invites/eventId']['events/validated'],
+                                status: inv['invites/eventId']['events/status'],
+                                answers: Object.assign([], inv['invites/eventId']['events/answers']).reverse(),
+                                money: inv['invites/eventId']['events/money'],
+                                finalAnswer: inv['invites/eventId']['events/finalAnswer'] === '' ? null : inv['invites/eventId']['events/finalAnswer'],
+                                validatorsAmount: inv['invites/eventId']['events/validatorsAmount'],
+                                endTime: inv['invites/eventId']['events/endTime'],
+                                transactionHash: inv['invites/eventId']['events/transactionHash'],
+                                showDistribution: inv['invites/eventId']['events/showDistribution'],
+                                question: inv['invites/eventId']['events/question'],
+                                private: inv['invites/eventId']['events/private'] === undefined ? false : inv['invites/eventId']['events/private'],
+                                multiChoise: inv['invites/eventId']['events/multiChoise'] === undefined ? false : inv['invites/eventId']['events/multiChoise']
+                            },
+
+                            transactionHash: inv['invites/transactionHash'],
+                            date: inv['invites/date'],
+                            from: inv['invites/from'],
+                            role: inv['invites/role'],
+                            status: inv['invites/status']
+                        }
+                    })
                     res.status(200);
-                    res.send(x.data);
+                    res.send(invitesQuery);
 
                 }).catch((err) => {
+                    console.log(err)
                     res.status(400);
                     res.send(err.response.data.message);
                 })

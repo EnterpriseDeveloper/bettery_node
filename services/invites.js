@@ -11,7 +11,7 @@ const path = require("../config/path")
 const inviteUsers = (data, allData, role ) => {
     return data.map((x, i) => {
         return {
-            _id: role === "Parcipiant" ? "invites$par" + i : "invites$valid" + i,
+            _id: role === "Participant" ? "invites$par" + i : "invites$valid" + i,
             status: "invited",
             role: role,
             from: allData.host,

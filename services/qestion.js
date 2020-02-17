@@ -27,7 +27,7 @@ const setQuestion = (req, res) => {
 
     if (allData.parcipiant.length !== 0) {
         // create obj for Parcipiant
-        let parc = invites.inviteUsers(allData.parcipiant, allData, "Parcipiant")
+        let parc = invites.inviteUsers(allData.parcipiant, allData, "Participant")
 
         parc.forEach((x) => {
             data.push(x)
