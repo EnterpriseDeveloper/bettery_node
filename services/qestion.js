@@ -114,7 +114,11 @@ const getById = (req, res) => {
     let id = Number(req.body.id);
 
     let conf = {
-        "select": ["*"],
+        "select": ["*",
+            { 'events/host': ["users/wallet"] },
+            { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
+            { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }
+        ],
         "from": id
     }
 
