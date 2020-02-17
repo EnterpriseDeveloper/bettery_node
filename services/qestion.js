@@ -134,7 +134,11 @@ const getAll = (req, res) => {
     // get all but only public /////////////////////////////////
 
     let conf = {
-        "select": ["*"],
+        "select": ["*",
+            { 'events/host': ["users/wallet"] },
+            { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
+            { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }
+        ],
         "from": "events"
     }
 
@@ -155,8 +159,7 @@ function eventStructure(data) {
             answerAmount: z['events/answerAmount'],
             startTime: z['events/startTime'],
             id: z._id,
-            // Host is object, maybe need rebuid structure
-            host: z['events/host'],
+            host: z['events/host']['users/wallet'],
             validated: z['events/validated'],
             status: z['events/status'],
             answers: Object.assign([], z['events/answers']).reverse(),
@@ -168,7 +171,23 @@ function eventStructure(data) {
             showDistribution: z['events/showDistribution'],
             question: z['events/question'],
             private: z['events/private'] === undefined ? false : z['events/private'],
-            multiChoise: z['events/multiChoise'] === undefined ? false : z['events/multiChoise']
+            multiChoise: z['events/multiChoise'] === undefined ? false : z['events/multiChoise'],
+            parcipiantAnswers: z["events/parcipiantsAnswer"] === undefined ? undefined : z["events/parcipiantsAnswer"].map((par) => {
+                return {
+                    transactionHash: par['activites/transactionHash'],
+                    date: par['activites/date'],
+                    answer: par['activites/answer'],
+                    wallet: par['activites/from']['users/wallet']
+                }
+            }),
+            validatorsAnswers: z["events/validatorsAnswer"] === undefined ? undefined : z["events/validatorsAnswer"].map((val) => {
+                return {
+                    transactionHash: val['activites/transactionHash'],
+                    date: val['activites/date'],
+                    answer: val['activites/answer'],
+                    wallet: val['activites/from']['users/wallet']
+                }
+            }),
         }
     })
 }

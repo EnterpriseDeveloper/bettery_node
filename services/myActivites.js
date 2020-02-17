@@ -33,12 +33,14 @@ const getAllActivites = async (req, res) => {
                 })
 
                 let allInvites = {
-                    "select": ["*", { 'invites/eventId': ["*"] }, { 'invites/from': ["users/nickName"] }],
+                    "select": ["*",
+                        { 'invites/eventId': ["*", { "events/host": ["users/wallet"] }] },
+                        { 'invites/from': ["users/nickName"] }
+                    ],
                     "from": invites
                 }
 
                 axios.post(path.path + "/query", allInvites).then((allInv) => {
-                    console.log(allInv)
                     let invitesQuery = allInv.data.map((inv) => {
                         return {
                             id: inv._id,
@@ -46,7 +48,7 @@ const getAllActivites = async (req, res) => {
                                 answerAmount: inv['invites/eventId']['events/answerAmount'],
                                 startTime: inv['invites/eventId']['events/startTime'],
                                 id: inv['invites/eventId']._id,
-                                host: inv['invites/eventId']['events/host'],
+                                host: inv['invites/eventId']['events/host']["users/wallet"],
                                 validated: inv['invites/eventId']['events/validated'],
                                 status: inv['invites/eventId']['events/status'],
                                 answers: Object.assign([], inv['invites/eventId']['events/answers']).reverse(),
