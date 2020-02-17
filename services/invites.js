@@ -1,14 +1,8 @@
-const MongoClient = require('mongodb').MongoClient;
-const keys = require("../key");
-
-const uri = keys.mongoKey;
-const fromDB = "Quize";
-
 const axios = require("axios");
 const path = require("../config/path")
 
 
-const inviteUsers = (data, allData, role ) => {
+const inviteUsers = (data, allData, role) => {
     return data.map((x, i) => {
         return {
             _id: role === "Participant" ? "invites$par" + i : "invites$valid" + i,
@@ -23,43 +17,21 @@ const inviteUsers = (data, allData, role ) => {
 
 }
 
-const deleteInvitation = (req, res) =>{
-    MongoClient.connect(uri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    }, (err, db) => {
-        if (err) {
-            res.status(400);
-            res.send("error database connection");
-            console.log("DB error: " + err)
-        }
-        let dbo = db.db(fromDB);
+const deleteInvitation = (req, res) => {
 
-        let user = { wallet: req.body.wallet };
-        let deleteInvites = {
-            $pull: {
-                [req.body.from]: {
-                    event: Number(req.body.id)
-                }
-            }
-        }
+    let conf = [{
+        "_id": req.body.id,
+        "_action": "delete"
+    }]
 
-        console.log(user)
-        console.log(deleteInvites)
-
-        dbo.collection("users").updateOne(user, deleteInvites, (err, obj) => {
-            if (err){
-                res.status(400);
-                res.send("error database connection");
-                console.log("DB error: " + err)
-            }
-
-            res.status(200);
-            res.send({deleted: 'ok'});
-            db.close();
-        })
+    axios.post(path.path + "/transact", conf).then(() => {
+        res.status(200);
+        res.send({ deleted: 'ok' });
+    }).catch((err) => {
+        console.log("DB error: " + err.response.data.message)
+        res.status(400);
+        res.send(err.response.data.message);
     })
-
 }
 
 module.exports = {
