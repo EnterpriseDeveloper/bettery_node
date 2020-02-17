@@ -39,10 +39,23 @@ const setOneAnswer = (req, res) => {
     }
     setAnswer.push(event)
 
-   // add to users table
+    // add history transaction
+    let history = {
+        _id: "historyTransactions$newHistory",
+        eventId: eventId,
+        role: req.body.from,
+        amount: req.body.money,
+        paymentWay: "send",
+        date: Math.floor(Date.now() / 1000)
+    }
+
+    setAnswer.push(history)
+
+    // add to users table
     let user = {
         _id: from,
-        activites: ["activites$act1"]
+        activites: ["activites$act1"],
+        historyTransactions: ["historyTransactions$newHistory"]
     }
     setAnswer.push(user)
 
