@@ -7,31 +7,6 @@ const fromDB = "Quize";
 const axios = require("axios");
 const path = require("../config/path")
 
-const addToHost = (data, res, dbo) => {
-    let hostWallet = data.hostWallet
-    let event_id = data.id
-    let transactionHash = data.transactionHash
-
-    let user = { wallet: hostWallet };
-    let newInvites = {
-        $push: {
-            listHostEvents: {
-                event: event_id,
-                transactionHash: transactionHash,
-                date: Number((new Date().getTime() / 1000).toFixed(0))
-            }
-        }
-    }
-
-    dbo.collection("users").updateOne(user, newInvites, (err, result) => {
-        if (err) {
-            res.status(400);
-            res.send("error database connection");
-            console.log("DB error: " + err)
-        }
-    })
-}
-
 
 const inviteUsers = (data, allData, role ) => {
     return data.map((x, i) => {
@@ -88,7 +63,6 @@ const deleteInvitation = (req, res) =>{
 }
 
 module.exports = {
-    addToHost,
     inviteUsers,
     deleteInvitation
 }

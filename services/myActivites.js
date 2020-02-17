@@ -5,6 +5,9 @@ const _ = require("lodash");
 const uri = keys.mongoKey;
 const fromDB = "Quize";
 
+const axios = require("axios");
+const path = require("../config/path");
+
 const getHostEvent = async (req, res) => {
     let data = await fetchDataUserinvitations(req, res, true);
     let x = _.filter(data, function (o) { return o.hostWallet === req.body.wallet; });
@@ -14,22 +17,47 @@ const getHostEvent = async (req, res) => {
 }
 
 const getAllActivites = async (req, res) => {
-    let result = []
-    let data = await fetchDataUserinvitations(req, res, false);
-    for (let i = 0; i < data.length; i++) {
-        let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
-        if (reserchPar === undefined) {
-            let reserchVal = _.find(data[i].validatorsAnswers, function (o) { return o.wallet === req.body.wallet; });
-            if (reserchVal === undefined) {
-                result.push(data[i]);
-            }
-        }
-    }
-    let x = _.filter(result, function (o) { return o.finalAnswers === null; });
-    let finish = _.orderBy(x, ['endTime'], ['desc']);
+    let wallet = req.body.wallet
 
-    res.status(200);
-    res.send(finish);
+    let conf = {
+        "select": ["*"],
+        "from": ["users/wallet", wallet]
+    }
+
+    axios.post(path.path + "/query", conf).then((x) => {
+        let inviteData = x.data['users/invites']
+        if (inviteData !== undefined) {
+            if (inviteData.length !== 0) {
+                let invites = inviteData.map((x) => {
+                    return x._id
+                })
+
+                let allInvites = {
+                    "select": ["*", { 'invites/eventId': ["*"] }, { 'invites/from': ["users/nickName"] }],
+                    "from": invites
+                }
+
+                axios.post(path.path + "/query", allInvites).then((x) => {
+                    res.status(200);
+                    res.send(x.data);
+
+                }).catch((err) => {
+                    res.status(400);
+                    res.send(err.response.data.message);
+                })
+
+            } else {
+                res.status(200);
+                res.send([]);
+            }
+        } else {
+            res.status(200);
+            res.send([]);
+        }
+    }).catch((err) => {
+        res.status(400);
+        res.send(err.response.data.message);
+    })
 }
 
 const getCurrentEvent = async (req, res) => {

@@ -4,6 +4,9 @@ const keys = require("../key");
 
 const uri = keys.mongoKey;
 
+const axios = require("axios");
+const path = require("../config/path");
+
 
 const deleteEvent = (req, res) => {
 

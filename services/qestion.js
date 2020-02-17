@@ -23,8 +23,7 @@ const setQuestion = (req, res) => {
     allData.invites = []
     let data = []
 
-    // ADD HASHtags
-    // ADD to user HOST
+    // ADD HASHtags ////////////////////////////////
 
     if (allData.parcipiant.length !== 0) {
         // create obj for Parcipiant
@@ -77,26 +76,32 @@ const setQuestion = (req, res) => {
         delete allData['validators'];
 
     } else {
-        delete data['validators'];
+        delete allData['validators'];
     }
 
     data.push(allData)
 
-    console.log(data);
-
     axios.post(path.path + "/transact", data).then((x) => {
 
-        console.log(x)
-        res.status(200).send();
+        // ADD to host
+        let hostData = [{
+            _id: allData.host,
+            hostEvents: [allData._id]
+        }]
+
+        axios.post(path.path + "/transact", hostData).then(() => {
+            res.status(200).send();
+        }).catch((err) => {
+            console.log("DB error: " + err.response.data.message)
+            res.status(400);
+            res.send(err.response.data.message);
+        })
+
     }).catch((err) => {
         console.log("DB error: " + err.response.data.message)
         res.status(400);
         res.send(err.response.data.message);
     })
-
-
-
-    //   invites.addToHost(req.body, res, dbo)
 
     // add new hashtags
     //  if (req.body.hashtags.length !== 0) {
@@ -126,6 +131,7 @@ const getById = (req, res) => {
 }
 
 const getAll = (req, res) => {
+    // get all but only public /////////////////////////////////
 
     let conf = {
         "select": ["*"],
@@ -134,6 +140,7 @@ const getAll = (req, res) => {
 
     axios.post(path.path + "/query", conf).then((x) => {
         let obj = eventStructure(x.data)
+        console.log(obj)
         res.status(200)
         res.send(obj)
     }).catch((err) => {
