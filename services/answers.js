@@ -1,132 +1,61 @@
-const MongoClient = require('mongodb').MongoClient;
-const keys = require("../key");
-const history = require("./history");
-
-const uri = keys.mongoKey;
-const fromDB = "Quize";
+const axios = require("axios");
+const path = require("../config/path");
 
 const setAnswer = (req, res) => {
-    MongoClient.connect(uri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    }, function (err, db) {
-        if (err) {
-            res.status(400);
-            res.send("error database connection");
-            console.log("DB error: " + err)
-        }
 
-        let dbo = db.db(fromDB);
-
-        if (req.body.multy) {
-            setMultyAnswer(dbo, db, req, res)
-        } else {
-            setOneAnswer(dbo, db, req, res)
-        }
-
-    })
-}
-
-const setMultyAnswer = (dbo, db, req, res) => {
-    let quantity = req.body.multyAnswer.length;
-    req.body.multyAnswer.forEach((x, i) => {
-        let from = req.body.from === "participant" ? "parcipiantAnswers" : "validatorsAnswers";
-
-        let question = {
-            id: req.body.event_id
-        };
-
-        let answer = {
-            $push: {
-                [from]: {
-                    date: req.body.date,
-                    answer: x,
-                    transactionHash: req.body.transactionHash,
-                    wallet: req.body.wallet,
-                }
-            }
-        }
-
-
-        dbo.collection("questions").updateOne(question, answer, (err, result) => {
-            if (err) {
-                res.status(400);
-                res.send("error database connection");
-                console.log("DB error: " + err)
-            }
-            if (i + 1 === quantity) {
-                setQuantityAnswer(dbo, db, req, res, from)
-            }
-        })
-    });
-
-}
-
-const setOneAnswer = (dbo, db, req, res) => {
-    let from = req.body.from === "participant" ? "parcipiantAnswers" : "validatorsAnswers";
-
-    let question = {
-        id: req.body.event_id
-    };
-
-    let answer = {
-        $push: {
-            [from]: {
-                date: req.body.date,
-                answer: req.body.answer,
-                transactionHash: req.body.transactionHash,
-                wallet: req.body.wallet,
-            }
-        }
+    if (req.body.multy) {
+        res.status(400);
+        res.send("multy answer not work");
+    } else {
+        setOneAnswer(req, res)
     }
-
-
-    dbo.collection("questions").updateOne(question, answer, (err, result) => {
-        if (err) {
-            res.status(400);
-            res.send("error database connection");
-            console.log("DB error: " + err)
-        }
-        dbo.collection("questions").findOne({ "id": req.body.event_id }, (err, result) => {
-            if (err) {
-                res.status(400);
-                res.send("error database connection");
-                console.log("DB error: " + err)
-            }
-            setQuantityAnswer(dbo, db, req, res, from)
-
-            if (req.body.from === "participant") {
-                history.setHistory(req.body.wallet, result.money, "send", req.body.event_id)
-            }
-
-        })
-    })
 }
 
-const setQuantityAnswer = (dbo, db, req, res, from) => {
-    var to = from === "parcipiantAnswers" ? "answerQuantity" : "validatorsQuantity";
-    let question = {
-        id: req.body.event_id
-    };
+const setOneAnswer = (req, res) => {
+    let setAnswer = []
 
-    let answer = {
-        $set: {
-            [to]: req.body[to]
-        }
+    let eventId = req.body.event_id;
+    let from = Number(req.body.userId)
+
+    // add to the activites table
+    let activites = {
+        _id: "activites$act1",
+        from: from,
+        answer: req.body.answer,
+        role: req.body.from,
+        date: Math.floor(Date.now() / 1000),
+        transactionHash: req.body.transactionHash,
+        eventId: eventId
     }
+    setAnswer.push(activites);
 
+    // increace quntity of activites in event table
+    let to = req.body.from === "participant" ? "parcipiantsAnswer" : "validatorsAnswer";
+    let quantityPath = req.body.from === "participant" ? "answerAmount" : 'validated'
+    let event = {
+        _id: eventId,
+        [to]: ["activites$act1"],
+        [quantityPath]: req.body.from === "participant" ? req.body.answerAmount : req.body.validated
+    }
+    setAnswer.push(event)
 
-    dbo.collection("questions").updateOne(question, answer, (err, result) => {
-        if (err) {
-            res.status(400);
-            res.send("error database connection");
-            console.log("DB error: " + err)
-        }
+   // add to users table
+    let user = {
+        _id: from,
+        activites: ["activites$act1"]
+    }
+    setAnswer.push(user)
+
+    axios.post(path.path + "/transact", setAnswer).then(() => {
         res.status(200);
         res.send({ done: "ok" });
-        db.close()
+    }).catch((err) => {
+        res.status(400);
+        res.send(err.response.data.message);
+        console.log("DB error: " + err.response.data.message)
     })
 }
+
 
 
 module.exports = {

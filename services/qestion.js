@@ -140,7 +140,6 @@ const getAll = (req, res) => {
 
     axios.post(path.path + "/query", conf).then((x) => {
         let obj = eventStructure(x.data)
-        console.log(obj)
         res.status(200)
         res.send(obj)
     }).catch((err) => {
