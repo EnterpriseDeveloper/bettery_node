@@ -42,7 +42,7 @@ const registration = (req, res) => {
 const validate = (req, res) => {
     if (req.body.wallet !== undefined) {
         let conf = {
-            "select": ["*"],
+            "select": ["*", { "historyTransactions": ["*"] }],
             "from": ["users/wallet", req.body.wallet]
         }
 
@@ -54,8 +54,20 @@ const validate = (req, res) => {
                     wallet: x.data["users/wallet"],
                     nickName: x.data["users/nickName"],
                     avatar: x.data["users/avatar"],
-                    email: x.data["users/email"]
+                    email: x.data["users/email"],
+                    historyTransaction: x.data["historyTransactions"].map((history) => {
+                        return {
+                            id: history._id,
+                            date: history['historyTransactions/date'],
+                            paymentWay: history['historyTransactions/paymentWay'],
+                            amount: history['historyTransactions/amount'],
+                            role: history['historyTransactions/role'],
+                            eventId: history['historyTransactions/eventId']["_id"]
+                        }
+                    })
                 }
+
+                console.log(o)
 
                 res.status(200);
                 res.send(o);
@@ -83,18 +95,29 @@ const validate = (req, res) => {
 const allUsers = (req, res) => {
 
     let conf = {
-        "select": ["*"],
+        "select": ["*", { "historyTransactions": ["*"] }],
         "from": "users"
     }
 
     axios.post(path.path + "/query", conf).then((o) => {
+        console.log(o)
         let result = o.data.map((x) => {
             return {
                 _id: x["_id"],
                 wallet: x["users/wallet"],
                 nickName: x["users/nickName"],
                 avatar: x["users/avatar"],
-                email: x["users/email"]
+                email: x["users/email"],
+                historyTransaction: x.data["historyTransactions"].map((history) => {
+                    return {
+                        id: history._id,
+                        date: history['historyTransactions/date'],
+                        paymentWay: history['historyTransactions/paymentWay'],
+                        amount: history['historyTransactions/amount'],
+                        role: history['historyTransactions/role'],
+                        eventId: history['historyTransactions/eventId']["_id"]
+                    }
+                })
             }
         })
         res.status(200);
