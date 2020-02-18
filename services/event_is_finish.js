@@ -4,10 +4,10 @@ const path = require("../config/path");
 
 const setCorrectAnswer = (data, id) => {
 
-    let finalAnswer = {
+    let finalAnswer = [{
         _id: Number(id),
         finalAnswerNumber: Number(data.correctAnswer)
-    }
+    }]
 
     axios.post(path.path + "/transact", finalAnswer)
         .catch((err) => {

@@ -53,7 +53,7 @@ const getAllInvites = async (req, res) => {
                                 status: inv['invites/eventId']['events/status'],
                                 answers: Object.assign([], inv['invites/eventId']['events/answers']).reverse(),
                                 money: inv['invites/eventId']['events/money'],
-                                finalAnswer: inv['invites/eventId']['events/finalAnswer'] === '' ? null : inv['invites/eventId']['events/finalAnswer'],
+                                finalAnswer: z['events/finalAnswerNumber'] === undefined ? null : z['events/finalAnswerNumber'],
                                 validatorsAmount: inv['invites/eventId']['events/validatorsAmount'],
                                 endTime: inv['invites/eventId']['events/endTime'],
                                 transactionHash: inv['invites/eventId']['events/transactionHash'],

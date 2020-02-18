@@ -67,8 +67,6 @@ const validate = (req, res) => {
                     })
                 }
 
-                console.log(o)
-
                 res.status(200);
                 res.send(o);
 
@@ -100,7 +98,6 @@ const allUsers = (req, res) => {
     }
 
     axios.post(path.path + "/query", conf).then((o) => {
-        console.log(o)
         let result = o.data.map((x) => {
             return {
                 _id: x["_id"],
@@ -108,7 +105,7 @@ const allUsers = (req, res) => {
                 nickName: x["users/nickName"],
                 avatar: x["users/avatar"],
                 email: x["users/email"],
-                historyTransaction: x.data["historyTransactions"].map((history) => {
+                historyTransaction: x["historyTransactions"].map((history) => {
                     return {
                         id: history._id,
                         date: history['historyTransactions/date'],

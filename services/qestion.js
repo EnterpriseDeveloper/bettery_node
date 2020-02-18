@@ -168,7 +168,7 @@ function eventStructure(data) {
             status: z['events/status'],
             answers: Object.assign([], z['events/answers']).reverse(),
             money: z['events/money'],
-            finalAnswer: z['events/finalAnswer'] === '' ? null : z['events/finalAnswer'],
+            finalAnswer: z['events/finalAnswerNumber'] === undefined ? null : z['events/finalAnswerNumber'],
             validatorsAmount: z['events/validatorsAmount'],
             endTime: z['events/endTime'],
             transactionHash: z['events/transactionHash'],
