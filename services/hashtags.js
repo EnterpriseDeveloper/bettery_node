@@ -66,7 +66,7 @@ const updateHashtags = (hash, res, dbo) => {
                     res.status(400);
                     res.send("error database connection");
                     console.log("DB error: " + err)
-                }
+                } 
             });
         }
     })

@@ -16,7 +16,7 @@ const getHostEvent = async (req, res) => {
 
 }
 
-const getAllActivites = async (req, res) => {
+const getAllInvites = async (req, res) => {
     let wallet = req.body.wallet
 
     let conf = {
@@ -272,7 +272,7 @@ getActivites = (data, dbo, res, from) => {
 }
 
 module.exports = {
-    getAllActivites,
+    getAllInvites,
     getCurrentEvent,
     getPastEvent,
     getHostEvent

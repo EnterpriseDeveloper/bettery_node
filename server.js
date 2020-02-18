@@ -82,7 +82,7 @@ app.get("/hashtags/get_all", async (req, res) => {
 })
 
 app.post("/my_activites/invites", async (req, res) =>{
-    myActivites.getAllActivites(req, res);
+    myActivites.getAllInvites(req, res);
 })
 
 app.post("/my_activites/current", async (req, res) =>{
