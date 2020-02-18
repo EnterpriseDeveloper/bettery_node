@@ -19,7 +19,6 @@ const setReceiveHistory = async (contractData, eventId) => {
             console.log("DB error: " + err.response.data.message)
         })
 
-        console.log(activites.data)
 
     let allData = activites.data.map((o) => {
         return {
@@ -30,8 +29,6 @@ const setReceiveHistory = async (contractData, eventId) => {
             userId: o['activites/from']["_id"]
         }
     })
-
-    console.log(allData)
 
     // filter by correct answer
     let rightAnswer = _.filter(allData, function (o) { return o.answer === Number(contractData.correctAnswer); });
@@ -52,7 +49,7 @@ const setReceiveHistory = async (contractData, eventId) => {
     // find validators
 
     let findValid = _.filter(rightAnswer, function (o) { return o.role === 'validator' });
-    if(findValid.length !== 0){
+    if (findValid.length !== 0) {
         let valid = createHistory(eventId, findValid, contractData.persentForEachValidators, "validator");
         let userData = createUserHistory(findValid, valid)
         let addTogether = valid.concat(userData);
@@ -62,11 +59,9 @@ const setReceiveHistory = async (contractData, eventId) => {
         })
     }
 
-    console.log(allHistory);
-
-    axios.post(path.path + "/transact", allHistory).then(()=>{
+    axios.post(path.path + "/transact", allHistory).then(() => {
         setToHost(eventId, contractData.persentFeeHost)
-    }).catch((err)=>{
+    }).catch((err) => {
         console.log("DB error: " + err.response.data.message)
     })
 }
@@ -119,17 +114,15 @@ async function setToHost(eventId, amount) {
         amount: Number(money),
         eventId: Number(eventId),
         role: "host"
-    },{
+    }, {
         _id: host,
         "historyTransactions": ["historyTransactions$newHost"]
     }]
 
-    axios.post(path.path + "/transact", allData).then(()=>{
-        console.log("finish")
-    }).catch((err)=>{
+    axios.post(path.path + "/transact", allData).catch((err) => {
         console.log("DB error: " + err.response.data.message)
     })
-    
+
 }
 
 module.exports = {
