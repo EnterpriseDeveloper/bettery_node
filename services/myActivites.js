@@ -8,14 +8,6 @@ const fromDB = "Quize";
 const axios = require("axios");
 const path = require("../config/path");
 
-const getHostEvent = async (req, res) => {
-    let data = await fetchDataUserinvitations(req, res, true);
-    let x = _.filter(data, function (o) { return o.hostWallet === req.body.wallet; });
-    res.status(200);
-    res.send(x);
-
-}
-
 const getAllInvites = async (req, res) => {
     let wallet = req.body.wallet
 
@@ -34,7 +26,13 @@ const getAllInvites = async (req, res) => {
 
                 let allInvites = {
                     "select": ["*",
-                        { 'invites/eventId': ["*", { "events/host": ["users/wallet"] }] },
+                        {
+                            'invites/eventId': ["*",
+                                { "events/host": ["users/wallet"] },
+                                { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
+                                { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }
+                            ]
+                        },
                         { 'invites/from': ["users/nickName"] }
                     ],
                     "from": invites
@@ -53,14 +51,30 @@ const getAllInvites = async (req, res) => {
                                 status: inv['invites/eventId']['events/status'],
                                 answers: Object.assign([], inv['invites/eventId']['events/answers']).reverse(),
                                 money: inv['invites/eventId']['events/money'],
-                                finalAnswer: z['events/finalAnswerNumber'] === undefined ? null : z['events/finalAnswerNumber'],
+                                finalAnswer: inv['invites/eventId']['events/finalAnswerNumber'] === undefined ? null : inv['invites/eventId']['events/finalAnswerNumber'],
                                 validatorsAmount: inv['invites/eventId']['events/validatorsAmount'],
                                 endTime: inv['invites/eventId']['events/endTime'],
                                 transactionHash: inv['invites/eventId']['events/transactionHash'],
                                 showDistribution: inv['invites/eventId']['events/showDistribution'],
                                 question: inv['invites/eventId']['events/question'],
                                 private: inv['invites/eventId']['events/private'] === undefined ? false : inv['invites/eventId']['events/private'],
-                                multiChoise: inv['invites/eventId']['events/multiChoise'] === undefined ? false : inv['invites/eventId']['events/multiChoise']
+                                multiChoise: inv['invites/eventId']['events/multiChoise'] === undefined ? false : inv['invites/eventId']['events/multiChoise'],
+                                parcipiantAnswers: inv['invites/eventId']["events/parcipiantsAnswer"] === undefined ? undefined : inv['invites/eventId']["events/parcipiantsAnswer"].map((par) => {
+                                    return {
+                                        transactionHash: par['activites/transactionHash'],
+                                        date: par['activites/date'],
+                                        answer: par['activites/answer'],
+                                        wallet: par['activites/from']['users/wallet']
+                                    }
+                                }),
+                                validatorsAnswers: inv['invites/eventId']["events/validatorsAnswer"] === undefined ? undefined : inv['invites/eventId']["events/validatorsAnswer"].map((val) => {
+                                    return {
+                                        transactionHash: val['activites/transactionHash'],
+                                        date: val['activites/date'],
+                                        answer: val['activites/answer'],
+                                        wallet: val['activites/from']['users/wallet']
+                                    }
+                                }),
                             },
 
                             transactionHash: inv['invites/transactionHash'],
@@ -94,43 +108,59 @@ const getAllInvites = async (req, res) => {
 }
 
 const getCurrentEvent = async (req, res) => {
-    let result = []
-    let data = await fetchData(req, res);
-    for (let i = 0; i < data.length; i++) {
-
-        if (data[i].hostWallet === req.body.wallet) {
-            let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
-            if (reserchPar !== undefined) {
-                data[i].from = "Participant";
-                data[i].host = true
-                result.push(data[i]);
-            } else {
-                data[i].from = "none";
-                data[i].host = true
-                result.push(data[i]);
-            }
-        } else {
-            let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
-            if (reserchPar !== undefined) {
-                data[i].from = "Participant";
-                data[i].host = false;
-                result.push(data[i]);
-            } else {
-                let reserchVal = _.find(data[i].validatorsAnswers, function (o) { return o.wallet === req.body.wallet; });
-                if (reserchVal !== undefined) {
-                    data[i].from = "Validator";
-                    data[i].host = false;
-                    result.push(data[i]);
-                }
-            }
-        }
+    let id = req.body.id
+    let config = {
+        select: [
+            { "users/activites": ["*", { 'activites/eventId': ["*"] }] },
+            { "users/hostEvents": ["*"] }
+        ],
+        from: id
     }
 
-    let x = _.filter(result, function (o) { return o.finalAnswers === null; });
-    let finish = _.orderBy(x, ['endTime'], ['desc']);
+    let allData = await axios.post(path.path + "/query", config).catch((err) => {
+        console.log(err)
+        res.status(400);
+        res.send(err.response.data.message);
+    })
 
-    res.status(200);
-    res.send(finish);
+    console.log(allData.data['users/hostEvents'])
+    // let result = []
+    // let data = await fetchData(req, res);
+    // for (let i = 0; i < data.length; i++) {
+
+    //     if (data[i].hostWallet === req.body.wallet) {
+    //         let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
+    //         if (reserchPar !== undefined) {
+    //             data[i].from = "Participant";
+    //             data[i].host = true
+    //             result.push(data[i]);
+    //         } else {
+    //             data[i].from = "none";
+    //             data[i].host = true
+    //             result.push(data[i]);
+    //         }
+    //     } else {
+    //         let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
+    //         if (reserchPar !== undefined) {
+    //             data[i].from = "Participant";
+    //             data[i].host = false;
+    //             result.push(data[i]);
+    //         } else {
+    //             let reserchVal = _.find(data[i].validatorsAnswers, function (o) { return o.wallet === req.body.wallet; });
+    //             if (reserchVal !== undefined) {
+    //                 data[i].from = "Validator";
+    //                 data[i].host = false;
+    //                 result.push(data[i]);
+    //             }
+    //         }
+    //     }
+    // }
+
+    // let x = _.filter(result, function (o) { return o.finalAnswers === null; });
+    // let finish = _.orderBy(x, ['endTime'], ['desc']);
+
+    // res.status(200);
+    // res.send(finish);
 }
 
 const getPastEvent = async (req, res) => {
@@ -274,7 +304,6 @@ getActivites = (data, dbo, res, from) => {
 module.exports = {
     getAllInvites,
     getCurrentEvent,
-    getPastEvent,
-    getHostEvent
+    getPastEvent
 }
 

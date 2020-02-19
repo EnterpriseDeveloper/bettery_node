@@ -1,6 +1,7 @@
 const axios = require("axios");
 const path = require("../config/path");
 const invites = require("./invites");
+const _ = require("lodash");
 
 const createId = (req, res) => {
     let data = {
@@ -135,7 +136,6 @@ const getById = (req, res) => {
 }
 
 const getAll = (req, res) => {
-    // get all but only public /////////////////////////////////
 
     let conf = {
         "select": ["*",
@@ -148,8 +148,9 @@ const getAll = (req, res) => {
 
     axios.post(path.path + "/query", conf).then((x) => {
         let obj = eventStructure(x.data)
+        let allData = _.filter(obj, (o) => { return o.private === false })
         res.status(200)
-        res.send(obj)
+        res.send(allData)
     }).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
