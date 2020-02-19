@@ -1,42 +1,73 @@
-const MongoClient = require('mongodb').MongoClient;
-const fromDB = "Quize";
-const keys = require("../key");
-
-const uri = keys.mongoKey;
-
 const axios = require("axios");
 const path = require("../config/path");
 
 
-const deleteEvent = (req, res) => {
+const deleteEvent = async (req, res) => {
+    let id = req.body.id;
+    let deleteQuery = [];
 
-    MongoClient.connect(uri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    }, (err, db) => {
-        if (err) {
-            res.status(400);
-            res.send("error database connection");
-            console.log("DB error: " + err)
-        }
-        let dbo = db.db(fromDB);
+    let getEvent = {
+        select: ["*"],
+        from: id
+    }
 
-        let event = {
-            id: Number(req.body.id)
-        };
-
-        dbo.collection("questions").deleteOne(event, (err, obj) => {
-            if (err){
-                res.status(400);
-                res.send("error database connection");
-                console.log("DB error: " + err)
-            }
-
-            res.status(200);
-            res.send({deleted: 'ok'});
-            db.close();
+    let event = await axios.post(path.path + "/query", getEvent)
+        .catch((err) => {
+            console.log("DB error: " + err.response.data.message)
         })
-    })
+
+    if (event !== undefined) {
+
+        // add event
+        deleteQuery.push({
+            _id: id,
+            _action: "delete"
+        })
+
+        // get all invites 
+        if (event.data['events/invites'] !== undefined) {
+            event.data['events/invites'].forEach((x) => {
+                deleteQuery.push({
+                    _id: x._id,
+                    _action: "delete"
+                })
+            })
+        }
+
+        // get parcipiants activites
+        if (event.data['events/parcipiantsAnswer'] !== undefined) {
+            event.data['events/parcipiantsAnswer'].forEach((x) => {
+                deleteQuery.push({
+                    _id: x._id,
+                    _action: "delete"
+                })
+            })
+        }
+
+        // get validatos activites
+        if (event.data['events/validatorsAnswer'] !== undefined) {
+            event.data['events/validatorsAnswer'].forEach((x) => {
+                deleteQuery.push({
+                    _id: x._id,
+                    _action: "delete"
+                })
+            })
+        }
+
+        axios.post(path.path + "/transact", deleteQuery).then(() => {
+
+            res.status(200)
+            res.send({ status: "ok" })
+
+        }).catch((err) => {
+
+            res.status(400);
+            res.send(err.response.data.message);
+            console.log("DB error: " + err.response.data.message)
+
+        })
+    }
+
 }
 
 
