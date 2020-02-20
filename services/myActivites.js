@@ -108,11 +108,39 @@ const getAllInvites = async (req, res) => {
 }
 
 const getCurrentEvent = async (req, res) => {
+    let allData = await fetchData(req, res)
+    let currentEvent = _.filter(allData, (e) => { return e.finalAnswer === null })
+
+    res.status(200);
+    res.send(currentEvent);
+}
+
+const getPastEvent = async (req, res) => {
+
+    let allData = await fetchData(req, res)
+    let pastEvent = _.filter(allData, (e) => { return e.finalAnswer !== null })
+
+    res.status(200);
+    res.send(pastEvent);
+}
+
+async function fetchData(req, res) {
+    let allActivites = [];
     let id = req.body.id
     let config = {
         select: [
-            { "users/activites": ["*", { 'activites/eventId': ["*"] }] },
-            { "users/hostEvents": ["*"] }
+            {
+                "users/activites": ["*", {
+                    'activites/eventId': ["*",
+                        { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
+                        { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }]
+                }]
+            },
+            {
+                "users/hostEvents": ["*",
+                    { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
+                    { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }]
+            }
         ],
         from: id
     }
@@ -123,181 +151,67 @@ const getCurrentEvent = async (req, res) => {
         res.send(err.response.data.message);
     })
 
-    console.log(allData.data['users/hostEvents'])
-    // let result = []
-    // let data = await fetchData(req, res);
-    // for (let i = 0; i < data.length; i++) {
-
-    //     if (data[i].hostWallet === req.body.wallet) {
-    //         let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
-    //         if (reserchPar !== undefined) {
-    //             data[i].from = "Participant";
-    //             data[i].host = true
-    //             result.push(data[i]);
-    //         } else {
-    //             data[i].from = "none";
-    //             data[i].host = true
-    //             result.push(data[i]);
-    //         }
-    //     } else {
-    //         let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
-    //         if (reserchPar !== undefined) {
-    //             data[i].from = "Participant";
-    //             data[i].host = false;
-    //             result.push(data[i]);
-    //         } else {
-    //             let reserchVal = _.find(data[i].validatorsAnswers, function (o) { return o.wallet === req.body.wallet; });
-    //             if (reserchVal !== undefined) {
-    //                 data[i].from = "Validator";
-    //                 data[i].host = false;
-    //                 result.push(data[i]);
-    //             }
-    //         }
-    //     }
-    // }
-
-    // let x = _.filter(result, function (o) { return o.finalAnswers === null; });
-    // let finish = _.orderBy(x, ['endTime'], ['desc']);
-
-    // res.status(200);
-    // res.send(finish);
-}
-
-const getPastEvent = async (req, res) => {
-    let result = [];
-    let data = await fetchData(req, res);
-
-    for (let i = 0; i < data.length; i++) {
-        if (data[i].hostWallet === req.body.wallet) {
-            let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
-            if (reserchPar !== undefined) {
-                data[i].from = "Participant";
-                data[i].host = true
-                result.push(data[i]);
-            } else {
-                data[i].from = "none";
-                data[i].host = true
-                result.push(data[i]);
-            }
-        } else {
-            let reserchPar = _.find(data[i].parcipiantAnswers, function (o) { return o.wallet === req.body.wallet; });
-            if (reserchPar !== undefined) {
-                data[i].from = "Participant";
-                data[i].host = false;
-                result.push(data[i]);
-            } else {
-                let reserchVal = _.find(data[i].validatorsAnswers, function (o) { return o.wallet === req.body.wallet; });
-                if (reserchVal !== undefined) {
-                    data[i].from = "Validator";
-                    data[i].host = false;
-                    result.push(data[i]);
-                }
-            }
-        }
-    }
-
-    let x = _.filter(result, function (o) { return o.finalAnswers !== null; });
-    let finish = _.orderBy(x, ['endTime'], ['desc']);
-
-    res.status(200);
-    res.send(finish);
-}
-
-fetchData = () => {
-    return new Promise((resolve) => {
-        MongoClient.connect(uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        }, function (err, db) {
-            if (err) {
-                res.status(400);
-                res.send("error database connection");
-                console.log("DB error: " + err)
-            }
-            let dbo = db.db(fromDB);
-            dbo.collection("questions").find({}).toArray((err, result) => {
-                if (err) {
-                    res.status(400);
-                    res.send("error database connection");
-                    console.log("DB error: " + err)
-                }
-                resolve(result);
-                db.close();
-            });
-        });
-    })
-}
-
-
-
-fetchDataUserinvitations = (req, res, from) => {
-    return new Promise((resolve) => {
-        MongoClient.connect(uri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        }, function (err, db) {
-            if (err) {
-                res.status(400);
-                res.send("error database connection");
-                console.log("DB error: " + err)
-            }
-            let dbo = db.db(fromDB);
-            let activites = [];
-
-            dbo.collection("users").findOne({ wallet: req.body.wallet }, async (err, result) => {
-                if (err) {
-                    res.status(400);
-                    res.send("error database connection");
-                    console.log("DB error: " + err)
-                }
-                if (from === true) {
-                    if (result.listHostEvents.length !== 0) {
-                        let active = await this.getActivites(result.listHostEvents, dbo, res, "Host");
-                        active.forEach(element => {
-                            activites.push(element)
-                        });
-                    }
-                }
-                if (result.listParticipantEvents.length !== 0) {
-                    let active = await this.getActivites(result.listParticipantEvents, dbo, res, "Participant");
-                    active.forEach(element => {
-                        activites.push(element)
-                    });
-                }
-                if (result.listValidatorEvents.length !== 0) {
-                    let active = await this.getActivites(result.listValidatorEvents, dbo, res, "Validator");
-                    active.forEach(element => {
-                        activites.push(element)
-                    });
-                }
-
-                resolve(activites)
-                db.close();
+    // get users activites
+    if (allData.data['users/activites'] !== undefined) {
+        allData.data['users/activites'].forEach((x) => {
+            let userActivites = activitiesArchitecture([x['activites/eventId']], x['activites/role'], false)
+            userActivites.forEach((o) => {
+                allActivites.push(o)
 
             })
         })
 
-    })
+    }
+
+    // get host activites 
+    if (allData.data['users/hostEvents'] !== undefined) {
+        let hostActivites = activitiesArchitecture(allData.data['users/hostEvents'], 'none', true)
+        hostActivites.forEach((o) => {
+            allActivites.push(o)
+        })
+
+    }
+
+    return allActivites
 }
 
-getActivites = (data, dbo, res, from) => {
-    let id = data.map((x) => {
-        return x.event
-    })
-    return new Promise(resolve => {
-        dbo.collection('questions').find({ "id": { "$in": id } }).toArray((err, result) => {
-            if (err) {
-                res.status(400);
-                res.send("error database connection");
-                console.log("DB error: " + err)
-            }
-
-            for (i in result) {
-                result[i].from = from;
-            }
-
-            resolve(result)
-        })
+function activitiesArchitecture(data, from, host) {
+    return data.map((z) => {
+        return {
+            answerAmount: z['events/answerAmount'],
+            startTime: z['events/startTime'],
+            id: z._id,
+            from: from,
+            host: host,
+            validated: z['events/validated'],
+            status: z['events/status'],
+            answers: Object.assign([], z['events/answers']).reverse(),
+            money: z['events/money'],
+            finalAnswer: z['events/finalAnswerNumber'] === undefined ? null : z['events/finalAnswerNumber'],
+            validatorsAmount: z['events/validatorsAmount'],
+            endTime: z['events/endTime'],
+            transactionHash: z['events/transactionHash'],
+            showDistribution: z['events/showDistribution'],
+            question: z['events/question'],
+            private: z['events/private'] === undefined ? false : z['events/private'],
+            multiChoise: z['events/multiChoise'] === undefined ? false : z['events/multiChoise'],
+            parcipiantAnswers: z["events/parcipiantsAnswer"] === undefined ? undefined : z["events/parcipiantsAnswer"].map((par) => {
+                return {
+                    transactionHash: par['activites/transactionHash'],
+                    date: par['activites/date'],
+                    answer: par['activites/answer'],
+                    wallet: par['activites/from']['users/wallet']
+                }
+            }),
+            validatorsAnswers: z["events/validatorsAnswer"] === undefined ? undefined : z["events/validatorsAnswer"].map((val) => {
+                return {
+                    transactionHash: val['activites/transactionHash'],
+                    date: val['activites/date'],
+                    answer: val['activites/answer'],
+                    wallet: val['activites/from']['users/wallet']
+                }
+            }),
+        }
     })
 }
 
