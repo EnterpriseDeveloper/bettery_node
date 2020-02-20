@@ -113,7 +113,8 @@ const allUsers = (req, res) => {
                         paymentWay: history['historyTransactions/paymentWay'],
                         amount: history['historyTransactions/amount'],
                         role: history['historyTransactions/role'],
-                        eventId: history['historyTransactions/eventId']["_id"]
+                        eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
+
                     }
                 })
             }
