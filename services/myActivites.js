@@ -1,12 +1,7 @@
-const MongoClient = require('mongodb').MongoClient;
-const keys = require("../key");
-const _ = require("lodash");
-
-const uri = keys.mongoKey;
-const fromDB = "Quize";
-
 const axios = require("axios");
 const path = require("../config/path");
+const _ = require("lodash");
+
 
 const getAllInvites = async (req, res) => {
     let wallet = req.body.wallet
@@ -46,6 +41,7 @@ const getAllInvites = async (req, res) => {
                                 answerAmount: inv['invites/eventId']['events/answerAmount'],
                                 startTime: inv['invites/eventId']['events/startTime'],
                                 id: inv['invites/eventId']._id,
+                                hashtags: inv['invites/eventId']['events/hashtags'],
                                 host: inv['invites/eventId']['events/host']["users/wallet"],
                                 validated: inv['invites/eventId']['events/validated'],
                                 status: inv['invites/eventId']['events/status'],
@@ -184,6 +180,7 @@ function activitiesArchitecture(data, from, host) {
             from: from,
             host: host,
             validated: z['events/validated'],
+            hashtags: z['events/hashtags'],
             status: z['events/status'],
             answers: Object.assign([], z['events/answers']).reverse(),
             money: z['events/money'],

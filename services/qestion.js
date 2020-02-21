@@ -169,6 +169,7 @@ function eventStructure(data) {
             answerAmount: z['events/answerAmount'],
             startTime: z['events/startTime'],
             id: z._id,
+            hashtags: z['events/hashtags'],
             host: z['events/host']['users/wallet'],
             validated: z['events/validated'],
             status: z['events/status'],
