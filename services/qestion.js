@@ -20,11 +20,21 @@ const createId = (req, res) => {
 
 const setQuestion = (req, res) => {
     let allData = req.body
+    let hashtagsId = req.body.hashtagsId
     delete allData['finalAnswers'];
     allData.invites = []
     let data = []
 
-    // ADD HASHtags ////////////////////////////////
+    // ADD Hashtags
+    if (allData.hashtags.length !== 0) {
+        data.push({
+            _id: hashtagsId,
+            hashtags: allData.hashtags
+        })
+        delete allData['hashtagsId'];
+    } else {
+        delete allData['hashtagsId'];
+    }
 
     if (allData.parcipiant.length !== 0) {
         // create obj for Parcipiant
@@ -103,11 +113,6 @@ const setQuestion = (req, res) => {
         res.status(400);
         res.send(err.response.data.message);
     })
-
-    // add new hashtags
-    //  if (req.body.hashtags.length !== 0) {
-    //      hashtags.updateHashtags(req.body.hashtags, res, dbo)
-    //  }
 
 }
 
