@@ -83,7 +83,7 @@ const validate = (req, res) => {
         }).catch((err) => {
             console.log(err)
             res.status(400);
-            res.send(err.response.data.message);
+            res.send(err);
         })
     } else {
         res.status(400);
