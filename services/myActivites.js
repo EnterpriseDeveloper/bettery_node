@@ -80,8 +80,42 @@ const getAllInvites = async (req, res) => {
                             status: inv['invites/status']
                         }
                     })
+
+                    let allData = []
+
+                    for (let i = 0; i < invitesQuery.length; i++) {
+                        if (invitesQuery[i].event.parcipiantAnswers !== undefined) {
+                            let findActivites = _.findIndex(invitesQuery[i].event.parcipiantAnswers, (o) => { return o.wallet === wallet });
+                            if (findActivites === -1) {
+                                if (invitesQuery[i].event.validatorsAnswers !== undefined) {
+                                    let findActivites = _.findIndex(invitesQuery[i].event.validatorsAnswers, (o) => { return o.wallet === wallet });
+                                    if (findActivites === -1) {
+                                        allData.push(invitesQuery[i])
+                                    }
+                                } else {
+                                    allData.push(invitesQuery[i])
+                                }
+                            }
+                        } else {
+                            if (invitesQuery[i].event.validatorsAnswers !== undefined) {
+                                let findActivites = _.findIndex(invitesQuery[i].event.validatorsAnswers, (o) => { return o.wallet === wallet });
+                                if (findActivites === -1) {
+                                    allData.push(invitesQuery[i])
+                                }
+                            } else {
+                                allData.push(invitesQuery[i])
+                            }
+                        }
+                    }
+
+                    console.log(wallet)
+
+                    allData.forEach((x) => {
+                        console.log(x.event.parcipiantAnswers)
+                    })
+
                     res.status(200);
-                    res.send(invitesQuery);
+                    res.send(allData);
 
                 }).catch((err) => {
                     console.log(err)
