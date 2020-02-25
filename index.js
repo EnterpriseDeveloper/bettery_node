@@ -10,6 +10,7 @@ const answer = require("./services/answers");
 const Contract = require("./contract/contract");
 const deleteEvent = require("./services/deleteEvent");
 const invites = require("./services/invites")
+const historyQuize = require("./services/historyQuize");
 
 const multer = require('multer');
 const upload = multer();
@@ -107,6 +108,10 @@ app.post("/answer", async (req, res) =>{
 
 app.post("/delete_event", async (req, res) =>{
     deleteEvent.deleteEvent(req, res);
+})
+
+app.post("/history_quize/get_by_id", async (req, res)=>{
+    historyQuize.historyQuizeById(req, res);
 })
 
 
