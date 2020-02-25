@@ -10,12 +10,14 @@ const historyQuizeById = async (req, res) => {
         "pretty-print": true
     }
 
+    // Limit here is not very clever solution!!!
     let time = {
         "select": ["?number", "?instant"],
         "where": [
             ["?block", "_block/number", "?number"],
             ["?block", "_block/instant", "?instant"]
-        ]
+        ],
+        "limit": 10000
     }
 
     let blocktime = await axios.post(path.path + "/query", time).catch((err) => {
@@ -80,6 +82,8 @@ function getFrom(data, activitesData) {
     if (Number(data.action) === data.action) {
         let findActivites = _.find(activitesData, (x) => { return x._id === data.action })
         return findActivites['activites/from']['users/nickName']
+    } else if(data.action.search("final answer") !== -1) {
+        return "system"
     } else {
         return 'host'
     }
@@ -89,6 +93,8 @@ function getFinalAction(data, activitesData) {
     if (Number(data.action) === data.action) {
         let findActivites = _.find(activitesData, (x) => { return x._id === data.action })
         return findActivites['activites/role']
+    } else if(data.action.search("final answer") !== -1) {
+        return "event ending"
     } else {
         return data.action
     }
@@ -101,9 +107,17 @@ function getAction(data, index) {
         case 1:
             return "created event"
         default:
-            return data.flakes.asserted[0]['events/parcipiantsAnswer'] === undefined
-                ? data.flakes.asserted[0]['events/validatorsAnswer'][0]["_id"]
-                : data.flakes.asserted[0]['events/parcipiantsAnswer'][0]["_id"]
+            return checkActivites(data);
+    }
+}
+
+function checkActivites(data) {
+    if (data.flakes.asserted[0]["events/finalAnswerNumber"] !== undefined) {
+        return "final answer is " + data.flakes.asserted[0]["events/finalAnswerNumber"]
+    } else if (data.flakes.asserted[0]['events/parcipiantsAnswer'] !== undefined) {
+        return data.flakes.asserted[0]['events/parcipiantsAnswer'][0]["_id"]
+    } else if (data.flakes.asserted[0]['events/validatorsAnswer'] !== undefined) {
+        return data.flakes.asserted[0]['events/validatorsAnswer'][0]["_id"]
     }
 }
 
