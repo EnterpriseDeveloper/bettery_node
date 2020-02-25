@@ -108,12 +108,6 @@ const getAllInvites = async (req, res) => {
                         }
                     }
 
-                    console.log(wallet)
-
-                    allData.forEach((x) => {
-                        console.log(x.event.parcipiantAnswers)
-                    })
-
                     res.status(200);
                     res.send(allData);
 
