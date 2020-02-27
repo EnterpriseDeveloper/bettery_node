@@ -41,17 +41,27 @@ const historyQuizeById = async (req, res) => {
                 action: getAction(z, i)
             }
         })
-        getAdditionalData(obj, res)
+        getAdditionalData(obj, allHistory, res)
 
     }
 }
 
-async function getAdditionalData(obj, res) {
+async function getAdditionalData(obj, allHistory, res) {
+    let hostId = undefined
+
     let activitesId = obj.map((x) => {
         if (Number(x.action) === x.action) {
             return x.action
         }
     })
+ 
+    // get host id
+    let findHost = _.find(allHistory.data, (x)=>{return x.flakes.asserted[0]["events/host"] !== undefined});
+    if(findHost !== undefined){
+        hostId = findHost.flakes.asserted[0]["events/host"]["_id"]
+        activitesId.push(hostId)
+    }
+
     let additionalData = {
         "select": ["*", { "activites/from": ["users/nickName"] }],
         "from": _.filter(activitesId, (x) => { return x !== undefined })
@@ -68,7 +78,7 @@ async function getAdditionalData(obj, res) {
             return {
                 time: x.time,
                 action: getFinalAction(x, activitesData.data),
-                from: getFrom(x, activitesData.data)
+                from: getFrom(x, activitesData.data, hostId)
             }
         })
 
@@ -78,14 +88,15 @@ async function getAdditionalData(obj, res) {
     }
 }
 
-function getFrom(data, activitesData) {
+function getFrom(data, activitesData, hostId) {
     if (Number(data.action) === data.action) {
         let findActivites = _.find(activitesData, (x) => { return x._id === data.action })
         return findActivites['activites/from']['users/nickName']
     } else if(data.action.search("final answer") !== -1) {
         return "system"
     } else {
-        return 'host'
+        let findNameHost = _.find(activitesData, (x)=> {return x._id === hostId})
+        return findNameHost['users/nickName']
     }
 }
 
