@@ -54,10 +54,10 @@ async function getAdditionalData(obj, allHistory, res) {
             return x.action
         }
     })
- 
+
     // get host id
-    let findHost = _.find(allHistory.data, (x)=>{return x.flakes.asserted[0]["events/host"] !== undefined});
-    if(findHost !== undefined){
+    let findHost = _.find(allHistory.data, (x) => { return x.flakes.asserted[0]["events/host"] !== undefined });
+    if (findHost !== undefined) {
         hostId = findHost.flakes.asserted[0]["events/host"]["_id"]
         activitesId.push(hostId)
     }
@@ -82,8 +82,23 @@ async function getAdditionalData(obj, allHistory, res) {
             }
         })
 
-        res.status(200);
-        res.send(allData);
+        let removeCreateId = allData.filter((x) => { return x.action !== "created id" })
+        let findEventEnding = _.findIndex(removeCreateId, (x) => { return x.action === "event ending" })
+
+        if (findEventEnding === -1) {
+
+            res.status(200);
+            res.send(removeCreateId);
+
+        } else {
+            let finalAnswer = removeCreateId[findEventEnding];
+            let removefinalAnsewr = removeCreateId.filter((x) => { return x.action !== "event ending" });
+            removefinalAnsewr.push(finalAnswer);
+
+            res.status(200);
+            res.send(removefinalAnsewr);
+        }
+
 
     }
 }
@@ -92,10 +107,10 @@ function getFrom(data, activitesData, hostId) {
     if (Number(data.action) === data.action) {
         let findActivites = _.find(activitesData, (x) => { return x._id === data.action })
         return findActivites['activites/from']['users/nickName']
-    } else if(data.action.search("final answer") !== -1) {
+    } else if (data.action.search("final answer") !== -1) {
         return "system"
     } else {
-        let findNameHost = _.find(activitesData, (x)=> {return x._id === hostId})
+        let findNameHost = _.find(activitesData, (x) => { return x._id === hostId })
         return findNameHost['users/nickName']
     }
 }
@@ -104,7 +119,7 @@ function getFinalAction(data, activitesData) {
     if (Number(data.action) === data.action) {
         let findActivites = _.find(activitesData, (x) => { return x._id === data.action })
         return findActivites['activites/role']
-    } else if(data.action.search("final answer") !== -1) {
+    } else if (data.action.search("final answer") !== -1) {
         return "event ending"
     } else {
         return data.action
