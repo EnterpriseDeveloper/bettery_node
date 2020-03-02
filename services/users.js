@@ -55,7 +55,7 @@ const validate = (req, res) => {
                     nickName: x.data["users/nickName"],
                     avatar: x.data["users/avatar"],
                     email: x.data["users/email"],
-                    historyTransaction: x.data["historyTransactions"].map((history) => {
+                    historyTransaction: x.data["historyTransactions"] === undefined ? [] : x.data["historyTransactions"].map((history) => {
                         return {
                             id: history._id,
                             date: history['historyTransactions/date'],
@@ -106,7 +106,7 @@ const allUsers = (req, res) => {
                 nickName: x["users/nickName"],
                 avatar: x["users/avatar"],
                 email: x["users/email"],
-                historyTransaction: x["historyTransactions"].map((history) => {
+                historyTransaction: x["historyTransactions"] === undefined ? [] : x["historyTransactions"].map((history) => {
                     return {
                         id: history._id,
                         date: history['historyTransactions/date'],
