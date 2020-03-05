@@ -13,7 +13,15 @@ class Contract {
         this._createClient()
         this._createCurrentUserAddress()
         this._createWebInstance()
-        await this._createContractInstance()
+        return await this._createContractInstance();
+    }
+
+    async loadHandlerContract() {
+        this.onEvent = null
+        this._createClient()
+        this._createCurrentUserAddress()
+        this._createWebInstance()
+        await this.eventHandler();
     }
 
     _createClient() {
@@ -48,15 +56,18 @@ class Contract {
         }
 
         const ABI = Quize.abi
-        this.QuizeInstance = new this.web3.eth.Contract(ABI, this.currentNetwork.address, {
+        return new this.web3.eth.Contract(ABI, this.currentNetwork.address, {
             from: this.currentUserAddress
         })
+    }
 
-        this.QuizeInstance.events.eventIsFinish(async (err, event) => {
+    async eventHandler() {
+        let QuizeInstance = await this._createContractInstance();
+        QuizeInstance.events.eventIsFinish(async (err, event) => {
             if (err) console.error('Error on event', err)
             else {
                 let eventId = event.returnValues.question_id;
-                let eventData = await this.QuizeInstance.methods.getQuestion(Number(eventId)).call();
+                let eventData = await QuizeInstance.methods.getQuestion(Number(eventId)).call();
                 console.log(eventData)
                 // set to Db
                 setAnswer.setCorrectAnswer(eventData, eventId);

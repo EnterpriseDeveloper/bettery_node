@@ -1,5 +1,6 @@
 const axios = require("axios");
 const path = require("../config/path");
+const contract = require("./holdMoneyDetection");
 
 const setAnswer = (req, res) => {
 
@@ -11,7 +12,7 @@ const setAnswer = (req, res) => {
     }
 }
 
-const setOneAnswer = (req, res) => {
+const setOneAnswer = async (req, res) => {
     let setAnswer = []
 
     let eventId = req.body.event_id;
@@ -39,6 +40,18 @@ const setOneAnswer = (req, res) => {
     }
     setAnswer.push(event)
 
+    // get hold money from contract
+    if (to === 'validatorsAnswer') {
+        if (Number(req.body.validated) === 1) {
+            let historyHoldMoney = await contract.receiveHoldMoney(eventId);
+            if (historyHoldMoney !== "error") {
+                historyHoldMoney.forEach((x)=>{
+                    setAnswer.push(x)
+                })
+            }
+        }
+    }
+
 
     // add history transaction if participant
     if (req.body.from === "participant") {
@@ -62,14 +75,14 @@ const setOneAnswer = (req, res) => {
             historyTransactions: ["historyTransactions$newHistory"]
         }
         setAnswer.push(user)
-    }else{
+    } else {
         let user = {
             _id: from,
             activites: ["activites$act1"]
         }
         setAnswer.push(user)
     }
-    
+
 
     axios.post(path.path + "/transact", setAnswer).then(() => {
         res.status(200);

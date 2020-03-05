@@ -122,7 +122,7 @@ var httpServer = http.createServer(app);
 
 httpServer.listen(80, async () => {
     let contract = new Contract.Contract();
-    contract.loadContract();
+    contract.loadHandlerContract();
    console.log("server run port 80")
 });
 
