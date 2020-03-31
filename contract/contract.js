@@ -6,10 +6,11 @@ const Web3 = require('web3');
 const Quize = require('./Quize.json');
 const setAnswer = require("../services/event_is_finish");
 const history = require("../services/history");
+const { readFileSync } = require('fs')
+const path = require('path')
 
 class Contract {
     async loadContract() {
-        this.onEvent = null
         this._createClient()
         this._createCurrentUserAddress()
         this._createWebInstance()
@@ -17,7 +18,6 @@ class Contract {
     }
 
     async loadHandlerContract() {
-        this.onEvent = null
         this._createClient()
         this._createCurrentUserAddress()
         this._createWebInstance()
@@ -25,8 +25,9 @@ class Contract {
     }
 
     _createClient() {
-        this.privateKey = CryptoUtils.generatePrivateKey();
-        this.publicKey = CryptoUtils.publicKeyFromPrivateKey(this.privateKey);
+        const privateKeyStr = readFileSync(path.join(__dirname, './private_key'), 'utf-8')
+        this.privateKey = CryptoUtils.B64ToUint8Array(privateKeyStr)
+        this.publicKey = CryptoUtils.publicKeyFromPrivateKey(this.privateKey)
 
         let writeUrl = 'wss://extdev-plasma-us1.dappchains.com/websocket';
         let readUrl = 'wss://extdev-plasma-us1.dappchains.com/queryws';

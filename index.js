@@ -11,6 +11,7 @@ const Contract = require("./contract/contract");
 const deleteEvent = require("./services/deleteEvent");
 const invites = require("./services/invites")
 const historyQuize = require("./services/historyQuize");
+const setEthPrice = require("./services/ethPrice");
 
 const multer = require('multer');
 const upload = multer();
@@ -123,6 +124,8 @@ var httpServer = http.createServer(app);
 httpServer.listen(80, async () => {
     let contract = new Contract.Contract();
     contract.loadHandlerContract();
+
+   setEthPrice.setEthPriceToContract();
    console.log("server run port 80")
 });
 
