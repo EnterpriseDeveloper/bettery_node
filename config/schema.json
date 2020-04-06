@@ -50,6 +50,12 @@
     },
     {
         "_id": "_predicate",
+        "name": "users/loomWallet",
+        "type": "string",
+        "unique": true
+    },
+    {
+        "_id": "_predicate",
         "name": "users/avatar",
         "type": "string"
     },

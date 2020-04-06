@@ -3,17 +3,20 @@ const axios = require("axios");
 const path = require("../config/path");
 const Web3 = require('web3');
 
-const receiveHoldMoney = async (eventId) => {
+const receiveHoldMoney = async (loomWallet, eventId) => {
     let contr = new Contract.Contract();
     let getContract = await contr.loadContract();
 
-    let getMoneyById = await getContract.methods.getHoldMoneyById(Number(eventId)).call();
+    let getMoneyById = await getContract.methods.getHoldMoneyById().call();
+    console.log(getMoneyById);
     if (getMoneyById !== undefined) {
 
         let web3 = new Web3();
         let coins = web3.utils.fromWei(getMoneyById, 'ether');
 
-        let contractData = await getContract.methods.getMoneyRetention(Number(eventId)).send();
+        console.log(loomWallet)
+
+        let contractData = await getContract.methods.getMoneyRetention(loomWallet.toString()).send();
         if (contractData !== undefined) {
 
             let getUserId = {

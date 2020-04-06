@@ -39,6 +39,21 @@ const registration = (req, res) => {
     })
 }
 
+const setLoomWallet = (req, res) =>{
+    let data = [{
+      "_id": Number(req.body.id),
+      "loomWallet": req.body.loomWallet
+    }]
+    axios.post(path.path + "/transact", data).then(()=>{
+        res.status(200);
+        res.send({ "transact": "done" })
+    }).catch((err)=>{
+        res.status(400);
+        res.send(err.response.data.message);
+    })
+
+}
+
 const validate = (req, res) => {
     if (req.body.wallet !== undefined) {
         let conf = {
@@ -130,5 +145,6 @@ const allUsers = (req, res) => {
 module.exports = {
     registration,
     validate,
-    allUsers
+    allUsers,
+    setLoomWallet
 }

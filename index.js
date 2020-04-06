@@ -12,6 +12,7 @@ const deleteEvent = require("./services/deleteEvent");
 const invites = require("./services/invites")
 const historyQuize = require("./services/historyQuize");
 const setEthPrice = require("./services/ethPrice");
+ 
 
 const multer = require('multer');
 const upload = multer();
@@ -63,6 +64,10 @@ app.get("/user/all", async (req, res) => {
     auth.allUsers(req, res);
 })
 
+app.post("/user/loomWallet", async (req, res) => {
+    auth.setLoomWallet(req, res);
+})
+
 app.post("/question/set", async (req, res) => {
     questions.setQuestion(req, res);
 })
@@ -101,11 +106,9 @@ app.post("/invites/delete", async (req, res) =>{
 })
 
 
-
 app.post("/answer", async (req, res) =>{
     answer.setAnswer(req, res)
 })
-
 
 app.post("/delete_event", async (req, res) =>{
     deleteEvent.deleteEvent(req, res);
@@ -113,6 +116,10 @@ app.post("/delete_event", async (req, res) =>{
 
 app.post("/history_quize/get_by_id", async (req, res)=>{
     historyQuize.historyQuizeById(req, res);
+})
+
+app.get("/eth_price", async (req, res)=>{
+    setEthPrice.getEthPrice(req, res);
 })
 
 

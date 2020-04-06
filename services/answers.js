@@ -43,9 +43,17 @@ const setOneAnswer = async (req, res) => {
     // get hold money from contract
     if (to === 'validatorsAnswer') {
         if (Number(req.body.validated) === 1) {
-            let historyHoldMoney = await contract.receiveHoldMoney(eventId);
+            let data = {
+                "select": [{ "events/host": ["users/loomWallet"] }],
+                "from": eventId
+            }
+            let userData = await axios.post(path.path + "/query", data)
+            let loomWallet = userData.data['events/host']['users/loomWallet']
+            console.log(loomWallet);
+
+            let historyHoldMoney = await contract.receiveHoldMoney(loomWallet, eventId); 
             if (historyHoldMoney !== "error") {
-                historyHoldMoney.forEach((x)=>{
+                historyHoldMoney.forEach((x) => {
                     setAnswer.push(x)
                 })
             }
