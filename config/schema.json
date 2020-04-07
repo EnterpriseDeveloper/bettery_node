@@ -261,6 +261,11 @@
     },
     {
         "_id": "_predicate",
+        "name": "events/tokenPay",
+        "type": "boolean"
+    },
+    {
+        "_id": "_predicate",
         "name": "events/invites",
         "type": "ref",
         "multi": true,

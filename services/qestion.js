@@ -192,6 +192,7 @@ function eventStructure(data) {
             transactionHash: z['events/transactionHash'],
             showDistribution: z['events/showDistribution'],
             question: z['events/question'],
+            tokenPay: z['events/tokenPay'] === undefined ? false : z['events/tokenPay'],
             private: z['events/private'] === undefined ? false : z['events/private'],
             multiChoise: z['events/multiChoise'] === undefined ? false : z['events/multiChoise'],
             parcipiantAnswers: z["events/parcipiantsAnswer"] === undefined ? undefined : z["events/parcipiantsAnswer"].map((par) => {

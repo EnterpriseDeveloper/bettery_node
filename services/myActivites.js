@@ -53,6 +53,7 @@ const getAllInvites = async (req, res) => {
                                 transactionHash: inv['invites/eventId']['events/transactionHash'],
                                 showDistribution: inv['invites/eventId']['events/showDistribution'],
                                 question: inv['invites/eventId']['events/question'],
+                                tokenPay: inv['invites/eventId']['events/tokenPay'] === undefined ? false : inv['invites/eventId']['events/tokenPay'],
                                 private: inv['invites/eventId']['events/private'] === undefined ? false : inv['invites/eventId']['events/private'],
                                 multiChoise: inv['invites/eventId']['events/multiChoise'] === undefined ? false : inv['invites/eventId']['events/multiChoise'],
                                 parcipiantAnswers: inv['invites/eventId']["events/parcipiantsAnswer"] === undefined ? undefined : inv['invites/eventId']["events/parcipiantsAnswer"].map((par) => {
@@ -218,6 +219,7 @@ function activitiesArchitecture(data, from, host) {
             transactionHash: z['events/transactionHash'],
             showDistribution: z['events/showDistribution'],
             question: z['events/question'],
+            tokenPay: z['events/tokenPay'] === undefined ? false : z['events/tokenPay'],
             private: z['events/private'] === undefined ? false : z['events/private'],
             multiChoise: z['events/multiChoise'] === undefined ? false : z['events/multiChoise'],
             parcipiantAnswers: z["events/parcipiantsAnswer"] === undefined ? undefined : z["events/parcipiantsAnswer"].map((par) => {
