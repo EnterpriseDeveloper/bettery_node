@@ -77,6 +77,7 @@ const validate = (req, res) => {
                             paymentWay: history['historyTransactions/paymentWay'],
                             amount: history['historyTransactions/amount'],
                             role: history['historyTransactions/role'],
+                            ether: history['historyTransactions/ether'] === undefined ? false : history['historyTransactions/ether'],
                             eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
                         }
                     })

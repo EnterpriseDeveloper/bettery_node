@@ -6,6 +6,7 @@ const Web3 = require('web3');
 const Quize = require('./Quize.json');
 const setAnswer = require("../services/event_is_finish");
 const history = require("../services/history");
+const onHoldHistory = require("../services/historyMoney");
 const { readFileSync } = require('fs')
 const path = require('path')
 
@@ -49,6 +50,10 @@ class Contract {
         this.web3 = new Web3(new LoomProvider(this.client, this.privateKey))
     }
 
+    _getCurrentNetwork() {
+        return '9545242630824'
+    }
+
     async _createContractInstance() {
         const networkId = await this._getCurrentNetwork()
         this.currentNetwork = Quize.networks[networkId]
@@ -64,26 +69,35 @@ class Contract {
 
     async eventHandler() {
         let QuizeInstance = await this._createContractInstance();
+
         QuizeInstance.events.eventIsFinish(async (err, event) => {
-            if (err) console.error('Error on event', err)
-            else {
+            if (err) {
+                console.error('Error eventIsFinish', err)
+            } else {
                 let eventId = event.returnValues.question_id;
+                let ether = event.returnValues.payEther;
                 let eventData = await QuizeInstance.methods.getQuestion(Number(eventId)).call();
                 console.log(eventData)
                 // set to Db
                 setAnswer.setCorrectAnswer(eventData, eventId);
-                
-                setTimeout(() => {
-                    history.setReceiveHistory(eventData, eventId);
-                }, 3000)
 
+                setTimeout(() => {
+                    history.setReceiveHistory(eventData, eventId, ether);
+                }, 5000)
+
+            }
+        })
+
+        QuizeInstance.events.payEvent(async (err, event) => {
+            if (err) {
+                console.error('Error payEvent', err)
+            } else {
+                let eventData = event.returnValues;
+                onHoldHistory.setHistoryMoney(eventData);
             }
         })
     }
 
-    _getCurrentNetwork() {
-        return '9545242630824'
-    }
 }
 
 module.exports = {

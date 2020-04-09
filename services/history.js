@@ -4,7 +4,7 @@ const path = require("../config/path");
 const _ = require("lodash");
 
 
-const setReceiveHistory = async (contractData, eventId) => {
+const setReceiveHistory = async (contractData, eventId, ether) => {
 
     let allHistory = []
 
@@ -37,7 +37,7 @@ const setReceiveHistory = async (contractData, eventId) => {
 
     let findPart = _.filter(rightAnswer, function (o) { return o.role === 'participant' });
     if (findPart.length !== 0) {
-        let parc = createHistory(eventId, findPart, contractData.monayForParticipant, "participant");
+        let parc = createHistory(eventId, findPart, contractData.moneyForParticipant, "participant", ether);
         let userData = createUserHistory(findPart, parc)
         let addTogether = parc.concat(userData);
 
@@ -50,7 +50,7 @@ const setReceiveHistory = async (contractData, eventId) => {
 
     let findValid = _.filter(rightAnswer, function (o) { return o.role === 'validator' });
     if (findValid.length !== 0) {
-        let valid = createHistory(eventId, findValid, contractData.persentForEachValidators, "validator");
+        let valid = createHistory(eventId, findValid, contractData.persentForEachValidators, "validator", ether);
         let userData = createUserHistory(findValid, valid)
         let addTogether = valid.concat(userData);
 
@@ -60,13 +60,13 @@ const setReceiveHistory = async (contractData, eventId) => {
     }
 
     axios.post(path.path + "/transact", allHistory).then(() => {
-        setToHost(eventId, contractData.persentFeeHost)
+        setToHost(eventId, contractData.persentFeeHost, ether)
     }).catch((err) => {
         console.log("DB error: " + err.response.data.message)
     })
 }
 
-function createHistory(eventId, data, amount, role) {
+function createHistory(eventId, data, amount, role, ether) {
     let web3 = new Web3();
     let money = web3.utils.fromWei(String(amount), 'ether')
 
@@ -77,7 +77,8 @@ function createHistory(eventId, data, amount, role) {
             paymentWay: "receive",
             amount: Number(money),
             eventId: Number(eventId),
-            role: role
+            role: role,
+            ether: ether
         }
     })
 }
@@ -91,7 +92,7 @@ function createUserHistory(userData, historyData) {
     })
 }
 
-async function setToHost(eventId, amount) {
+async function setToHost(eventId, amount, ether) {
     let getQuestion = {
         "select": [{ "events/host": ["users/wallet"] }],
         "from": Number(eventId)
@@ -113,7 +114,8 @@ async function setToHost(eventId, amount) {
         paymentWay: "receive",
         amount: Number(money),
         eventId: Number(eventId),
-        role: "host"
+        role: "host",
+        ether: ether
     }, {
         _id: host,
         "historyTransactions": ["historyTransactions$newHost"]

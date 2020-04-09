@@ -21,7 +21,6 @@ const createId = (req, res) => {
 const setQuestion = (req, res) => {
     let allData = req.body
     let hashtagsId = req.body.hashtagsId
-    let getCoinsForHold = req.body.getCoinsForHold
     delete allData['getCoinsForHold'];
     delete allData['finalAnswers'];
     allData.invites = []
@@ -98,17 +97,8 @@ const setQuestion = (req, res) => {
 
         // ADD to host
         let hostData = [{
-            _id: "historyTransactions$newHost",
-            date: Math.floor(Date.now() / 1000),
-            paymentWay: "send",
-            amount: Number(getCoinsForHold),
-            eventId: allData._id,
-            role: "quiz hold money"
-        },
-        {
             _id: allData.host,
             hostEvents: [allData._id],
-            "historyTransactions": ["historyTransactions$newHost"]
         }]
 
         axios.post(path.path + "/transact", hostData).then(() => {

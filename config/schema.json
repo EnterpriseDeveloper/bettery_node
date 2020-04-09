@@ -185,6 +185,11 @@
     },
     {
         "_id": "_predicate",
+        "name": "historyTransactions/ether",
+        "type": "boolean"
+    },
+    {
+        "_id": "_predicate",
         "name": "historyTransactions/amount",
         "type": "float"
     },

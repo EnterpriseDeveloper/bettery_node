@@ -49,48 +49,17 @@ const setOneAnswer = async (req, res) => {
             }
             let userData = await axios.post(path.path + "/query", data)
             let loomWallet = userData.data['events/host']['users/loomWallet']
-            console.log(loomWallet);
 
-            let historyHoldMoney = await contract.receiveHoldMoney(loomWallet, eventId); 
-            if (historyHoldMoney !== "error") {
-                historyHoldMoney.forEach((x) => {
-                    setAnswer.push(x)
-                })
-            }
+            await contract.receiveHoldMoney(loomWallet, eventId);
         }
-    }
-
-
-    // add history transaction if participant
-    if (req.body.from === "participant") {
-        let history = {
-            _id: "historyTransactions$newHistory",
-            eventId: eventId,
-            role: req.body.from,
-            amount: req.body.money,
-            paymentWay: "send",
-            date: Math.floor(Date.now() / 1000)
-        }
-
-        setAnswer.push(history)
     }
 
     // add to users table
-    if (req.body.from === "participant") {
         let user = {
             _id: from,
             activites: ["activites$act1"],
-            historyTransactions: ["historyTransactions$newHistory"]
         }
         setAnswer.push(user)
-    } else {
-        let user = {
-            _id: from,
-            activites: ["activites$act1"]
-        }
-        setAnswer.push(user)
-    }
-
 
     axios.post(path.path + "/transact", setAnswer).then(() => {
         res.status(200);
