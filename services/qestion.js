@@ -130,7 +130,7 @@ const getById = (req, res) => {
     }
 
     axios.post(path.path + "/query", conf).then((x) => {
-        let obj = eventStructure([x.data])
+        let obj = eventStructure([x.data[0]])
         res.status(200)
         res.send(obj[0])
     }).catch((err) => {

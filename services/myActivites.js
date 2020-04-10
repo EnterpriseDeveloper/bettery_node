@@ -12,7 +12,7 @@ const getAllInvites = async (req, res) => {
     }
 
     axios.post(path.path + "/query", conf).then((x) => {
-        let inviteData = x.data['users/invites']
+        let inviteData = x.data[0]['users/invites']
         if (inviteData !== undefined) {
             if (inviteData.length !== 0) {
                 let invites = inviteData.map((x) => {
@@ -177,8 +177,8 @@ async function fetchData(req, res) {
     })
 
     // get users activites
-    if (allData.data['users/activites'] !== undefined) {
-        allData.data['users/activites'].forEach((x) => {
+    if (allData.data[0]['users/activites'] !== undefined) {
+        allData.data[0]['users/activites'].forEach((x) => {
             let userActivites = activitiesArchitecture([x['activites/eventId']], x['activites/role'], false)
             userActivites.forEach((o) => {
                 allActivites.push(o)
@@ -189,8 +189,8 @@ async function fetchData(req, res) {
     }
 
     // get host activites 
-    if (allData.data['users/hostEvents'] !== undefined) {
-        let hostActivites = activitiesArchitecture(allData.data['users/hostEvents'], 'none', true)
+    if (allData.data[0]['users/hostEvents'] !== undefined) {
+        let hostActivites = activitiesArchitecture(allData.data[0]['users/hostEvents'], 'none', true)
         hostActivites.forEach((o) => {
             allActivites.push(o)
         })

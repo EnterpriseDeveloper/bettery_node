@@ -11,7 +11,7 @@ const registration = (req, res) => {
     }
 
     axios.post(path.path + "/query", findNickName).then((x) => {
-        if (x.data === null) {
+        if (x.data.length === 0) {
             let data = [{
                 "_id": "users$newUser",
                 "nickName": req.body.nickName,
@@ -62,15 +62,14 @@ const validate = (req, res) => {
         }
 
         axios.post(path.path + "/query", conf).then((x) => {
-
-            if (x.data !== null) {
+            if (x.data.length != 0) {
                 let o = {
-                    _id: x.data["_id"],
-                    wallet: x.data["users/wallet"],
-                    nickName: x.data["users/nickName"],
-                    avatar: x.data["users/avatar"],
-                    email: x.data["users/email"],
-                    historyTransaction: x.data["historyTransactions"] === undefined ? [] : x.data["historyTransactions"].map((history) => {
+                    _id: x.data[0]["_id"],
+                    wallet: x.data[0]["users/wallet"],
+                    nickName: x.data[0]["users/nickName"],
+                    avatar: x.data[0]["users/avatar"],
+                    email: x.data[0]["users/email"],
+                    historyTransaction: x.data[0]["historyTransactions"] === undefined ? [] : x.data[0]["historyTransactions"].map((history) => {
                         return {
                             id: history._id,
                             date: history['historyTransactions/date'],
@@ -135,6 +134,7 @@ const allUsers = (req, res) => {
                 })
             }
         })
+
         res.status(200);
         res.send(result);
     }).catch((err) => {

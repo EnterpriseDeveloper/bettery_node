@@ -21,8 +21,9 @@ const setHistoryMoney = async (contractData) => {
             console.log("DB error: " + err.response.data.message)
         })
 
-    if (userData.data !== undefined) {
-        let userId = userData.data["_id"]
+    if (userData.data.length !== undefined) {
+        let userId = userData.data[0]["_id"];
+        console.log(userId);
 
         let history = [{
             _id: "historyTransactions$quizHoldMoney",

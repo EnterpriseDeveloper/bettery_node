@@ -18,8 +18,7 @@ const setEthPriceToContract = async () => {
 
     // ETH price
     // Token price
-    let test = await getContract.methods.setEthPrice(toWei, toWei).send();
-    console.log(test);
+    await getContract.methods.setEthPrice(toWei, toWei).send();
 
     setInterval(() => {
         setEthPriceToContract();

@@ -48,7 +48,7 @@ const setOneAnswer = async (req, res) => {
                 "from": eventId
             }
             let userData = await axios.post(path.path + "/query", data)
-            let loomWallet = userData.data['events/host']['users/loomWallet']
+            let loomWallet = userData.data[0]['events/host']['users/loomWallet']
 
             await contract.receiveHoldMoney(loomWallet, eventId);
         }
