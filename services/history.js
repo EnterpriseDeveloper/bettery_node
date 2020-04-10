@@ -103,7 +103,7 @@ async function setToHost(eventId, amount, ether) {
             console.log("DB error: " + err.response.data.message)
         })
 
-    let host = quest.data['events/host']['_id']
+    let host = quest.data[0]['events/host']['_id']
 
     let web3 = new Web3();
     let money = web3.utils.fromWei(String(amount), 'ether')

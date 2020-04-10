@@ -78,6 +78,7 @@ class Contract {
                 let ether = event.returnValues.payEther;
                 let eventData = await QuizeInstance.methods.getQuestion(Number(eventId)).call();
                 console.log(eventData)
+                console.log("FINISH EVENT WORK")
                 // set to Db
                 setAnswer.setCorrectAnswer(eventData, eventId);
 
@@ -92,6 +93,7 @@ class Contract {
             if (err) {
                 console.error('Error payEvent', err)
             } else {
+                console.log("PAY EVENT WORK")
                 let eventData = event.returnValues;
                 onHoldHistory.setHistoryMoney(eventData);
             }
