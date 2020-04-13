@@ -1,4 +1,4 @@
-const Contract = require("../contract/contract");
+const Contract = require("../contract-services/contract");
 
 const receiveHoldMoney = async (loomWallet, eventId) => {
     let contr = new Contract.Contract();

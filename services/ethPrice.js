@@ -1,6 +1,6 @@
 const axios = require("axios");
-const Contract = require("../contract/contract");
-const key = require("../key");
+const Contract = require("../contract-services/contract");
+const key = require("../config/key");
 const Web3 = require("web3");
 
 const setEthPriceToContract = async () => {
