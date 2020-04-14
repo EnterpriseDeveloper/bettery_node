@@ -77,8 +77,6 @@ class Contract {
                 let eventId = event.returnValues.question_id;
                 let ether = event.returnValues.payEther;
                 let eventData = await QuizeInstance.methods.getQuestion(Number(eventId)).call();
-                console.log(eventData)
-                console.log("FINISH EVENT WORK")
                 // set to Db
                 setAnswer.setCorrectAnswer(eventData, eventId);
 
@@ -93,9 +91,19 @@ class Contract {
             if (err) {
                 console.error('Error payEvent', err)
             } else {
-                console.log("PAY EVENT WORK")
                 let eventData = event.returnValues;
                 onHoldHistory.setHistoryMoney(eventData);
+            }
+        })
+
+        QuizeInstance.events.revertedEvent(async (err, event) =>{
+            if (err) {
+                console.error('Error payEvent', err)
+            } else {
+                let eventData = event.returnValues;
+                console.log("REVERT EVENT WORK");
+                console.log(eventData)
+                onHoldHistory.setRevertedHistoryMoney(eventData);
             }
         })
     }

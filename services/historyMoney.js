@@ -48,6 +48,11 @@ const setHistoryMoney = async (contractData) => {
 
 }
 
+const setRevertedHistoryMoney = async (contractData) =>{
+    let eventId = Number(contractData.question_id);
+    
+}
+
 
 
 module.exports = {

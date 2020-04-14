@@ -1,5 +1,6 @@
 const axios = require("axios");
 const path = require("../config/path");
+const contract = require("./holdMoneyDetection");
 
 
 const deleteEvent = async (req, res) => {
@@ -7,7 +8,7 @@ const deleteEvent = async (req, res) => {
     let deleteQuery = [];
 
     let getEvent = {
-        select: ["*"],
+        select: ["*", { "events/host": ["users/loomWallet"] }],
         from: id
     }
 
@@ -16,7 +17,14 @@ const deleteEvent = async (req, res) => {
             console.log("DB error: " + err.response.data.message)
         })
 
-    if (event !== undefined) {
+    if (event.data.length !== 0) {
+
+        // !!! ATTENTION can be a problem if the user will delete the event 
+        // after the event is finished, will return one more money from the on-hold contract.
+        let loomWallet = event.data[0]['events/host']['users/loomWallet']
+
+        await contract.receiveHoldMoney(loomWallet, id);
+
 
         // add event
         deleteQuery.push({
@@ -25,8 +33,8 @@ const deleteEvent = async (req, res) => {
         })
 
         // get all invites 
-        if (event.data['events/invites'] !== undefined) {
-            event.data['events/invites'].forEach((x) => {
+        if (event.data[0]['events/invites'] !== undefined) {
+            event.data[0]['events/invites'].forEach((x) => {
                 deleteQuery.push({
                     _id: x._id,
                     _action: "delete"
@@ -35,8 +43,8 @@ const deleteEvent = async (req, res) => {
         }
 
         // get parcipiants activites
-        if (event.data['events/parcipiantsAnswer'] !== undefined) {
-            event.data['events/parcipiantsAnswer'].forEach((x) => {
+        if (event.data[0]['events/parcipiantsAnswer'] !== undefined) {
+            event.data[0]['events/parcipiantsAnswer'].forEach((x) => {
                 deleteQuery.push({
                     _id: x._id,
                     _action: "delete"
@@ -45,8 +53,8 @@ const deleteEvent = async (req, res) => {
         }
 
         // get validatos activites
-        if (event.data['events/validatorsAnswer'] !== undefined) {
-            event.data['events/validatorsAnswer'].forEach((x) => {
+        if (event.data[0]['events/validatorsAnswer'] !== undefined) {
+            event.data[0]['events/validatorsAnswer'].forEach((x) => {
                 deleteQuery.push({
                     _id: x._id,
                     _action: "delete"
