@@ -12,7 +12,9 @@ const deleteEvent = require("./services/deleteEvent");
 const invites = require("./services/invites")
 const historyQuize = require("./services/historyQuize");
 const setEthPrice = require("./services/ethPrice");
- 
+
+const test = require("./services/historyMoney");
+
 
 const multer = require('multer');
 const upload = multer();
@@ -88,37 +90,37 @@ app.get("/hashtags/get_all", async (req, res) => {
     hashtags.getAllHashtags(req, res);
 })
 
-app.post("/my_activites/invites", async (req, res) =>{
+app.post("/my_activites/invites", async (req, res) => {
     myActivites.getAllInvites(req, res);
 })
 
-app.post("/my_activites/current", async (req, res) =>{
+app.post("/my_activites/current", async (req, res) => {
     myActivites.getCurrentEvent(req, res);
 })
 
-app.post("/my_activites/past", async (req, res) =>{
+app.post("/my_activites/past", async (req, res) => {
     myActivites.getPastEvent(req, res);
 })
 
 
-app.post("/invites/delete", async (req, res) =>{
+app.post("/invites/delete", async (req, res) => {
     invites.deleteInvitation(req, res);
 })
 
 
-app.post("/answer", async (req, res) =>{
+app.post("/answer", async (req, res) => {
     answer.setAnswer(req, res)
 })
 
-app.post("/delete_event", async (req, res) =>{
+app.post("/delete_event", async (req, res) => {
     deleteEvent.deleteEvent(req, res);
 })
 
-app.post("/history_quize/get_by_id", async (req, res)=>{
+app.post("/history_quize/get_by_id", async (req, res) => {
     historyQuize.historyQuizeById(req, res);
 })
 
-app.get("/eth_price", async (req, res)=>{
+app.get("/eth_price", async (req, res) => {
     setEthPrice.getEthPrice(req, res);
 })
 
@@ -132,7 +134,7 @@ httpServer.listen(80, async () => {
     let contract = new Contract.Contract();
     contract.loadHandlerContract();
 
-   setEthPrice.setEthPriceToContract();
-   console.log("server run port 80")
+    setEthPrice.setEthPriceToContract();
+    console.log("server run port 80")
 });
 
