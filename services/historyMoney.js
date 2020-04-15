@@ -84,7 +84,12 @@ const setRevertedHistoryMoney = async (contractData) =>{
            )
         })
 
-        console.log(historyData)
+        // add reverted to the event
+        historyData.push({
+            _id: eventId,
+            reverted: true
+        })
+
 
         await axios.post(path.path + "/transact", historyData)
         .catch((err) => {
