@@ -33,6 +33,7 @@ const historyQuizeById = async (req, res) => {
     })
 
     if (allHistory.status === 200 && blocktime.status === 200) {
+
         let sortByBlock = _.sortBy(allHistory.data, [function (o) { return o.block; }]);
         let obj = sortByBlock.map((z, i) => {
             let getTime = _.find(blocktime.data, (o) => { return o[0] === z.block })
@@ -120,7 +121,11 @@ function getFinalAction(data, activitesData) {
         let findActivites = _.find(activitesData, (x) => { return x._id === data.action })
         return findActivites['activites/role']
     } else if (data.action.search("final answer") !== -1) {
-        return "event ending"
+        if(data.action.search("Undefined") === -1){
+            return "event ending";
+        }else{
+            return "reverted";
+        }
     } else {
         return data.action
     }
@@ -140,6 +145,8 @@ function getAction(data, index) {
 function checkActivites(data) {
     if (data.flakes.asserted[0]["events/finalAnswerNumber"] !== undefined) {
         return "final answer is " + data.flakes.asserted[0]["events/finalAnswerNumber"]
+    }else if(data.flakes.asserted[0]["events/reverted"] === true){
+        return "final answer is Undefined. Because event is reverted";
     } else if (data.flakes.asserted[0]['events/parcipiantsAnswer'] !== undefined) {
         return data.flakes.asserted[0]['events/parcipiantsAnswer'][0]["_id"]
     } else if (data.flakes.asserted[0]['events/validatorsAnswer'] !== undefined) {
