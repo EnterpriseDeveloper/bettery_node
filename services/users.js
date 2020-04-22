@@ -17,7 +17,8 @@ const registration = (req, res) => {
                 "nickName": req.body.nickName,
                 "email": req.body.email,
                 "wallet": req.body.wallet,
-                "avatar": req.body.avatar
+                "avatar": req.body.avatar,
+                "fakeCoins": req.body.fakeCoins
             }]
 
             axios.post(path.path + "/transact", data).then((x) => {
@@ -69,6 +70,7 @@ const validate = (req, res) => {
                     nickName: x.data[0]["users/nickName"],
                     avatar: x.data[0]["users/avatar"],
                     email: x.data[0]["users/email"],
+                    fakeCoins: x.data[0]["users/fakeCoins"],
                     historyTransaction: x.data[0]["historyTransactions"] === undefined ? [] : x.data[0]["historyTransactions"].map((history) => {
                         return {
                             id: history._id,
@@ -121,6 +123,7 @@ const allUsers = (req, res) => {
                 nickName: x["users/nickName"],
                 avatar: x["users/avatar"],
                 email: x["users/email"],
+                fakeCoins: x["users/fakeCoins"],
                 historyTransaction: x["historyTransactions"] === undefined ? [] : x["historyTransactions"].map((history) => {
                     return {
                         id: history._id,
