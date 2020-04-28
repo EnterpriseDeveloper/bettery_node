@@ -12,9 +12,7 @@ const deleteEvent = require("./services/deleteEvent");
 const invites = require("./services/invites")
 const historyQuize = require("./services/historyQuize");
 const setEthPrice = require("./services/ethPrice");
-
-const test = require("./services/historyMoney");
-
+const socialRegistration = require("./services/socialRegistration");
 
 const multer = require('multer');
 const upload = multer();
@@ -56,6 +54,10 @@ app.use(bodyParser.urlencoded({
 
 app.post("/user/validate", async (req, res) => {
     auth.validate(req, res);
+})
+
+app.post("/user/socialRegistration", async (req, res) => {
+    socialRegistration.socialRegistration(req, res);
 })
 
 app.post("/user/regist", async (req, res) => {

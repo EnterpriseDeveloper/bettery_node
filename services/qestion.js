@@ -182,7 +182,7 @@ function eventStructure(data) {
             transactionHash: z['events/transactionHash'],
             showDistribution: z['events/showDistribution'],
             question: z['events/question'],
-            tokenPay: z['events/tokenPay'] === undefined ? false : z['events/tokenPay'],
+            currencyType: z['events/currencyType'] === undefined ? false : z['events/currencyType'],
             private: z['events/private'] === undefined ? false : z['events/private'],
             reverted: z['events/reverted'] === undefined ? false : z['events/reverted'],
             multiChoise: z['events/multiChoise'] === undefined ? false : z['events/multiChoise'],

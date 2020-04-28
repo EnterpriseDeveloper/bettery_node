@@ -61,7 +61,7 @@ const setRevertedHistoryMoney = async (contractData) =>{
     if(eventData.data.length !== 0){
 
         let money = Number(eventData.data[0]["events/money"]);
-        let payEther = eventData.data[0]["events/tokenPay"];
+        let payEther = eventData.data[0]["events/currencyType"];
 
         let historyData = eventData.data[0]["events/parcipiantsAnswer"].map((x, i)=>{
             return {
