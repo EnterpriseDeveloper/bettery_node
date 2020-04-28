@@ -23,7 +23,6 @@ const getAllInvites = async (req, res) => {
                     "select": ["*",
                         {
                             'invites/eventId': ["*",
-                                { "events/host": ["users/wallet"] },
                                 { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
                                 { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }
                             ]
@@ -42,7 +41,7 @@ const getAllInvites = async (req, res) => {
                                 startTime: inv['invites/eventId']['events/startTime'],
                                 id: inv['invites/eventId']._id,
                                 hashtags: inv['invites/eventId']['events/hashtags'],
-                                host: inv['invites/eventId']['events/host']["users/wallet"],
+                                host: inv['invites/eventId']['events/host']["_id"],
                                 validated: inv['invites/eventId']['events/validated'],
                                 status: inv['invites/eventId']['events/status'],
                                 answers: Object.assign([], inv['invites/eventId']['events/answers']).reverse(),
@@ -59,6 +58,7 @@ const getAllInvites = async (req, res) => {
                                 multiChoise: inv['invites/eventId']['events/multiChoise'] === undefined ? false : inv['invites/eventId']['events/multiChoise'],
                                 parcipiantAnswers: inv['invites/eventId']["events/parcipiantsAnswer"] === undefined ? undefined : inv['invites/eventId']["events/parcipiantsAnswer"].map((par) => {
                                     return {
+                                        id: par['activites/_id'],
                                         transactionHash: par['activites/transactionHash'],
                                         date: par['activites/date'],
                                         answer: par['activites/answer'],
@@ -67,6 +67,7 @@ const getAllInvites = async (req, res) => {
                                 }),
                                 validatorsAnswers: inv['invites/eventId']["events/validatorsAnswer"] === undefined ? undefined : inv['invites/eventId']["events/validatorsAnswer"].map((val) => {
                                     return {
+                                        id: par['activites/_id'],
                                         transactionHash: val['activites/transactionHash'],
                                         date: val['activites/date'],
                                         answer: val['activites/answer'],
@@ -226,6 +227,7 @@ function activitiesArchitecture(data, from, host) {
             multiChoise: z['events/multiChoise'] === undefined ? false : z['events/multiChoise'],
             parcipiantAnswers: z["events/parcipiantsAnswer"] === undefined ? undefined : z["events/parcipiantsAnswer"].map((par) => {
                 return {
+                    id: par['activites/_id'],
                     transactionHash: par['activites/transactionHash'],
                     date: par['activites/date'],
                     answer: par['activites/answer'],
@@ -234,6 +236,7 @@ function activitiesArchitecture(data, from, host) {
             }),
             validatorsAnswers: z["events/validatorsAnswer"] === undefined ? undefined : z["events/validatorsAnswer"].map((val) => {
                 return {
+                    id: par['activites/_id'],
                     transactionHash: val['activites/transactionHash'],
                     date: val['activites/date'],
                     answer: val['activites/answer'],

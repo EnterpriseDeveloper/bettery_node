@@ -145,7 +145,6 @@ const getAll = (req, res) => {
 
     let conf = {
         "select": ["*",
-            { 'events/host': ["users/wallet"] },
             { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
             { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }
         ],
@@ -171,7 +170,7 @@ function eventStructure(data) {
             startTime: z['events/startTime'],
             id: z._id,
             hashtags: z['events/hashtags'],
-            host: z['events/host']['users/wallet'],
+            host: z['events/host']["_id"],
             validated: z['events/validated'],
             status: z['events/status'],
             answers: Object.assign([], z['events/answers']).reverse(),
@@ -188,6 +187,7 @@ function eventStructure(data) {
             multiChoise: z['events/multiChoise'] === undefined ? false : z['events/multiChoise'],
             parcipiantAnswers: z["events/parcipiantsAnswer"] === undefined ? undefined : z["events/parcipiantsAnswer"].map((par) => {
                 return {
+                    id: par['activites/_id'],
                     transactionHash: par['activites/transactionHash'],
                     date: par['activites/date'],
                     answer: par['activites/answer'],
@@ -196,6 +196,7 @@ function eventStructure(data) {
             }),
             validatorsAnswers: z["events/validatorsAnswer"] === undefined ? undefined : z["events/validatorsAnswer"].map((val) => {
                 return {
+                    id: par['activites/_id'],
                     transactionHash: val['activites/transactionHash'],
                     date: val['activites/date'],
                     answer: val['activites/answer'],
