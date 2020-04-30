@@ -11,7 +11,6 @@ const socialRegistration = (req, res) => {
     }
 
     axios.post(path.path + "/query", findNickName).then((x) => {
-        console.log(x.data)
         if (x.data.length === 0) {
             let data = [{
                 "_id": "users$newUser",
@@ -43,7 +42,6 @@ const socialRegistration = (req, res) => {
             })
 
         } else {
-            console.log(x.data[0]["users/historyTransactions"])
             res.status(200);
             res.send({
                 _id: x.data[0]["_id"],

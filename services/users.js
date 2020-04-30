@@ -41,15 +41,15 @@ const registration = (req, res) => {
     })
 }
 
-const setLoomWallet = (req, res) =>{
+const setLoomWallet = (req, res) => {
     let data = [{
-      "_id": Number(req.body.id),
-      "loomWallet": req.body.loomWallet
+        "_id": Number(req.body.id),
+        "loomWallet": req.body.loomWallet
     }]
-    axios.post(path.path + "/transact", data).then(()=>{
+    axios.post(path.path + "/transact", data).then(() => {
         res.status(200);
         res.send({ "transact": "done" })
-    }).catch((err)=>{
+    }).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
     })
@@ -65,26 +65,7 @@ const validate = (req, res) => {
 
         axios.post(path.path + "/query", conf).then((x) => {
             if (x.data.length != 0) {
-                let o = {
-                    _id: x.data[0]["_id"],
-                    wallet: x.data[0]["users/wallet"],
-                    nickName: x.data[0]["users/nickName"],
-                    avatar: x.data[0]["users/avatar"],
-                    email: x.data[0]["users/email"],
-                    fakeCoins: x.data[0]["users/fakeCoins"],
-                    socialRegistration: x.data[0]["users/socialRegistration"] === undefined ? false : x.data[0]["users/socialRegistration"],
-                    historyTransaction: x.data[0]["historyTransactions"] === undefined ? [] : x.data[0]["historyTransactions"].map((history) => {
-                        return {
-                            id: history._id,
-                            date: history['historyTransactions/date'],
-                            paymentWay: history['historyTransactions/paymentWay'],
-                            amount: history['historyTransactions/amount'],
-                            role: history['historyTransactions/role'],
-                            currencyType: history['historyTransactions/currencyType'],
-                            eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
-                        }
-                    })
-                }
+                let o = userStructure(x)
 
                 res.status(200);
                 res.send(o);
@@ -110,6 +91,30 @@ const validate = (req, res) => {
     }
 }
 
+const getUserById = (req, res) => {
+    let conf = {
+        "select": ["*", { "historyTransactions": ["*"] }],
+        "from": Number(req.body.id)
+    }
+
+    axios.post(path.path + "/query", conf).then((x) => {
+        if (x.data.length != 0) {
+            let o = userStructure(x)
+
+            res.status(200);
+            res.send(o);
+
+        } else {
+            res.status(400);
+            res.send("user do not exist");
+        }
+    }).catch((err) => {
+        console.log(err)
+        res.status(400);
+        res.send(err);
+    })
+}
+
 const allUsers = (req, res) => {
 
     let conf = {
@@ -119,26 +124,7 @@ const allUsers = (req, res) => {
 
     axios.post(path.path + "/query", conf).then((o) => {
         let result = o.data.map((x) => {
-            return {
-                _id: x["_id"],
-                wallet: x["users/wallet"],
-                nickName: x["users/nickName"],
-                avatar: x["users/avatar"],
-                email: x["users/email"],
-                fakeCoins: x["users/fakeCoins"],
-                socialRegistration: x["users/socialRegistration"] === undefined ? false : x["users/socialRegistration"],
-                historyTransaction: x["historyTransactions"] === undefined ? [] : x["historyTransactions"].map((history) => {
-                    return {
-                        id: history._id,
-                        date: history['historyTransactions/date'],
-                        currencyType: history['historyTransactions/currencyType'],
-                        amount: history['historyTransactions/amount'],
-                        role: history['historyTransactions/role'],
-                        eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
-
-                    }
-                })
-            }
+            return userStructure(x);
         })
 
         res.status(200);
@@ -149,9 +135,33 @@ const allUsers = (req, res) => {
     })
 }
 
+const userStructure = (x) => {
+    return {
+        _id: x.data[0]["_id"],
+        wallet: x.data[0]["users/wallet"],
+        nickName: x.data[0]["users/nickName"],
+        avatar: x.data[0]["users/avatar"],
+        email: x.data[0]["users/email"],
+        fakeCoins: x.data[0]["users/fakeCoins"],
+        socialRegistration: x.data[0]["users/socialRegistration"] === undefined ? false : x.data[0]["users/socialRegistration"],
+        historyTransaction: x.data[0]["historyTransactions"] === undefined ? [] : x.data[0]["historyTransactions"].map((history) => {
+            return {
+                id: history._id,
+                date: history['historyTransactions/date'],
+                paymentWay: history['historyTransactions/paymentWay'],
+                amount: history['historyTransactions/amount'],
+                role: history['historyTransactions/role'],
+                currencyType: history['historyTransactions/currencyType'],
+                eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
+            }
+        })
+    }
+}
+
 module.exports = {
     registration,
     validate,
     allUsers,
-    setLoomWallet
+    setLoomWallet,
+    getUserById
 }

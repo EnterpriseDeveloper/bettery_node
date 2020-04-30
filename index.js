@@ -60,6 +60,10 @@ app.post("/user/validate", async (req, res) => {
     auth.validate(req, res);
 })
 
+app.post("/user/getUserById", async (req, res) => {
+    auth.getUserById(req, res);
+})
+
 app.post("/user/socialRegistration", async (req, res) => {
     socialRegistration.socialRegistration(req, res);
 })
