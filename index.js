@@ -147,14 +147,5 @@ httpServer.listen(80, async () => {
     setEthPrice.setEthPriceToContract();
     console.log("server run port 80");
 
-    let data = {
-        "select": ["*",
-            { "events/host": ["_id", "users/fakeCoins"]},
-            { "events/parcipiantsAnswer": ["*", { "activites/from": ["_id", "users/fakeCoins"] }] },
-            { "events/validatorsAnswer": ["*", { "activites/from": ["_id", "users/fakeCoins"] }] }],
-        "from": 422212465065997
-    }
-    let eventData = await axios.post(path.path + "/query", data);
-    demoContract.demoSmartContract(eventData);
 });
 
