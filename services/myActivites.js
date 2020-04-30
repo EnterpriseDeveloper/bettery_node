@@ -4,11 +4,11 @@ const _ = require("lodash");
 
 
 const getAllInvites = async (req, res) => {
-    let wallet = req.body.wallet
+    let id = req.body.id
 
     let conf = {
         "select": ["*"],
-        "from": ["users/wallet", wallet]
+        "from": id
     }
 
     axios.post(path.path + "/query", conf).then((x) => {
@@ -23,8 +23,8 @@ const getAllInvites = async (req, res) => {
                     "select": ["*",
                         {
                             'invites/eventId': ["*",
-                                { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
-                                { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }
+                                { 'events/parcipiantsAnswer': ["*", { "activites/from": ["_id"] }] },
+                                { 'events/validatorsAnswer': ["*", { "activites/from": ["_id"] }] }
                             ]
                         },
                         { 'invites/from': ["users/nickName"] }
@@ -58,20 +58,18 @@ const getAllInvites = async (req, res) => {
                                 multiChoise: inv['invites/eventId']['events/multiChoise'] === undefined ? false : inv['invites/eventId']['events/multiChoise'],
                                 parcipiantAnswers: inv['invites/eventId']["events/parcipiantsAnswer"] === undefined ? undefined : inv['invites/eventId']["events/parcipiantsAnswer"].map((par) => {
                                     return {
-                                        id: par['activites/_id'],
                                         transactionHash: par['activites/transactionHash'],
                                         date: par['activites/date'],
                                         answer: par['activites/answer'],
-                                        wallet: par['activites/from']['users/wallet']
+                                        userId: par['activites/from']['_id']
                                     }
                                 }),
                                 validatorsAnswers: inv['invites/eventId']["events/validatorsAnswer"] === undefined ? undefined : inv['invites/eventId']["events/validatorsAnswer"].map((val) => {
                                     return {
-                                        id: par['activites/_id'],
                                         transactionHash: val['activites/transactionHash'],
                                         date: val['activites/date'],
                                         answer: val['activites/answer'],
-                                        wallet: val['activites/from']['users/wallet']
+                                        userId: val['activites/from']['_id']
                                     }
                                 }),
                             },
@@ -88,10 +86,10 @@ const getAllInvites = async (req, res) => {
 
                     for (let i = 0; i < invitesQuery.length; i++) {
                         if (invitesQuery[i].event.parcipiantAnswers !== undefined) {
-                            let findActivites = _.findIndex(invitesQuery[i].event.parcipiantAnswers, (o) => { return o.wallet === wallet });
+                            let findActivites = _.findIndex(invitesQuery[i].event.parcipiantAnswers, (o) => { return o.userId === id });
                             if (findActivites === -1) {
                                 if (invitesQuery[i].event.validatorsAnswers !== undefined) {
-                                    let findActivites = _.findIndex(invitesQuery[i].event.validatorsAnswers, (o) => { return o.wallet === wallet });
+                                    let findActivites = _.findIndex(invitesQuery[i].event.validatorsAnswers, (o) => { return o.userId === id });
                                     if (findActivites === -1) {
                                         allData.push(invitesQuery[i])
                                     }
@@ -101,7 +99,7 @@ const getAllInvites = async (req, res) => {
                             }
                         } else {
                             if (invitesQuery[i].event.validatorsAnswers !== undefined) {
-                                let findActivites = _.findIndex(invitesQuery[i].event.validatorsAnswers, (o) => { return o.wallet === wallet });
+                                let findActivites = _.findIndex(invitesQuery[i].event.validatorsAnswers, (o) => { return o.userId === id });
                                 if (findActivites === -1) {
                                     allData.push(invitesQuery[i])
                                 }
@@ -159,14 +157,14 @@ async function fetchData(req, res) {
             {
                 "users/activites": ["*", {
                     'activites/eventId': ["*",
-                        { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
-                        { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }]
+                        { 'events/parcipiantsAnswer': ["*", { "activites/from": ["_id"] }] },
+                        { 'events/validatorsAnswer': ["*", { "activites/from": ["_id"] }] }]
                 }]
             },
             {
                 "users/hostEvents": ["*",
-                    { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
-                    { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }]
+                    { 'events/parcipiantsAnswer': ["*", { "activites/from": ["_id"] }] },
+                    { 'events/validatorsAnswer': ["*", { "activites/from": ["_id"] }] }]
             }
         ],
         from: id
@@ -227,20 +225,18 @@ function activitiesArchitecture(data, from, host) {
             multiChoise: z['events/multiChoise'] === undefined ? false : z['events/multiChoise'],
             parcipiantAnswers: z["events/parcipiantsAnswer"] === undefined ? undefined : z["events/parcipiantsAnswer"].map((par) => {
                 return {
-                    id: par['activites/_id'],
                     transactionHash: par['activites/transactionHash'],
                     date: par['activites/date'],
                     answer: par['activites/answer'],
-                    wallet: par['activites/from']['users/wallet']
+                    userId: par['activites/from']['_id']
                 }
             }),
             validatorsAnswers: z["events/validatorsAnswer"] === undefined ? undefined : z["events/validatorsAnswer"].map((val) => {
                 return {
-                    id: par['activites/_id'],
                     transactionHash: val['activites/transactionHash'],
                     date: val['activites/date'],
                     answer: val['activites/answer'],
-                    wallet: val['activites/from']['users/wallet']
+                    userId: val['activites/from']['_id']
                 }
             }),
         }

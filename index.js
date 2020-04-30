@@ -14,6 +14,10 @@ const historyQuize = require("./services/historyQuize");
 const setEthPrice = require("./services/ethPrice");
 const socialRegistration = require("./services/socialRegistration");
 
+const axios = require("axios");
+const path = require("./config/path");
+const demoContract = require("./services/demoCoinContract");
+
 const multer = require('multer');
 const upload = multer();
 
@@ -137,6 +141,16 @@ httpServer.listen(80, async () => {
     contract.loadHandlerContract();
 
     setEthPrice.setEthPriceToContract();
-    console.log("server run port 80")
+    console.log("server run port 80");
+
+    let data = {
+        "select": ["*",
+            { "events/host": ["_id", "users/fakeCoins"]},
+            { "events/parcipiantsAnswer": ["*", { "activites/from": ["_id", "users/fakeCoins"] }] },
+            { "events/validatorsAnswer": ["*", { "activites/from": ["_id", "users/fakeCoins"] }] }],
+        "from": 422212465065997
+    }
+    let eventData = await axios.post(path.path + "/query", data);
+    demoContract.demoSmartContract(eventData);
 });
 

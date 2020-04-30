@@ -1,6 +1,7 @@
 const axios = require("axios");
 const path = require("../config/path");
 const contract = require("./holdMoneyDetection");
+const demoContract = require("./demoCoinContract");
 
 const setAnswer = (req, res) => {
 
@@ -17,6 +18,8 @@ const setOneAnswer = async (req, res) => {
 
     let eventId = req.body.event_id;
     let from = Number(req.body.userId)
+    let currencyType = req.body.currencyType
+    let validatedAmount = Number(req.body.validated);
 
     // add to the activites table
     let activites = {
@@ -26,6 +29,7 @@ const setOneAnswer = async (req, res) => {
         role: req.body.from,
         date: Math.floor(Date.now() / 1000),
         transactionHash: req.body.transactionHash,
+        currencyType: currencyType,
         eventId: eventId
     }
     setAnswer.push(activites);
@@ -36,13 +40,13 @@ const setOneAnswer = async (req, res) => {
     let event = {
         _id: eventId,
         [to]: ["activites$act1"],
-        [quantityPath]: req.body.from === "participant" ? req.body.answerAmount : req.body.validated
+        [quantityPath]: req.body.from === "participant" ? req.body.answerAmount : validatedAmount
     }
     setAnswer.push(event)
 
-    // get hold money from contract
     if (to === 'validatorsAnswer') {
-        if (Number(req.body.validated) === 1) {
+        // get hold money from contract
+        if (validatedAmount === 1 && currencyType !== "demo") {
             let data = {
                 "select": [{ "events/host": ["users/loomWallet"] }],
                 "from": eventId
@@ -52,14 +56,46 @@ const setOneAnswer = async (req, res) => {
 
             await contract.receiveHoldMoney(loomWallet, eventId);
         }
+        // check last validator for demo coins
+        if (currencyType === "demo") {
+            let data = {
+                "select": ["*",
+                    { "events/host": ["_id", "users/fakeCoins"] },
+                    { "events/parcipiantsAnswer": ["*", { "activites/from": ["_id", "users/fakeCoins"] }] },
+                    { "events/validatorsAnswer": ["*", { "activites/from": ["_id", "users/fakeCoins"] }] }],
+                "from": eventId
+            }
+            let eventData = await axios.post(path.path + "/query", data);
+            let validEventAmount = eventData.data[0]["events/validatorsAmount"]
+            if (validEventAmount === validatedAmount) {
+                demoContract.demoSmartContract(eventData);
+            }
+
+        }
     }
 
-    // add to users table
+    // get user demo coins
+    if (currencyType === "demo") {
+
+        let { transactId, userAmount, history } = await histortTransactForDemoCoins(from, eventId)
+
+        let user = {
+            _id: from,
+            activites: ["activites$act1"],
+            fakeCoins: userAmount,
+            historyTransactions: [transactId]
+        }
+        setAnswer.push(user);
+        setAnswer.push(history);
+
+    } else {
+        // add to users table
         let user = {
             _id: from,
             activites: ["activites$act1"],
         }
         setAnswer.push(user)
+    }
 
     axios.post(path.path + "/transact", setAnswer).then(() => {
         res.status(200);
@@ -69,6 +105,31 @@ const setOneAnswer = async (req, res) => {
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
     })
+}
+
+const histortTransactForDemoCoins = async (from, eventId) => {
+    let data = {
+        "select": ["*"],
+        "from": [from, eventId]
+    }
+    let allData = await axios.post(path.path + "/query", data);
+
+    let demoCoins = allData.data[0]["users/fakeCoins"];
+    let eventMoney = allData.data[1]["events/money"];
+    let userAmount = demoCoins - eventMoney
+    console.log()
+
+    let transactId = "historyTransactions$quizHoldMoney"
+    let history = {
+        _id: transactId,
+        eventId: Number(eventId),
+        role: "participant",
+        amount: Number(eventMoney),
+        paymentWay: "send",
+        currencyType: "demo",
+        date: Math.floor(Date.now() / 1000)
+    }
+    return { transactId, userAmount, history}
 }
 
 

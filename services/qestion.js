@@ -122,9 +122,8 @@ const getById = (req, res) => {
 
     let conf = {
         "select": ["*",
-            { 'events/host': ["users/wallet"] },
-            { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
-            { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }
+            { 'events/parcipiantsAnswer': ["*", { "activites/from": ["_id"] }] },
+            { 'events/validatorsAnswer': ["*", { "activites/from": ["_id"] }] }
         ],
         "from": id
     }
@@ -145,8 +144,8 @@ const getAll = (req, res) => {
 
     let conf = {
         "select": ["*",
-            { 'events/parcipiantsAnswer': ["*", { "activites/from": ["users/wallet"] }] },
-            { 'events/validatorsAnswer': ["*", { "activites/from": ["users/wallet"] }] }
+            { 'events/parcipiantsAnswer': ["*", { "activites/from": ["_id"] }] },
+            { 'events/validatorsAnswer': ["*", { "activites/from": ["_id"] }] }
         ],
         "from": "events"
     }
@@ -187,20 +186,18 @@ function eventStructure(data) {
             multiChoise: z['events/multiChoise'] === undefined ? false : z['events/multiChoise'],
             parcipiantAnswers: z["events/parcipiantsAnswer"] === undefined ? undefined : z["events/parcipiantsAnswer"].map((par) => {
                 return {
-                    id: par['activites/_id'],
                     transactionHash: par['activites/transactionHash'],
                     date: par['activites/date'],
                     answer: par['activites/answer'],
-                    wallet: par['activites/from']['users/wallet']
+                    userId: par['activites/from']['_id']
                 }
             }),
             validatorsAnswers: z["events/validatorsAnswer"] === undefined ? undefined : z["events/validatorsAnswer"].map((val) => {
                 return {
-                    id: par['activites/_id'],
                     transactionHash: val['activites/transactionHash'],
                     date: val['activites/date'],
                     answer: val['activites/answer'],
-                    wallet: val['activites/from']['users/wallet']
+                    userId: val['activites/from']['_id']
                 }
             }),
         }
