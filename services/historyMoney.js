@@ -30,7 +30,7 @@ const setHistoryMoney = async (contractData) => {
             role: role,
             amount: Number(amount),
             paymentWay: paymentWay,
-            ether: payEther,
+            currencyType: payEther ? "ether" : "token",
             date: Math.floor(Date.now() / 1000)
         }, {
             _id: userId,
@@ -61,7 +61,7 @@ const setRevertedHistoryMoney = async (contractData) =>{
     if(eventData.data.length !== 0){
 
         let money = Number(eventData.data[0]["events/money"]);
-        let payEther = eventData.data[0]["events/currencyType"];
+        let currencyType = eventData.data[0]["events/currencyType"];
 
         let historyData = eventData.data[0]["events/parcipiantsAnswer"].map((x, i)=>{
             return {
@@ -78,7 +78,7 @@ const setRevertedHistoryMoney = async (contractData) =>{
                 role: "Revert",
                 amount: money,
                 paymentWay: "receive",
-                ether: payEther,
+                currencyType: currencyType,
                 date: Math.floor(Date.now() / 1000)
             }
            )

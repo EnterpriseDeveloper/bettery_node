@@ -80,7 +80,7 @@ const validate = (req, res) => {
                             paymentWay: history['historyTransactions/paymentWay'],
                             amount: history['historyTransactions/amount'],
                             role: history['historyTransactions/role'],
-                            ether: history['historyTransactions/ether'] === undefined ? false : history['historyTransactions/ether'],
+                            currencyType: history['historyTransactions/currencyType'],
                             eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
                         }
                     })
@@ -131,7 +131,7 @@ const allUsers = (req, res) => {
                     return {
                         id: history._id,
                         date: history['historyTransactions/date'],
-                        paymentWay: history['historyTransactions/paymentWay'],
+                        currencyType: history['historyTransactions/currencyType'],
                         amount: history['historyTransactions/amount'],
                         role: history['historyTransactions/role'],
                         eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
