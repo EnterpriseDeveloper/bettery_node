@@ -65,7 +65,7 @@ const validate = (req, res) => {
 
         axios.post(path.path + "/query", conf).then((x) => {
             if (x.data.length != 0) {
-                let o = userStructure(x)
+                let o = userStructure(x.data[0])
 
                 res.status(200);
                 res.send(o);
@@ -99,7 +99,7 @@ const getUserById = (req, res) => {
 
     axios.post(path.path + "/query", conf).then((x) => {
         if (x.data.length != 0) {
-            let o = userStructure(x)
+            let o = userStructure(x.data[0])
 
             res.status(200);
             res.send(o);
@@ -137,14 +137,14 @@ const allUsers = (req, res) => {
 
 const userStructure = (x) => {
     return {
-        _id: x.data[0]["_id"],
-        wallet: x.data[0]["users/wallet"],
-        nickName: x.data[0]["users/nickName"],
-        avatar: x.data[0]["users/avatar"],
-        email: x.data[0]["users/email"],
-        fakeCoins: x.data[0]["users/fakeCoins"],
-        socialRegistration: x.data[0]["users/socialRegistration"] === undefined ? false : x.data[0]["users/socialRegistration"],
-        historyTransaction: x.data[0]["historyTransactions"] === undefined ? [] : x.data[0]["historyTransactions"].map((history) => {
+        _id: x["_id"],
+        wallet: x["users/wallet"],
+        nickName: x["users/nickName"],
+        avatar: x["users/avatar"],
+        email: x["users/email"],
+        fakeCoins: x["users/fakeCoins"],
+        socialRegistration: x["users/socialRegistration"] === undefined ? false : x["users/socialRegistration"],
+        historyTransaction: x["historyTransactions"] === undefined ? [] : x["historyTransactions"].map((history) => {
             return {
                 id: history._id,
                 date: history['historyTransactions/date'],

@@ -20,13 +20,14 @@ const setOneAnswer = async (req, res) => {
     let from = Number(req.body.userId)
     let currencyType = req.body.currencyType
     let validatedAmount = Number(req.body.validated);
+    let partsOrValidate = req.body.from;
 
     // add to the activites table
     let activites = {
         _id: "activites$act1",
         from: from,
         answer: req.body.answer,
-        role: req.body.from,
+        role: partsOrValidate,
         date: Math.floor(Date.now() / 1000),
         transactionHash: req.body.transactionHash,
         currencyType: currencyType,
@@ -35,12 +36,12 @@ const setOneAnswer = async (req, res) => {
     setAnswer.push(activites);
 
     // increace quntity of activites in event table
-    let to = req.body.from === "participant" ? "parcipiantsAnswer" : "validatorsAnswer";
-    let quantityPath = req.body.from === "participant" ? "answerAmount" : 'validated'
+    let to = partsOrValidate === "participant" ? "parcipiantsAnswer" : "validatorsAnswer";
+    let quantityPath = partsOrValidate === "participant" ? "answerAmount" : 'validated'
     let event = {
         _id: eventId,
         [to]: ["activites$act1"],
-        [quantityPath]: req.body.from === "participant" ? req.body.answerAmount : validatedAmount
+        [quantityPath]: partsOrValidate === "participant" ? req.body.answerAmount : validatedAmount
     }
     setAnswer.push(event)
 
@@ -75,7 +76,7 @@ const setOneAnswer = async (req, res) => {
     }
 
     // get user demo coins
-    if (currencyType === "demo") {
+    if (currencyType === "demo" && partsOrValidate === 'participant') {
 
         let { transactId, userAmount, history } = await histortTransactForDemoCoins(from, eventId)
 

@@ -78,7 +78,7 @@ function createHistory(eventId, data, amount, role, ether) {
             amount: Number(money),
             eventId: Number(eventId),
             role: role,
-            ether: ether
+            currencyType: ether ? "ether" : "token"
         }
     })
 }
@@ -115,7 +115,7 @@ async function setToHost(eventId, amount, ether) {
         amount: Number(money),
         eventId: Number(eventId),
         role: "host",
-        ether: ether
+        currencyType: ether ? "ether" : "token"
     }, {
         _id: host,
         "historyTransactions": ["historyTransactions$newHost"]
