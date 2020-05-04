@@ -1,12 +1,13 @@
 const axios = require("axios");
 const path = require("../config/path");
 const _ = require("lodash");
+const configContract = require("../config/demoContractConfig")
 
 const demoSmartContract = async (data) => {
     let allData = []
     let totalAmount;
-    let persentHost = 3;
-    let persentValidator = 5;
+    let persentHost = configContract.persentHost;
+    let persentValidator = configContract.persentValidator;
     let eventData = data.data[0];
     let eventId = data.data[0]["_id"]
     let eventPrice = Number(data.data[0]["events/money"]);
