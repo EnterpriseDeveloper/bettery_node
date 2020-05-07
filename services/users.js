@@ -59,7 +59,10 @@ const setLoomWallet = (req, res) => {
 const validate = (req, res) => {
     if (req.body.wallet !== undefined) {
         let conf = {
-            "select": ["*", { "historyTransactions": ["*"] }],
+            "select": ["*",
+                { "historyTransactions": ["*"] },
+                { "invites": ["*"] }
+            ],
             "from": ["users/wallet", req.body.wallet]
         }
 
@@ -93,7 +96,10 @@ const validate = (req, res) => {
 
 const getUserById = (req, res) => {
     let conf = {
-        "select": ["*", { "historyTransactions": ["*"] }],
+        "select": ["*",
+            { "historyTransactions": ["*"] },
+            { "invites": ["*"] }
+        ],
         "from": Number(req.body.id)
     }
 
@@ -118,7 +124,10 @@ const getUserById = (req, res) => {
 const allUsers = (req, res) => {
 
     let conf = {
-        "select": ["*", { "historyTransactions": ["*"] }],
+        "select": ["*",
+            { "historyTransactions": ["*"] },
+            { "invites": ["*"] }
+        ],
         "from": "users"
     }
 
@@ -153,6 +162,13 @@ const userStructure = (x) => {
                 role: history['historyTransactions/role'],
                 currencyType: history['historyTransactions/currencyType'],
                 eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
+            }
+        }),
+        invitationList: x["invites"] === undefined ? [] : x["invites"].map((invites) => {
+            return {
+                eventId: invites["invites/eventId"]["_id"],
+                role: invites["invites/role"],
+                status: invites["status"]
             }
         })
     }
