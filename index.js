@@ -126,6 +126,10 @@ app.post("/delete_event", async (req, res) => {
     deleteEvent.deleteEvent(req, res);
 })
 
+app.post("/delete_event_id", async (req, res) => {
+    deleteEvent.deleteEventID(req, res);
+})
+
 app.post("/history_quize/get_by_id", async (req, res) => {
     historyQuize.historyQuizeById(req, res);
 })
