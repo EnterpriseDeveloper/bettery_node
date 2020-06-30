@@ -16,7 +16,7 @@ const torusRegist = (req, res) => {
         if (x.data.length === 0) {
             let data = [{
                 "_id": "users$newUser",
-                "nickName": req.body.name,
+                "nickName": req.body.nickName,
                 "email": req.body.email,
                 "wallet": req.body.wallet,
                 "avatar": req.body.avatar,
