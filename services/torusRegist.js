@@ -1,25 +1,28 @@
 const axios = require("axios");
 const path = require("../config/path");
+const config = require("../config/demoContractConfig")
 
-const socialRegistration = (req, res) => {
+const torusRegist = (req, res) => {
 
-    let findNickName = {
+    let findEmail = {
         "select": ["*",
-            { "users/historyTransactions": ["*"] }
+            { "users/historyTransactions": ["*"] },
+            { "invites": ["*"] }
         ],
-        "from": ["users/nickName", req.body.nickName]
+        "from": ["users/email", req.body.email]
     }
 
-    axios.post(path.path + "/query", findNickName).then((x) => {
+    axios.post(path.path + "/query", findEmail).then((x) => {
         if (x.data.length === 0) {
             let data = [{
                 "_id": "users$newUser",
-                "nickName": req.body.nickName,
+                "nickName": req.body.name,
                 "email": req.body.email,
                 "wallet": req.body.wallet,
                 "avatar": req.body.avatar,
-                "fakeCoins": req.body.fakeCoins,
-                "socialRegistration": req.body.socialRegistration
+                "fakeCoins": config.fakeCoins,
+                "verifier": req.body.verifier,
+                "verifierId": req.body.verifierId
             }]
 
             axios.post(path.path + "/transact", data).then((x) => {
@@ -30,11 +33,13 @@ const socialRegistration = (req, res) => {
                     email: req.body.email,
                     wallet: req.body.wallet,
                     avatar: req.body.avatar,
-                    fakeCoins: req.body.fakeCoins,
+                    fakeCoins: config.fakeCoins,
                     listHostEvents: [],
                     listParticipantEvents: [],
                     listValidatorEvents: [],
-                    historyTransaction: []
+                    historyTransaction: [],
+                    invitationList: [],
+                    verifier: req.body.verifier,
                 })
             }).catch((err) => {
                 res.status(400);
@@ -50,6 +55,7 @@ const socialRegistration = (req, res) => {
                 wallet: x.data[0]["users/wallet"],
                 avatar: x.data[0]["users/avatar"],
                 fakeCoins: x.data[0]["users/fakeCoins"],
+                verifier: x.data[0]["users/verifier"],
                 listHostEvents: [],
                 listParticipantEvents: [],
                 listValidatorEvents: [],
@@ -63,6 +69,13 @@ const socialRegistration = (req, res) => {
                         currencyType: history['historyTransactions/currencyType'],
                         eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
                     }
+                }),
+                invitationList: x.data[0]["invites"] === undefined ? [] : x.data[0]["invites"].map((invites) => {
+                    return {
+                        eventId: invites["invites/eventId"]["_id"],
+                        role: invites["invites/role"],
+                        status: invites["status"]
+                    }
                 })
             })
         }
@@ -74,5 +87,5 @@ const socialRegistration = (req, res) => {
 }
 
 module.exports = {
-    socialRegistration
+    torusRegist
 }

@@ -12,11 +12,7 @@ const deleteEvent = require("./services/deleteEvent");
 const invites = require("./services/invites")
 const historyQuize = require("./services/historyQuize");
 const setEthPrice = require("./services/ethPrice");
-const socialRegistration = require("./services/socialRegistration");
-
-const axios = require("axios");
-const path = require("./config/path");
-const demoContract = require("./services/demoCoinContract");
+const torusRegist = require("./services/torusRegist");
 
 const multer = require('multer');
 const upload = multer();
@@ -64,10 +60,6 @@ app.post("/user/getUserById", async (req, res) => {
     auth.getUserById(req, res);
 })
 
-app.post("/user/socialRegistration", async (req, res) => {
-    socialRegistration.socialRegistration(req, res);
-})
-
 app.post("/user/regist", async (req, res) => {
     auth.registration(req, res);
 })
@@ -76,8 +68,8 @@ app.get("/user/all", async (req, res) => {
     auth.allUsers(req, res);
 })
 
-app.post("/user/loomWallet", async (req, res) => {
-    auth.setLoomWallet(req, res);
+app.post("/user/torus_regist", async (req, res) => {
+    torusRegist.torusRegist(req, res)
 })
 
 app.post("/question/set", async (req, res) => {

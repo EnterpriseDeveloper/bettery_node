@@ -1,16 +1,17 @@
 
 const axios = require("axios");
 const path = require("../config/path");
+const config = require("../config/demoContractConfig")
 
 
 const registration = (req, res) => {
 
-    let findNickName = {
+    let findEmail = {
         "select": ["*"],
-        "from": ["users/nickName", req.body.nickName]
+        "from": ["users/email", req.body.email]
     }
 
-    axios.post(path.path + "/query", findNickName).then((x) => {
+    axios.post(path.path + "/query", findEmail).then((x) => {
         if (x.data.length === 0) {
             let data = [{
                 "_id": "users$newUser",
@@ -18,13 +19,17 @@ const registration = (req, res) => {
                 "email": req.body.email,
                 "wallet": req.body.wallet,
                 "avatar": req.body.avatar,
-                "fakeCoins": req.body.fakeCoins,
-                "socialRegistration": req.body.socialRegistration
+                "fakeCoins": config.fakeCoins,
+                "verifier": "metamask"
             }]
 
             axios.post(path.path + "/transact", data).then((x) => {
                 res.status(200);
-                res.send({ "_id": x.data.tempids['users$newUser'] })
+                res.send({ 
+                    "_id": x.data.tempids['users$newUser'],
+                    "fakeCoins": config.fakeCoins,
+                     "verifier": "metamask"
+                })
             }).catch((err) => {
                 res.status(400);
                 res.send(err.response.data.message);
@@ -39,21 +44,6 @@ const registration = (req, res) => {
         res.status(400);
         res.send(err.response.data.message);
     })
-}
-
-const setLoomWallet = (req, res) => {
-    let data = [{
-        "_id": Number(req.body.id),
-        "loomWallet": req.body.loomWallet
-    }]
-    axios.post(path.path + "/transact", data).then(() => {
-        res.status(200);
-        res.send({ "transact": "done" })
-    }).catch((err) => {
-        res.status(400);
-        res.send(err.response.data.message);
-    })
-
 }
 
 const validate = (req, res) => {
@@ -151,8 +141,8 @@ const userStructure = (x) => {
         nickName: x["users/nickName"],
         avatar: x["users/avatar"],
         email: x["users/email"],
+        verifier: x["users/verifier"],
         fakeCoins: x["users/fakeCoins"],
-        socialRegistration: x["users/socialRegistration"] === undefined ? false : x["users/socialRegistration"],
         historyTransaction: x["historyTransactions"] === undefined ? [] : x["historyTransactions"].map((history) => {
             return {
                 id: history._id,
@@ -178,6 +168,5 @@ module.exports = {
     registration,
     validate,
     allUsers,
-    setLoomWallet,
     getUserById
 }
