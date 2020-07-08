@@ -15,14 +15,22 @@ const setEthPriceToContract = async () => {
     // conntect to contract
     let contr = new Contract.Contract();
     let getContract = await contr.loadContract();
-
+    let from = contr.getAccount();
     // ETH price
     // Token price
-    await getContract.methods.setEthPrice(toWei, toWei).send();
+    try {
+        const gasEstimate = await getContract.methods.setEthPrice(toWei, toWei).estimateGas({ from: from });
+        await getContract.methods.setEthPrice(toWei, toWei).send({
+            gas: gasEstimate,
+            gasPrice: 0
+        });
+    } catch (err) {
+        console.log(err)
+    }
 
     setInterval(() => {
         setEthPriceToContract();
-    }, 3 * 60 * 60 * 1000)
+    }, 3 * 60 * 60 * 1000) // each 3 hours
 }
 
 const getEthPrice = async (req, res) => {
@@ -36,7 +44,7 @@ const getEthPrice = async (req, res) => {
     let price = data.data.USD
 
     res.status(200)
-    res.send({ price: price})
+    res.send({ price: price })
 }
 
 module.exports = {
