@@ -13,6 +13,7 @@ const invites = require("./services/invites")
 const historyQuize = require("./services/historyQuize");
 const setEthPrice = require("./services/ethPrice");
 const torusRegist = require("./services/torusRegist");
+const withdrawal = require("./services/withdrawal");
 
 const multer = require('multer');
 const upload = multer();
@@ -130,6 +131,10 @@ app.get("/eth_price", async (req, res) => {
     setEthPrice.getEthPrice(req, res);
 })
 
+app.post("/withdrawal/init", async (req, res) => {
+    withdrawal.setInitWithd(req, res);
+})
+
 
 var httpServer = http.createServer(app);
 //var httpsServer = https.createServer(credentials, app);
@@ -138,10 +143,11 @@ var httpServer = http.createServer(app);
 
 httpServer.listen(80, async () => {
     // Do not work
-    let contract = new Contract.Contract();
-    contract.loadHandlerContract();
+  //  let contract = new Contract.Contract();
+  //  contract.loadHandlerContract();
 
     setEthPrice.setEthPriceToContract();
+    withdrawal.runBotWithdrawal();
     console.log("server run port 80");
 
 });

@@ -13,6 +13,7 @@ const demoSmartContract = async (data) => {
     let eventPrice = Number(data.data[0]["events/money"]);
     let answerAmount = eventData["events/answers"].length;
 
+    // need to add function to detect duplicates in answers. !!!!! IMPORTANT
     let correctAnswer = findCorrectAnswer(eventData["events/validatorsAnswer"], answerAmount);
     console.log("correct answer: " + correctAnswer)
 

@@ -18,7 +18,7 @@ class Contract {
     }
 
     async _createWebInstance() {
-        this.web3 = new Web3(new Web3.providers.WebsocketProvider('wss://ws-mumbai.matic.today/'));
+        this.web3 = new Web3(new Web3.providers.WebsocketProvider('wss://ws-mumbai.matic.today'));
         let privateKey = readFileSync(path.join(__dirname, './privateKey'), 'utf-8')
         const prKey = this.web3.eth.accounts.privateKeyToAccount('0x' + privateKey);
 
