@@ -49,13 +49,13 @@ const setOneAnswer = async (req, res) => {
         // get hold money from contract
         if (validatedAmount === 1 && currencyType !== "demo") {
             let data = {
-                "select": [{ "events/host": ["users/loomWallet"] }],
+                "select": [{ "events/host": ["users/wallet"] }],
                 "from": eventId
             }
             let userData = await axios.post(path.path + "/query", data)
-            let loomWallet = userData.data[0]['events/host']['users/loomWallet']
+            let userWallet = userData.data[0]['events/host']['users/wallet']
 
-            await contract.receiveHoldMoney(loomWallet, eventId);
+            await contract.receiveHoldMoney(userWallet, eventId);
         }
         // check last validator for demo coins
         if (currencyType === "demo") {

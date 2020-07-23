@@ -142,9 +142,8 @@ var httpServer = http.createServer(app);
 //httpsServer.listen(443);
 
 httpServer.listen(80, async () => {
-    // Do not work
-  //  let contract = new Contract.Contract();
-  //  contract.loadHandlerContract();
+   let contract = new Contract.Contract();
+   contract.loadHandlerContract();
 
     setEthPrice.setEthPriceToContract();
     withdrawal.runBotWithdrawal();

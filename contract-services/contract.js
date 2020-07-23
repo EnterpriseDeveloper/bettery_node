@@ -18,7 +18,7 @@ class Contract {
     }
 
     async _createWebInstance() {
-        this.web3 = new Web3(new Web3.providers.WebsocketProvider('wss://ws-mumbai.matic.today'));
+        this.web3 = new Web3('wss://ws-mumbai.matic.today');
         let privateKey = readFileSync(path.join(__dirname, './privateKey'), 'utf-8')
         const prKey = this.web3.eth.accounts.privateKeyToAccount('0x' + privateKey);
 
@@ -51,6 +51,7 @@ class Contract {
 
     async eventHandler() {
         let QuizeInstance = await this._createContractInstance();
+        
         QuizeInstance.events.eventIsFinish(async (err, event) => {
             if (err) {
                 console.error('Error eventIsFinish', err)
@@ -73,6 +74,7 @@ class Contract {
                 console.error('Error payEvent', err)
             } else {
                 let eventData = event.returnValues;
+                console.log(eventData);
                 onHoldHistory.setHistoryMoney(eventData);
             }
         })

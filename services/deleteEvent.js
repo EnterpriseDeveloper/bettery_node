@@ -8,7 +8,7 @@ const deleteEvent = async (req, res) => {
     let deleteQuery = [];
 
     let getEvent = {
-        select: ["*", { "events/host": ["users/loomWallet"] }],
+        select: ["*", { "events/host": ["users/wallet"] }],
         from: id
     }
 
@@ -21,9 +21,9 @@ const deleteEvent = async (req, res) => {
 
         // !!! ATTENTION can be a problem if the user will delete the event 
         // after the event is finished, will return one more money from the on-hold contract.
-        let loomWallet = event.data[0]['events/host']['users/loomWallet']
+        let userWallet = event.data[0]['events/host']['users/wallet']
 
-        await contract.receiveHoldMoney(loomWallet, id);
+        await contract.receiveHoldMoney(userWallet, id);
 
 
         // add event
