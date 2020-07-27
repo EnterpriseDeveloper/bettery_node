@@ -146,7 +146,7 @@ httpServer.listen(80, async () => {
    contract.loadHandlerContract();
 
     setEthPrice.setEthPriceToContract();
-    withdrawal.runBotWithdrawal();
+  //  withdrawal.runBotWithdrawal();
     console.log("server run port 80");
 
 });

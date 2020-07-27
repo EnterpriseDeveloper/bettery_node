@@ -1,5 +1,7 @@
 const axios = require("axios");
 const path = require("../config/path");
+const contract = require('../contract-services/contract');
+const _ = require("lodash");
 
 const setInitWithd = (req, res) => {
     let data = [{
@@ -20,41 +22,34 @@ const setInitWithd = (req, res) => {
     })
 }
 
-const runBotWithdrawal = () => {
+const runBotWithdrawal = async () => {
+    let dateNow = Math.floor(Date.now() / 1000);
+    let pendingTime = 1800;
     let data = {
         "select": ["*"],
-        "from": ["withdrawal/status", "pending"]
+        "from": "withdrawal"
     }
-    axios.post(path.path + "/query", data).then((x) => {
-        console.log(x.data)
+    let withdrawalData = await axios.post(path.path + "/query", data).then((x) => {
+        return x.data;
     }).catch((err) => {
         console.log(err)
     })
 
-    // console.log(hash)
-    // await this.PromiseTimeout(360000);
-    // //Wait for 6 mins till the checkpoint is submitted, then run the confirm withdraw
-    // this.matic
-    //     .withdraw(hash, {
-    //         from
-    //     })
-    //     .then(async logs => {
-    //         console.log("Withdraw on Ropsten" + logs.transactionHash);
-    //         // action on Transaction success
-    //         // Withdraw process is completed, funds will be transfer to your account after challege period is over.
-    //         await this.PromiseTimeout(10000);
-    //         token = this.Ropsten_Erc20Address;
-    //         this.matic
-    //             .processExits(token, {
-    //                 from
-    //             })
-    //             .then(logs => {
-    //                 console.log(
-    //                     "Process Exit on Ropsten:" + logs.transactionHash
-    //                 )
-    //                 return;
-    //             });
-    //     });
+    if (withdrawalData || withdrawalData.length > 0) {
+        console.log(dateNow);
+        let findPending = _.filter(withdrawalData, function (o) { return o['withdrawal/status'] == 'pending'; });
+        for (let i = 0; i < findPending.length; i++) {
+            let startTime = findPending[i]['withdrawal/date'] + pendingTime
+            if (dateNow > startTime) {
+                console.log(findPending[i])
+                let exitHash = findPending[i]['withdrawal/transactionHash']
+                let contr = new contract.Contract();
+                let test = await contr.makeExitProcess(exitHash)
+                console.log(test);
+
+            }
+        }
+    }
 }
 
 module.exports = {

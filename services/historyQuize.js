@@ -7,7 +7,7 @@ const historyQuizeById = async (req, res) => {
 
     let data = {
         "history": Number(id),
-        "pretty-print": true
+        "prettyPrint": true
     }
 
     // Limit here is not very clever solution!!!
@@ -57,14 +57,14 @@ async function getAdditionalData(obj, allHistory, res) {
     })
 
     // get host id
-    let findHost = _.find(allHistory.data, (x) => { return x.flakes.asserted[0]["events/host"] !== undefined });
+    let findHost = _.find(allHistory.data, (x) => { return x.asserted[0]["events/host"] !== undefined });
     if (findHost !== undefined) {
-        hostId = findHost.flakes.asserted[0]["events/host"]["_id"]
+        hostId = findHost.asserted[0]["events/host"]["_id"]
         activitesId.push(hostId)
     }
 
     let additionalData = {
-        "select": ["*", { "activites/from": ["users/nickName"] }],
+        "select": ["*", { "activites/from": ["users/nickName", "users/email"] }],
         "from": _.filter(activitesId, (x) => { return x !== undefined })
     }
 
@@ -107,12 +107,12 @@ async function getAdditionalData(obj, allHistory, res) {
 function getFrom(data, activitesData, hostId) {
     if (Number(data.action) === data.action) {
         let findActivites = _.find(activitesData, (x) => { return x._id === data.action })
-        return findActivites['activites/from']['users/nickName']
+        return findActivites['activites/from']['users/nickName'].length != 0 ? findActivites['activites/from']['users/nickName'] : findActivites['activites/from']['users/email'];
     } else if (data.action.search("final answer") !== -1) {
         return "system"
     } else {
         let findNameHost = _.find(activitesData, (x) => { return x._id === hostId })
-        return findNameHost['users/nickName']
+        return findNameHost['users/nickName'] ? findNameHost['users/nickName'] : findNameHost['users/email'];
     }
 }
 
@@ -143,14 +143,14 @@ function getAction(data, index) {
 }
 
 function checkActivites(data) {
-    if (data.flakes.asserted[0]["events/finalAnswerNumber"] !== undefined) {
-        return "final answer is " + data.flakes.asserted[0]["events/finalAnswerNumber"]
-    }else if(data.flakes.asserted[0]["events/reverted"] === true){
+    if (data.asserted[0]["events/finalAnswerNumber"] !== undefined) {
+        return "final answer is " + data.asserted[0]["events/finalAnswerNumber"]
+    }else if(data.asserted[0]["events/reverted"] === true){
         return "final answer is Undefined. Because event is reverted";
-    } else if (data.flakes.asserted[0]['events/parcipiantsAnswer'] !== undefined) {
-        return data.flakes.asserted[0]['events/parcipiantsAnswer'][0]["_id"]
-    } else if (data.flakes.asserted[0]['events/validatorsAnswer'] !== undefined) {
-        return data.flakes.asserted[0]['events/validatorsAnswer'][0]["_id"]
+    } else if (data.asserted[0]['events/parcipiantsAnswer'] !== undefined) {
+        return data.asserted[0]['events/parcipiantsAnswer'][0]["_id"]
+    } else if (data.asserted[0]['events/validatorsAnswer'] !== undefined) {
+        return data.asserted[0]['events/validatorsAnswer'][0]["_id"]
     }
 }
 

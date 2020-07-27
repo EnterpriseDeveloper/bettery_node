@@ -1,43 +1,60 @@
 const Web3 = require('web3');
-const Quize = require('./Quize.json');
+const { readFileSync } = require('fs');
+const path = require('path');
+
+const Quize = require('./abi/Quize.json');
+const RootChainManager = require("./abi/RootChainManager.json")
+
 const setAnswer = require("../services/event_is_finish");
 const history = require("../services/history");
 const onHoldHistory = require("../services/historyMoney");
-const { readFileSync } = require('fs')
-const path = require('path')
+
+const networkConfig = require("../config/networks");
+const maticConfig = require('../config/matic.json');
+
+const maticInit = require('./maticInit');
 
 class Contract {
+    constructor() {
+        this.provider = networkConfig.maticMumbai;
+    }
     async loadContract() {
-        await this._createWebInstance()
+        await this.connectToNetwork(this.provider)
         return await this._createContractInstance();
     }
 
     async loadHandlerContract() {
-        await this._createWebInstance()
+        await this.connectToNetwork(this.provider)
         await this.eventHandler();
     }
 
-    async _createWebInstance() {
-        this.web3 = new Web3('wss://ws-mumbai.matic.today');
+    async connectToNetwork(provider) {
+        this.web3 = new Web3(provider);
         let privateKey = readFileSync(path.join(__dirname, './privateKey'), 'utf-8')
         const prKey = this.web3.eth.accounts.privateKeyToAccount('0x' + privateKey);
-
         await this.web3.eth.accounts.wallet.add(prKey);
         let accounts = await this.web3.eth.accounts.wallet;
         this.account = accounts[0].address;
-        return this.account;
+        return { web3: this.web3, account: this.account };
     }
 
-    _getCurrentNetwork() {
-        return '80001'
+    async makeExitProcess(exitHash) {
+        let { web3, account } = await this.connectToNetwork(networkConfig.goerli)
+        console.log(exitHash)
+        let matic = await maticInit.getMaticPOSClient();
+        let test = await matic.exitERC20("0xa33c9dc2ce89e00892d581866c163666866d6ffedd16142ead9aee0c22d6508f", {
+            from: account,
+        })
+
+        console.log(test);
     }
 
-    getAccount(){
+    getAccount() {
         return this.account;
     }
 
     async _createContractInstance() {
-        const networkId = this._getCurrentNetwork()
+        const networkId = networkConfig.maticId
         this.currentNetwork = Quize.networks[networkId]
         if (!this.currentNetwork) {
             throw Error('Contract not deployed on DAppChain')
@@ -51,7 +68,7 @@ class Contract {
 
     async eventHandler() {
         let QuizeInstance = await this._createContractInstance();
-        
+
         QuizeInstance.events.eventIsFinish(async (err, event) => {
             if (err) {
                 console.error('Error eventIsFinish', err)
