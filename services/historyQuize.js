@@ -10,23 +10,21 @@ const historyQuizeById = async (req, res) => {
         "prettyPrint": true
     }
 
-    // Limit here is not very clever solution!!!
-    let time = {
-        "select": ["?number", "?instant"],
-        "where": [
-            ["?block", "_block/number", "?number"],
-            ["?block", "_block/instant", "?instant"]
-        ],
-        "limit": 10000
-    }
-
-    let blocktime = await axios.post(path.path + "/query", time).catch((err) => {
+    let allHistory = await axios.post(path.path + "/history", data).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
     })
 
-    let allHistory = await axios.post(path.path + "/history", data).catch((err) => {
+    let time = {
+        "select": ["?number", "?instant"],
+        "where": [
+            ["?block", "_block/number", "?number"],
+            ["?block", "_block/instant", "?instant"]
+        ]
+    }
+
+    let blocktime = await axios.post(path.path + "/query", time).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)

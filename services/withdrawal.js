@@ -11,7 +11,8 @@ const setInitWithd = (req, res) => {
         "transactionHash": req.body.transactionHash,
         "status": "pending",
         "amount": req.body.amount,
-        "coinType": req.body.coinType
+        "coinType": req.body.coinType,
+        "sign": req.body.sign
     }]
     axios.post(path.path + "/transact", data).then(() => {
         res.status(200);

@@ -3,14 +3,12 @@ const { readFileSync } = require('fs');
 const path = require('path');
 
 const Quize = require('./abi/Quize.json');
-const RootChainManager = require("./abi/RootChainManager.json")
 
 const setAnswer = require("../services/event_is_finish");
 const history = require("../services/history");
 const onHoldHistory = require("../services/historyMoney");
 
 const networkConfig = require("../config/networks");
-const maticConfig = require('../config/matic.json');
 
 const maticInit = require('./maticInit');
 
