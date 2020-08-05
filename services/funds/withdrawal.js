@@ -1,6 +1,6 @@
 const axios = require("axios");
-const path = require("../config/path");
-const contract = require('../contract-services/contract');
+const path = require("../../config/path");
+const contract = require('../../contract-services/contract');
 const _ = require("lodash");
 
 const setInitWithd = (req, res) => {

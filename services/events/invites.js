@@ -1,5 +1,5 @@
 const axios = require("axios");
-const path = require("../config/path")
+const path = require("../../config/path")
 
 
 const inviteUsers = (data, allData, role) => {

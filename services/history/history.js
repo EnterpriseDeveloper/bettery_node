@@ -1,8 +1,8 @@
 const Web3 = require('web3');
 const axios = require("axios");
-const path = require("../config/path");
+const path = require("../../config/path");
 const _ = require("lodash");
-const configContract = require("../config/demoContractConfig")
+const configContract = require("../../config/demoContractConfig")
 
 
 const setReceiveHistory = async (contractData, eventId, ether) => {

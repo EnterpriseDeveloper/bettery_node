@@ -1,6 +1,6 @@
 const axios = require("axios");
-const path = require("../config/path");
-const contract = require("./holdMoneyDetection");
+const path = require("../../config/path");
+const contract = require("../funds/holdMoneyDetection");
 
 
 const deleteEvent = async (req, res) => {

@@ -1,7 +1,7 @@
 const axios = require("axios");
-const path = require("../config/path");
-const contract = require("./holdMoneyDetection");
-const demoContract = require("./demoCoinContract");
+const path = require("../../config/path");
+const contract = require("../funds/holdMoneyDetection");
+const demoContract = require("../demoCoinContract");
 
 const setAnswer = (req, res) => {
 

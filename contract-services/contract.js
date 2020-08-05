@@ -4,9 +4,9 @@ const path = require('path');
 
 const Quize = require('./abi/Quize.json');
 
-const setAnswer = require("../services/event_is_finish");
-const history = require("../services/history");
-const onHoldHistory = require("../services/historyMoney");
+const setAnswer = require("../services/events/event_is_finish");
+const history = require("../services/history/history");
+const onHoldHistory = require("../services/history/historyMoney");
 
 const networkConfig = require("../config/networks");
 

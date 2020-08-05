@@ -1,6 +1,6 @@
 const axios = require("axios");
-const path = require("../config/path");
-const config = require("../config/demoContractConfig")
+const path = require("../../config/path");
+const config = require("../../config/demoContractConfig")
 
 const torusRegist = (req, res) => {
 
