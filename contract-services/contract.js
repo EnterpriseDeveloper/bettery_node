@@ -67,9 +67,12 @@ class Contract {
             if (err) {
                 console.error('Error eventIsFinish', err)
             } else {
+                console.log("EVENT IS finish work")
+                console.log(event.returnValues)
                 let eventId = event.returnValues.question_id;
                 let ether = event.returnValues.payEther;
                 let eventData = await QuizeInstance.methods.getQuestion(Number(eventId)).call();
+                console.log(eventData);
                 // set to Db
                 setAnswer.setCorrectAnswer(eventData, eventId);
 
@@ -95,8 +98,6 @@ class Contract {
                 console.error('Error payEvent', err)
             } else {
                 let eventData = event.returnValues;
-                console.log("REVERT EVENT WORK");
-                console.log(eventData)
                 onHoldHistory.setRevertedHistoryMoney(eventData);
             }
         })
