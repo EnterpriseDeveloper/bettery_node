@@ -3,14 +3,13 @@ const { readFileSync } = require('fs');
 const path = require('path');
 
 const Quize = require('./abi/Quize.json');
+const BetteryToken = require("./abi/BetteryToken.json");
 
 const setAnswer = require("../services/events/event_is_finish");
 const history = require("../services/history/history");
 const onHoldHistory = require("../services/history/historyMoney");
 
 const networkConfig = require("../config/networks");
-
-const maticInit = require('./maticInit');
 
 class Contract {
     constructor() {
@@ -36,15 +35,12 @@ class Contract {
         return { web3: this.web3, account: this.account };
     }
 
-    async makeExitProcess(exitHash) {
-        let { web3, account } = await this.connectToNetwork(networkConfig.goerli)
-        console.log(exitHash)
-        let matic = await maticInit.getMaticPOSClient();
-        let test = await matic.exitERC20("0xa33c9dc2ce89e00892d581866c163666866d6ffedd16142ead9aee0c22d6508f", {
-            from: account,
-        })
-
-        console.log(test);
+    async betteryToken() {
+        let { web3, account } = await this.connectToNetwork(this.provider);
+        let networkId = networkConfig.maticId;
+        let abi = BetteryToken.abi;
+        let address = BetteryToken.networks[networkId].address;
+        return new web3.eth.Contract(abi, address, { from: account });
     }
 
     getAccount() {

@@ -1,8 +1,10 @@
 const axios = require("axios");
 const path = require("../../config/path");
-const config = require("../../config/demoContractConfig")
+const betteryToken = require("../funds/betteryToken");
 
 const torusRegist = (req, res) => {
+
+    let wallet = req.body.wallet;
 
     let findEmail = {
         "select": ["*",
@@ -18,14 +20,14 @@ const torusRegist = (req, res) => {
                 "_id": "users$newUser",
                 "nickName": req.body.nickName,
                 "email": req.body.email,
-                "wallet": req.body.wallet,
+                "wallet": wallet,
                 "avatar": req.body.avatar,
-                "fakeCoins": config.fakeCoins,
                 "verifier": req.body.verifier,
                 "verifierId": req.body.verifierId
             }]
 
-            axios.post(path.path + "/transact", data).then((x) => {
+            axios.post(path.path + "/transact", data).then(async (x) => {
+                await betteryToken.transferBetteryToken(wallet);
                 res.status(200);
                 res.send({
                     _id: x.data.tempids['users$newUser'],
@@ -33,7 +35,6 @@ const torusRegist = (req, res) => {
                     email: req.body.email,
                     wallet: req.body.wallet,
                     avatar: req.body.avatar,
-                    fakeCoins: config.fakeCoins,
                     listHostEvents: [],
                     listParticipantEvents: [],
                     listValidatorEvents: [],
@@ -54,7 +55,6 @@ const torusRegist = (req, res) => {
                 email: x.data[0]["users/email"],
                 wallet: x.data[0]["users/wallet"],
                 avatar: x.data[0]["users/avatar"],
-                fakeCoins: x.data[0]["users/fakeCoins"],
                 verifier: x.data[0]["users/verifier"],
                 listHostEvents: [],
                 listParticipantEvents: [],

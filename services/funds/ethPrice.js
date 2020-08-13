@@ -20,11 +20,10 @@ const setEthPriceToContract = async () => {
     // Token price
     try {
         const gasEstimate = await getContract.methods.setEthPrice(toWei, toWei).estimateGas({ from: from });
-        let test = await getContract.methods.setEthPrice(toWei, toWei).send({
+        await getContract.methods.setEthPrice(toWei, toWei).send({
             gas: gasEstimate,
             gasPrice: 0
         });
-        console.log(test);
     } catch (err) {
         console.log(err)
     }

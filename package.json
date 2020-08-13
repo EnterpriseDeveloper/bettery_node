@@ -15,7 +15,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@maticnetwork/maticjs": "^2.0.2",
     "@truffle/hdwallet-provider": "^1.0.39",
     "await-exec": "^0.1.2",
     "axios": "^0.19.2",
@@ -26,7 +25,6 @@
     "express": "^4.17.1",
     "glob": "^7.1.4",
     "lodash": "^4.17.15",
-    "mongodb": "^3.3.1",
     "multer": "^1.4.2",
     "nodemon": "1.18.3",
     "request": "^2.88.0",

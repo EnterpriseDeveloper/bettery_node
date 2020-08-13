@@ -1,7 +1,6 @@
 const axios = require("axios");
 const path = require("../../config/path");
 const contract = require("../funds/holdMoneyDetection");
-const demoContract = require("../demoCoinContract");
 
 const setAnswer = (req, res) => {
 
@@ -47,7 +46,7 @@ const setOneAnswer = async (req, res) => {
 
     if (to === 'validatorsAnswer') {
         // get hold money from contract
-        if (validatedAmount === 1 && currencyType !== "demo") {
+        if (validatedAmount === 1) {
             let data = {
                 "select": [{ "events/host": ["users/wallet"] }],
                 "from": eventId
@@ -57,46 +56,13 @@ const setOneAnswer = async (req, res) => {
 
             await contract.receiveHoldMoney(userWallet, eventId);
         }
-        // check last validator for demo coins
-        if (currencyType === "demo") {
-            let data = {
-                "select": ["*",
-                    { "events/host": ["_id", "users/fakeCoins"] },
-                    { "events/parcipiantsAnswer": ["*", { "activites/from": ["_id", "users/fakeCoins"] }] },
-                    { "events/validatorsAnswer": ["*", { "activites/from": ["_id", "users/fakeCoins"] }] }],
-                "from": eventId
-            }
-            let eventData = await axios.post(path.path + "/query", data);
-            let validEventAmount = eventData.data[0]["events/validatorsAmount"]
-            if (validEventAmount === validatedAmount) {
-                demoContract.demoSmartContract(eventData);
-            }
-
-        }
     }
-
-    // get user demo coins
-    if (currencyType === "demo" && partsOrValidate === 'participant') {
-
-        let { transactId, userAmount, history } = await histortTransactForDemoCoins(from, eventId)
-
-        let user = {
-            _id: from,
-            activites: ["activites$act1"],
-            fakeCoins: userAmount,
-            historyTransactions: [transactId]
-        }
-        setAnswer.push(user);
-        setAnswer.push(history);
-
-    } else {
-        // add to users table
-        let user = {
-            _id: from,
-            activites: ["activites$act1"],
-        }
-        setAnswer.push(user)
+    // add to users table
+    let user = {
+        _id: from,
+        activites: ["activites$act1"],
     }
+    setAnswer.push(user)
 
     axios.post(path.path + "/transact", setAnswer).then(() => {
         res.status(200);
@@ -106,31 +72,6 @@ const setOneAnswer = async (req, res) => {
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
     })
-}
-
-const histortTransactForDemoCoins = async (from, eventId) => {
-    let data = {
-        "select": ["*"],
-        "from": [from, eventId]
-    }
-    let allData = await axios.post(path.path + "/query", data);
-
-    let demoCoins = allData.data[0]["users/fakeCoins"];
-    let eventMoney = allData.data[1]["events/money"];
-    let userAmount = demoCoins - eventMoney
-    console.log()
-
-    let transactId = "historyTransactions$quizHoldMoney"
-    let history = {
-        _id: transactId,
-        eventId: Number(eventId),
-        role: "participant",
-        amount: Number(eventMoney),
-        paymentWay: "send",
-        currencyType: "demo",
-        date: Math.floor(Date.now() / 1000)
-    }
-    return { transactId, userAmount, history}
 }
 
 

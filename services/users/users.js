@@ -1,49 +1,50 @@
 
 const axios = require("axios");
 const path = require("../../config/path");
-const config = require("../../config/demoContractConfig")
+const betteryToken = require("../funds/betteryToken");
 
+const registration = async (req, res) => {
 
-const registration = (req, res) => {
+    let wallet = req.body.wallet
 
     let findEmail = {
         "select": ["*"],
         "from": ["users/email", req.body.email]
     }
 
-    axios.post(path.path + "/query", findEmail).then((x) => {
-        if (x.data.length === 0) {
-            let data = [{
-                "_id": "users$newUser",
-                "nickName": req.body.nickName,
-                "email": req.body.email,
-                "wallet": req.body.wallet,
-                "avatar": req.body.avatar,
-                "fakeCoins": config.fakeCoins,
-                "verifier": "metamask"
-            }]
+    let validate = await axios.post(path.path + "/query", findEmail)
+        .catch((err) => {
+            res.status(400);
+            res.send(err.response.data.message);
+        })
+    if (validate.data.length === 0) {
+        let data = [{
+            "_id": "users$newUser",
+            "nickName": req.body.nickName,
+            "email": req.body.email,
+            "wallet": wallet,
+            "avatar": req.body.avatar,
+            "verifier": "metamask"
+        }]
 
-            axios.post(path.path + "/transact", data).then((x) => {
-                res.status(200);
-                res.send({ 
-                    "_id": x.data.tempids['users$newUser'],
-                    "fakeCoins": config.fakeCoins,
-                     "verifier": "metamask"
-                })
-            }).catch((err) => {
+        let userData = await axios.post(path.path + "/transact", data)
+            .catch((err) => {
                 res.status(400);
                 res.send(err.response.data.message);
             })
-
-        } else {
-            res.status(400);
-            res.send("user already exist");
+        if (userData.data.length !== 0) {
+            await betteryToken.transferBetteryToken(wallet);
+            res.status(200);
+            res.send({
+                "_id": userData.data.tempids['users$newUser'],
+                "verifier": "metamask"
+            })
         }
 
-    }).catch((err) => {
+    } else {
         res.status(400);
-        res.send(err.response.data.message);
-    })
+        res.send("user already exist");
+    }
 }
 
 const validate = (req, res) => {
@@ -142,7 +143,6 @@ const userStructure = (x) => {
         avatar: x["users/avatar"],
         email: x["users/email"],
         verifier: x["users/verifier"],
-        fakeCoins: x["users/fakeCoins"],
         historyTransaction: x["historyTransactions"] === undefined ? [] : x["historyTransactions"].map((history) => {
             return {
                 id: history._id,
