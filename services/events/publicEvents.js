@@ -15,7 +15,6 @@ const createId = (req, res) => {
         res.status(400);
         res.send(err.response.data.message);
     })
-
 }
 
 const setQuestion = (req, res) => {
