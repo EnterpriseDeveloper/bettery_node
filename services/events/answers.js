@@ -48,11 +48,11 @@ const setOneAnswer = async (req, res) => {
         // get hold money from contract
         if (validatedAmount === 1) {
             let data = {
-                "select": [{ "events/host": ["users/wallet"] }],
+                "select": [{ "publicEvents/host": ["users/wallet"] }],
                 "from": eventId
             }
             let userData = await axios.post(path.path + "/query", data)
-            let userWallet = userData.data[0]['events/host']['users/wallet']
+            let userWallet = userData.data[0]['publicEvents/host']['users/wallet']
 
             await contract.receiveHoldMoney(userWallet, eventId);
         }

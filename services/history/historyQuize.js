@@ -55,9 +55,9 @@ async function getAdditionalData(obj, allHistory, res) {
     })
 
     // get host id
-    let findHost = _.find(allHistory.data, (x) => { return x.asserted[0]["events/host"] !== undefined });
+    let findHost = _.find(allHistory.data, (x) => { return x.asserted[0]["publicEvents/host"] !== undefined });
     if (findHost !== undefined) {
-        hostId = findHost.asserted[0]["events/host"]["_id"]
+        hostId = findHost.asserted[0]["publicEvents/host"]["_id"]
         activitesId.push(hostId)
     }
 
@@ -141,14 +141,14 @@ function getAction(data, index) {
 }
 
 function checkActivites(data) {
-    if (data.asserted[0]["events/finalAnswerNumber"] !== undefined) {
-        return "final answer is " + data.asserted[0]["events/finalAnswerNumber"]
-    }else if(data.asserted[0]["events/reverted"] === true){
+    if (data.asserted[0]["publicEvents/finalAnswerNumber"] !== undefined) {
+        return "final answer is " + data.asserted[0]["publicEvents/finalAnswerNumber"]
+    }else if(data.asserted[0]["publicEvents/reverted"] === true){
         return "final answer is Undefined. Because event is reverted";
-    } else if (data.asserted[0]['events/parcipiantsAnswer'] !== undefined) {
-        return data.asserted[0]['events/parcipiantsAnswer'][0]["_id"]
-    } else if (data.asserted[0]['events/validatorsAnswer'] !== undefined) {
-        return data.asserted[0]['events/validatorsAnswer'][0]["_id"]
+    } else if (data.asserted[0]['publicEvents/parcipiantsAnswer'] !== undefined) {
+        return data.asserted[0]['publicEvents/parcipiantsAnswer'][0]["_id"]
+    } else if (data.asserted[0]['publicEvents/validatorsAnswer'] !== undefined) {
+        return data.asserted[0]['publicEvents/validatorsAnswer'][0]["_id"]
     }
 }
 

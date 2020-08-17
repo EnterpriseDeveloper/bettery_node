@@ -2,7 +2,7 @@ const Web3 = require('web3');
 const { readFileSync } = require('fs');
 const path = require('path');
 
-const Quize = require('./abi/Quize.json');
+const PublicEvent = require('./abi/PublicEvent.json');
 const BetteryToken = require("./abi/BetteryToken.json");
 
 const setAnswer = require("../services/events/event_is_finish");
@@ -49,12 +49,12 @@ class Contract {
 
     async _createContractInstance() {
         const networkId = networkConfig.maticId
-        this.currentNetwork = Quize.networks[networkId]
+        this.currentNetwork = PublicEvent.networks[networkId]
         if (!this.currentNetwork) {
             throw Error('Contract not deployed on DAppChain')
         }
 
-        const ABI = Quize.abi
+        const ABI = PublicEvent.abi
         return new this.web3.eth.Contract(ABI, this.currentNetwork.address, {
             from: this.account
         })

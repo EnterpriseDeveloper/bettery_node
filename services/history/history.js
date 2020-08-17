@@ -11,7 +11,7 @@ const setReceiveHistory = async (contractData, eventId, ether) => {
     let findActivites = {
         "select": ["*",
             { "activites/from": ["users/wallet", "users/fakeCoins"] },
-            { "activites/eventId": ["events/money"] }
+            { "activites/eventId": ["publicEvents/money"] }
         ],
         "where": "activites/eventId = " + eventId,
         "from": "activites"
@@ -96,7 +96,7 @@ function createUserHistory(userData, historyData) {
 
 async function setToHost(eventId, amount, ether) {
     let getQuestion = {
-        "select": [{ "events/host": ["users/wallet"] }],
+        "select": [{ "publicEvents/host": ["users/wallet"] }],
         "from": Number(eventId)
     }
 
@@ -105,7 +105,7 @@ async function setToHost(eventId, amount, ether) {
             console.log("DB error: " + err.response.data.message)
         })
 
-    let host = quest.data[0]['events/host']['_id']
+    let host = quest.data[0]['publicEvents/host']['_id']
 
     let web3 = new Web3();
     let money = web3.utils.fromWei(String(amount), 'ether')

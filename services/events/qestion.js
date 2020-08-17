@@ -5,12 +5,12 @@ const _ = require("lodash");
 
 const createId = (req, res) => {
     let data = {
-        _id: "events$newEvents",
+        _id: "publicEvents$newEvents",
         finalAnswer: ''
     }
     axios.post(path.path + "/transact", [data]).then((x) => {
         res.status(200);
-        res.send({ "_id": x.data.tempids['events$newEvents'] })
+        res.send({ "_id": x.data.tempids['publicEvents$newEvents'] })
     }).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
@@ -122,8 +122,8 @@ const getById = (req, res) => {
 
     let conf = {
         "select": ["*",
-            { 'events/parcipiantsAnswer': ["*", { "activites/from": ["_id"] }] },
-            { 'events/validatorsAnswer': ["*", { "activites/from": ["_id"] }] }
+            { 'publicEvents/parcipiantsAnswer': ["*", { "activites/from": ["_id"] }] },
+            { 'publicEvents/validatorsAnswer': ["*", { "activites/from": ["_id"] }] }
         ],
         "from": id
     }
@@ -144,10 +144,10 @@ const getAll = (req, res) => {
 
     let conf = {
         "select": ["*",
-            { 'events/parcipiantsAnswer': ["*", { "activites/from": ["_id"] }] },
-            { 'events/validatorsAnswer': ["*", { "activites/from": ["_id"] }] }
+            { 'publicEvents/parcipiantsAnswer': ["*", { "activites/from": ["_id"] }] },
+            { 'publicEvents/validatorsAnswer': ["*", { "activites/from": ["_id"] }] }
         ],
-        "from": "events"
+        "from": "publicEvents"
     }
 
     axios.post(path.path + "/query", conf).then((x) => {
@@ -165,26 +165,26 @@ const getAll = (req, res) => {
 function eventStructure(data) {
     return data.map((z) => {
         return {
-            answerAmount: z['events/answerAmount'],
-            startTime: z['events/startTime'],
+            answerAmount: z['publicEvents/answerAmount'],
+            startTime: z['publicEvents/startTime'],
             id: z._id,
-            hashtags: z['events/hashtags'],
-            host: z['events/host']["_id"],
-            validated: z['events/validated'],
-            status: z['events/status'],
-            answers: Object.assign([], z['events/answers']).reverse(),
-            money: z['events/money'],
-            finalAnswer: z['events/finalAnswerNumber'] === undefined ? null : z['events/finalAnswerNumber'],
-            validatorsAmount: z['events/validatorsAmount'],
-            endTime: z['events/endTime'],
-            transactionHash: z['events/transactionHash'],
-            showDistribution: z['events/showDistribution'],
-            question: z['events/question'],
-            currencyType: z['events/currencyType'] === undefined ? false : z['events/currencyType'],
-            private: z['events/private'] === undefined ? false : z['events/private'],
-            reverted: z['events/reverted'] === undefined ? false : z['events/reverted'],
-            multiChoise: z['events/multiChoise'] === undefined ? false : z['events/multiChoise'],
-            parcipiantAnswers: z["events/parcipiantsAnswer"] === undefined ? undefined : z["events/parcipiantsAnswer"].map((par) => {
+            hashtags: z['publicEvents/hashtags'],
+            host: z['publicEvents/host']["_id"],
+            validated: z['publicEvents/validated'],
+            status: z['publicEvents/status'],
+            answers: Object.assign([], z['publicEvents/answers']).reverse(),
+            money: z['publicEvents/money'],
+            finalAnswer: z['publicEvents/finalAnswerNumber'] === undefined ? null : z['publicEvents/finalAnswerNumber'],
+            validatorsAmount: z['publicEvents/validatorsAmount'],
+            endTime: z['publicEvents/endTime'],
+            transactionHash: z['publicEvents/transactionHash'],
+            showDistribution: z['publicEvents/showDistribution'],
+            question: z['publicEvents/question'],
+            currencyType: z['publicEvents/currencyType'] === undefined ? false : z['publicEvents/currencyType'],
+            private: z['publicEvents/private'] === undefined ? false : z['publicEvents/private'],
+            reverted: z['publicEvents/reverted'] === undefined ? false : z['publicEvents/reverted'],
+            multiChoise: z['publicEvents/multiChoise'] === undefined ? false : z['publicEvents/multiChoise'],
+            parcipiantAnswers: z["publicEvents/parcipiantsAnswer"] === undefined ? undefined : z["publicEvents/parcipiantsAnswer"].map((par) => {
                 return {
                     transactionHash: par['activites/transactionHash'],
                     date: par['activites/date'],
@@ -192,7 +192,7 @@ function eventStructure(data) {
                     userId: par['activites/from']['_id']
                 }
             }),
-            validatorsAnswers: z["events/validatorsAnswer"] === undefined ? undefined : z["events/validatorsAnswer"].map((val) => {
+            validatorsAnswers: z["publicEvents/validatorsAnswer"] === undefined ? undefined : z["publicEvents/validatorsAnswer"].map((val) => {
                 return {
                     transactionHash: val['activites/transactionHash'],
                     date: val['activites/date'],

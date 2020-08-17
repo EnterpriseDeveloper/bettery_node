@@ -50,7 +50,7 @@ const setHistoryMoney = async (contractData) => {
 const setRevertedHistoryMoney = async (contractData) =>{
     let eventId = Number(contractData.question_id);
     let data = {
-        "select": ["*", {"events/parcipiantsAnswer": [{"activites/from":["_id"]}]}],
+        "select": ["*", {"publicEvents/parcipiantsAnswer": [{"activites/from":["_id"]}]}],
         "from": eventId
     }
 
@@ -60,10 +60,10 @@ const setRevertedHistoryMoney = async (contractData) =>{
 
     if(eventData.data.length !== 0){
 
-        let money = Number(eventData.data[0]["events/money"]);
-        let currencyType = eventData.data[0]["events/currencyType"];
+        let money = Number(eventData.data[0]["publicEvents/money"]);
+        let currencyType = eventData.data[0]["publicEvents/currencyType"];
 
-        let historyData = eventData.data[0]["events/parcipiantsAnswer"].map((x, i)=>{
+        let historyData = eventData.data[0]["publicEvents/parcipiantsAnswer"].map((x, i)=>{
             return {
                 _id: x["activites/from"]["_id"],
                 historyTransactions: ["historyTransactions$quizHoldMoney" + i],

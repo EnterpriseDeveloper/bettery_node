@@ -8,7 +8,7 @@ const deleteEvent = async (req, res) => {
     let deleteQuery = [];
 
     let getEvent = {
-        select: ["*", { "events/host": ["users/wallet"] }],
+        select: ["*", { "publicEvents/host": ["users/wallet"] }],
         from: id
     }
 
@@ -21,7 +21,7 @@ const deleteEvent = async (req, res) => {
 
         // !!! ATTENTION can be a problem if the user will delete the event 
         // after the event is finished, will return one more money from the on-hold contract.
-        let userWallet = event.data[0]['events/host']['users/wallet']
+        let userWallet = event.data[0]['publicEvents/host']['users/wallet']
 
         await contract.receiveHoldMoney(userWallet, id);
 
@@ -33,8 +33,8 @@ const deleteEvent = async (req, res) => {
         })
 
         // get all invites 
-        if (event.data[0]['events/invites'] !== undefined) {
-            event.data[0]['events/invites'].forEach((x) => {
+        if (event.data[0]['publicEvents/invites'] !== undefined) {
+            event.data[0]['publicEvents/invites'].forEach((x) => {
                 deleteQuery.push({
                     _id: x._id,
                     _action: "delete"
@@ -43,8 +43,8 @@ const deleteEvent = async (req, res) => {
         }
 
         // get parcipiants activites
-        if (event.data[0]['events/parcipiantsAnswer'] !== undefined) {
-            event.data[0]['events/parcipiantsAnswer'].forEach((x) => {
+        if (event.data[0]['publicEvents/parcipiantsAnswer'] !== undefined) {
+            event.data[0]['publicEvents/parcipiantsAnswer'].forEach((x) => {
                 deleteQuery.push({
                     _id: x._id,
                     _action: "delete"
@@ -53,8 +53,8 @@ const deleteEvent = async (req, res) => {
         }
 
         // get validatos activites
-        if (event.data[0]['events/validatorsAnswer'] !== undefined) {
-            event.data[0]['events/validatorsAnswer'].forEach((x) => {
+        if (event.data[0]['publicEvents/validatorsAnswer'] !== undefined) {
+            event.data[0]['publicEvents/validatorsAnswer'].forEach((x) => {
                 deleteQuery.push({
                     _id: x._id,
                     _action: "delete"
