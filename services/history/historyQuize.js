@@ -62,7 +62,7 @@ async function getAdditionalData(obj, allHistory, res) {
     }
 
     let additionalData = {
-        "select": ["*", { "activites/from": ["users/nickName", "users/email"] }],
+        "select": ["*", { "publicActivites/from": ["users/nickName", "users/email"] }],
         "from": _.filter(activitesId, (x) => { return x !== undefined })
     }
 
@@ -105,7 +105,7 @@ async function getAdditionalData(obj, allHistory, res) {
 function getFrom(data, activitesData, hostId) {
     if (Number(data.action) === data.action) {
         let findActivites = _.find(activitesData, (x) => { return x._id === data.action })
-        return findActivites['activites/from']['users/nickName'].length != 0 ? findActivites['activites/from']['users/nickName'] : findActivites['activites/from']['users/email'];
+        return findActivites['publicActivites/from']['users/nickName'].length != 0 ? findActivites['publicActivites/from']['users/nickName'] : findActivites['publicActivites/from']['users/email'];
     } else if (data.action.search("final answer") !== -1) {
         return "system"
     } else {
@@ -117,7 +117,7 @@ function getFrom(data, activitesData, hostId) {
 function getFinalAction(data, activitesData) {
     if (Number(data.action) === data.action) {
         let findActivites = _.find(activitesData, (x) => { return x._id === data.action })
-        return findActivites['activites/role']
+        return findActivites['publicActivites/role']
     } else if (data.action.search("final answer") !== -1) {
         if(data.action.search("Undefined") === -1){
             return "event ending";

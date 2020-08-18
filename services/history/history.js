@@ -10,28 +10,28 @@ const setReceiveHistory = async (contractData, eventId, ether) => {
 
     let findActivites = {
         "select": ["*",
-            { "activites/from": ["users/wallet", "users/fakeCoins"] },
-            { "activites/eventId": ["publicEvents/money"] }
+            { "publicActivites/from": ["users/wallet", "users/fakeCoins"] },
+            { "publicActivites/eventId": ["publicEvents/money"] }
         ],
-        "where": "activites/eventId = " + eventId,
-        "from": "activites"
+        "where": "publicActivites/eventId = " + eventId,
+        "from": "publicActivites"
     }
 
-    let activites = await axios.post(path.path + "/query", findActivites)
+    let publicActivites = await axios.post(path.path + "/query", findActivites)
         .catch((err) => {
             console.log("DB error: " + err.response.data.message)
         })
 
 
-    let allData = activites.data.map((o) => {
+    let allData = publicActivites.data.map((o) => {
         return {
             id: o._id,
-            role: o['activites/role'],
-            answer: o['activites/answer'],
-            wallet: o['activites/from']["users/wallet"],
-            userId: o['activites/from']["_id"],
-            currencyType: o["activites/currencyType"],
-            fakeCoins: o['activites/from']["users/fakeCoins"]
+            role: o['publicActivites/role'],
+            answer: o['publicActivites/answer'],
+            wallet: o['publicActivites/from']["users/wallet"],
+            userId: o['publicActivites/from']["_id"],
+            currencyType: o["publicActivites/currencyType"],
+            fakeCoins: o['publicActivites/from']["users/fakeCoins"]
         }
     })
 

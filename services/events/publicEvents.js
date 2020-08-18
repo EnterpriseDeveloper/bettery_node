@@ -97,7 +97,7 @@ const setQuestion = (req, res) => {
         // ADD to host
         let hostData = [{
             _id: allData.host,
-            hostEvents: [allData._id],
+            hostPublicEvents: [allData._id],
         }]
 
         axios.post(path.path + "/transact", hostData).then(() => {
@@ -121,8 +121,8 @@ const getById = (req, res) => {
 
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "activites/from": ["_id"] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "activites/from": ["_id"] }] }
+            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
+            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["_id"] }] }
         ],
         "from": id
     }
@@ -143,8 +143,8 @@ const getAll = (req, res) => {
 
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "activites/from": ["_id"] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "activites/from": ["_id"] }] }
+            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
+            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["_id"] }] }
         ],
         "from": "publicEvents"
     }
@@ -185,18 +185,18 @@ function eventStructure(data) {
             multiChoise: z['publicEvents/multiChoise'] === undefined ? false : z['publicEvents/multiChoise'],
             parcipiantAnswers: z["publicEvents/parcipiantsAnswer"] === undefined ? undefined : z["publicEvents/parcipiantsAnswer"].map((par) => {
                 return {
-                    transactionHash: par['activites/transactionHash'],
-                    date: par['activites/date'],
-                    answer: par['activites/answer'],
-                    userId: par['activites/from']['_id']
+                    transactionHash: par['publicActivites/transactionHash'],
+                    date: par['publicActivites/date'],
+                    answer: par['publicActivites/answer'],
+                    userId: par['publicActivites/from']['_id']
                 }
             }),
             validatorsAnswers: z["publicEvents/validatorsAnswer"] === undefined ? undefined : z["publicEvents/validatorsAnswer"].map((val) => {
                 return {
-                    transactionHash: val['activites/transactionHash'],
-                    date: val['activites/date'],
-                    answer: val['activites/answer'],
-                    userId: val['activites/from']['_id']
+                    transactionHash: val['publicActivites/transactionHash'],
+                    date: val['publicActivites/date'],
+                    answer: val['publicActivites/answer'],
+                    userId: val['publicActivites/from']['_id']
                 }
             }),
         }

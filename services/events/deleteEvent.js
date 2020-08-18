@@ -42,7 +42,7 @@ const deleteEvent = async (req, res) => {
             })
         }
 
-        // get parcipiants activites
+        // get parcipiants publicActivites
         if (event.data[0]['publicEvents/parcipiantsAnswer'] !== undefined) {
             event.data[0]['publicEvents/parcipiantsAnswer'].forEach((x) => {
                 deleteQuery.push({
@@ -52,7 +52,7 @@ const deleteEvent = async (req, res) => {
             })
         }
 
-        // get validatos activites
+        // get validatos publicActivites
         if (event.data[0]['publicEvents/validatorsAnswer'] !== undefined) {
             event.data[0]['publicEvents/validatorsAnswer'].forEach((x) => {
                 deleteQuery.push({

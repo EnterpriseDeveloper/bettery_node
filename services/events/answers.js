@@ -21,9 +21,9 @@ const setOneAnswer = async (req, res) => {
     let validatedAmount = Number(req.body.validated);
     let partsOrValidate = req.body.from;
 
-    // add to the activites table
-    let activites = {
-        _id: "activites$act1",
+    // add to the publicActivites table
+    let publicActivites = {
+        _id: "publicActivites$act1",
         from: from,
         answer: req.body.answer,
         role: partsOrValidate,
@@ -32,14 +32,14 @@ const setOneAnswer = async (req, res) => {
         currencyType: currencyType,
         eventId: eventId
     }
-    setAnswer.push(activites);
+    setAnswer.push(publicActivites);
 
-    // increace quntity of activites in event table
+    // increace quntity of publicActivites in event table
     let to = partsOrValidate === "participant" ? "parcipiantsAnswer" : "validatorsAnswer";
     let quantityPath = partsOrValidate === "participant" ? "answerAmount" : 'validated'
     let event = {
         _id: eventId,
-        [to]: ["activites$act1"],
+        [to]: ["publicActivites$act1"],
         [quantityPath]: partsOrValidate === "participant" ? req.body.answerAmount : validatedAmount
     }
     setAnswer.push(event)
@@ -60,7 +60,7 @@ const setOneAnswer = async (req, res) => {
     // add to users table
     let user = {
         _id: from,
-        activites: ["activites$act1"],
+        publicActivites: ["publicActivites$act1"],
     }
     setAnswer.push(user)
 
