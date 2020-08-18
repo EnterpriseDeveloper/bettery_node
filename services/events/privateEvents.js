@@ -3,11 +3,11 @@ const path = require("../../config/path");
 const _ = require("lodash");
 
 const createId = (req, res) => {
-    let data = {
+    let data = [{
         _id: "privateEvents$newEvents",
         finalAnswer: ''
-    }
-    axios.post(path.path + "/transact", [data]).then((x) => {
+    }]
+    axios.post(path.path + "/transact", data).then((x) => {
         res.status(200);
         res.send({ "_id": x.data.tempids['privateEvents$newEvents'] })
     }).catch((err) => {
@@ -17,17 +17,28 @@ const createId = (req, res) => {
 }
 
 const createPrivateEvent = async (req, res) => {
+    let allData = req.body;
     let data = [];
-    data.push(req.body);
-    let responce = await axios.post(path.path + "/transact", data).catch((err) => {
+    data.push(allData);
+    axios.post(path.path + "/transact", data).then(()=>{
+         // ADD to host
+         let hostData = [{
+            _id: allData.host,
+            hostPrivateEvents: [allData._id],
+        }]
+
+        axios.post(path.path + "/transact", hostData).then(() => {
+            res.status(200).send();
+        }).catch((err)=>{
+            console.log("DB error: " + err.response.data.message)
+            res.status(400);
+            res.send(err.response.data.message);
+        })
+    }).catch((err) => {
         console.log("DB error: " + err.response.data.message)
         res.status(400);
         res.send(err.response.data.message);
     })
-
-    if (responce) {
-        res.status(200).send();
-    }
 }
 
 module.exports = {
