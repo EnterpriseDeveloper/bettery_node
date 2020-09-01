@@ -30,6 +30,10 @@ module.exports = app => {
         privateEvents.createPrivateEvent(req, res);
     })
 
+    app.post("/privateEvents/get_by_id", async (req, res) => {
+        privateEvents.getById(req, res);
+    })
+
     app.get("/hashtags/get_all", async (req, res) => {
         hashtags.getAllHashtags(req, res);
     })
