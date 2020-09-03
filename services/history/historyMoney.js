@@ -4,7 +4,7 @@ const Web3 = require('web3');
 
 const setHistoryMoney = async (contractData) => {
     let web3 = new Web3();
-    let userWallet = contractData.wallet.toLowerCase();
+    let userWallet = contractData.wallet;
     let eventId = Number(contractData.question_id);
     let amount = Number(web3.utils.fromWei(contractData.money, "ether"));
     let paymentWay = contractData.path;
