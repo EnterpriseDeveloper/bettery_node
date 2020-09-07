@@ -49,7 +49,8 @@ const getById = (req, res) => {
     } else {
         let conf = {
             "select": ["*",
-                { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
+                { 'privateEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
+                { 'privateEvents/host': ["*"] }
             ],
             "from": id
         }
@@ -75,6 +76,7 @@ function eventStructure(data) {
     return data.map((z) => {
         return {
             winner: z['privateEvents/winner'],
+            loser: z['privateEvents/loser'],
             startTime: z['privateEvents/startTime'],
             endTime: z['privateEvents/endTime'],
             transactionHash: z['privateEvents/transactionHash'],
@@ -82,7 +84,12 @@ function eventStructure(data) {
             status: z['privateEvents/status'],
             question: z['privateEvents/question'],
             answers: z["privateEvents/answers"],
-            host: z['privateEvents/host']["_id"],
+            host: {
+                id: z['privateEvents/host']["_id"],
+                nickName: z['privateEvents/host']['users/nickName'],
+                avatat: z['privateEvents/host']['users/avatar'],
+                wallet: z['privateEvents/host']['users/wallet']
+             }, 
             finalAnswer: z["privateEvents/finalAnswer"],
             parcipiantAnswers: z["privateEvents/parcipiantsAnswer"] === undefined ? undefined : z["privateEvents/parcipiantsAnswer"].map((par) => {
                 return {

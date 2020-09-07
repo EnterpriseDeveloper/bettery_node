@@ -122,7 +122,8 @@ const getById = (req, res) => {
     let conf = {
         "select": ["*",
             { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["_id"] }] }
+            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
+            { 'publicEvents/host': ["*"] }
         ],
         "from": id
     }
@@ -144,7 +145,8 @@ const getAll = (req, res) => {
     let conf = {
         "select": ["*",
             { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["_id"] }] }
+            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
+            { 'publicEvents/host': ["*"] }
         ],
         "from": "publicEvents"
     }
@@ -168,7 +170,12 @@ function eventStructure(data) {
             startTime: z['publicEvents/startTime'],
             id: z._id,
             hashtags: z['publicEvents/hashtags'],
-            host: z['publicEvents/host']["_id"],
+            host: {
+               id: z['publicEvents/host']["_id"],
+               nickName: z['publicEvents/host']['users/nickName'],
+               avatat: z['publicEvents/host']['users/avatar'],
+               wallet: z['publicEvents/host']['users/wallet']
+            }, 
             validated: z['publicEvents/validated'],
             status: z['publicEvents/status'],
             answers: Object.assign([], z['publicEvents/answers']).reverse(),
