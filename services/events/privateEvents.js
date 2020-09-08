@@ -61,8 +61,8 @@ const getById = (req, res) => {
                 res.status(200)
                 res.send(obj[0])
             } else {
-                res.status(400);
-                res.send({ "error": "id is incorect" });
+                res.status(404);
+                res.send({ "error": "event not found" });
             }
         }).catch((err) => {
             res.status(400);

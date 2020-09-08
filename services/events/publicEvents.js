@@ -129,9 +129,15 @@ const getById = (req, res) => {
     }
 
     axios.post(path.path + "/query", conf).then((x) => {
-        let obj = eventStructure([x.data[0]])
-        res.status(200)
-        res.send(obj[0])
+        if (x.data.length !== 0) {
+            let obj = eventStructure([x.data[0]])
+            res.status(200)
+            res.send(obj[0])
+        } else {
+            res.status(404);
+            res.send({ message: "event not found" });
+        }
+
     }).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
@@ -171,14 +177,14 @@ function eventStructure(data) {
             id: z._id,
             hashtags: z['publicEvents/hashtags'],
             host: {
-               id: z['publicEvents/host']["_id"],
-               nickName: z['publicEvents/host']['users/nickName'],
-               avatat: z['publicEvents/host']['users/avatar'],
-               wallet: z['publicEvents/host']['users/wallet']
-            }, 
+                id: z['publicEvents/host']["_id"],
+                nickName: z['publicEvents/host']['users/nickName'],
+                avatat: z['publicEvents/host']['users/avatar'],
+                wallet: z['publicEvents/host']['users/wallet']
+            },
             validated: z['publicEvents/validated'],
             status: z['publicEvents/status'],
-            answers: Object.assign([], z['publicEvents/answers']).reverse(),
+            answers: z['publicEvents/answers'],
             money: z['publicEvents/money'],
             finalAnswer: z['publicEvents/finalAnswerNumber'] === undefined ? null : z['publicEvents/finalAnswerNumber'],
             validatorsAmount: z['publicEvents/validatorsAmount'],
