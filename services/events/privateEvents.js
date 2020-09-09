@@ -41,6 +41,91 @@ const createPrivateEvent = async (req, res) => {
     })
 }
 
+const participate = (req, res) => {
+    let eventId = Number(req.body.eventId);
+    let date = req.body.date;
+    let answer = Number(req.body.answer);
+    let transactionHash = req.body.transactionHash;
+    let from = Number(req.body.from)
+    if (!eventId || !date || !answer || !transactionHash || !from) {
+        res.status(400);
+        res.send({ "error": "structure is incorrect" });
+    } else {
+        // private action structure
+        let data = [{
+            _id: 'privateEvents$newEvents',
+            eventId: eventId,
+            date: date,
+            answer: answer,
+            transactionHash: transactionHash,
+            from: from,
+            role: "participate"
+        }]
+        // add to user table
+        data.push({
+            _id: from,
+            privateActivites: ["privateEvents$newEvents"],
+        })
+        // add to event
+        data.push({
+            _id: eventId,
+            parcipiantsAnswer: ["publicActivites$act1"],
+        })
+        axios.post(path.path + "/transact", data).then(() => {
+            res.status(200);
+            res.send({ done: "ok" });
+        }).catch((err) => {
+            res.status(400);
+            res.send(err.response.data.message);
+            console.log("DB error: " + err.response.data.message)
+        })
+    }
+}
+
+const validate = (req, res) => {
+    let eventId = Number(req.body.eventId);
+    let date = req.body.date;
+    let answer = Number(req.body.answer);
+    let answerNumber = Number(req.body.answerNumber);
+    let transactionHash = req.body.transactionHash;
+    let from = Number(req.body.from)
+    if (!eventId || !date || !answer || !transactionHash || !from || !answerNumber) {
+        res.status(400);
+        res.send({ "error": "structure is incorrect" });
+    } else {
+        // private action structure
+        let data = [{
+            _id: 'privateEvents$newEvents',
+            eventId: eventId,
+            date: date,
+            answer: answer,
+            transactionHash: transactionHash,
+            from: from,
+            role: "validate"
+        }]
+        // add to user table
+        data.push({
+            _id: from,
+            privateActivites: ["privateEvents$newEvents"],
+        })
+        // add to event
+        data.push({
+            _id: eventId,
+            parcipiantsAnswer: ["publicActivites$act1"],
+            finalAnswerNumber: answerNumber,
+            finalAnswer: answer
+        })
+        axios.post(path.path + "/transact", data).then(() => {
+            res.status(200);
+            res.send({ done: "ok" });
+        }).catch((err) => {
+            res.status(400);
+            res.send(err.response.data.message);
+            console.log("DB error: " + err.response.data.message)
+        })
+    }
+}
+
 const getById = (req, res) => {
     let id = Number(req.body.id);
     if (!id) {
@@ -89,7 +174,7 @@ function eventStructure(data) {
                 nickName: z['privateEvents/host']['users/nickName'],
                 avatat: z['privateEvents/host']['users/avatar'],
                 wallet: z['privateEvents/host']['users/wallet']
-             }, 
+            },
             finalAnswer: z["privateEvents/finalAnswer"],
             parcipiantAnswers: z["privateEvents/parcipiantsAnswer"] === undefined ? undefined : z["privateEvents/parcipiantsAnswer"].map((par) => {
                 return {
@@ -106,5 +191,7 @@ function eventStructure(data) {
 module.exports = {
     createId,
     createPrivateEvent,
-    getById
+    getById,
+    participate,
+    validate
 }
