@@ -121,8 +121,8 @@ const getById = (req, res) => {
 
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
+            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
+            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
             { 'publicEvents/host': ["*"] }
         ],
         "from": id
@@ -150,8 +150,8 @@ const getAll = (req, res) => {
 
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
+            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
+            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
             { 'publicEvents/host': ["*"] }
         ],
         "from": "publicEvents"
@@ -202,7 +202,8 @@ function eventStructure(data) {
                     date: par['publicActivites/date'],
                     answer: par['publicActivites/answer'],
                     userId: par['publicActivites/from']['_id'],
-                    amount: par['publicActivites/amount']
+                    amount: par['publicActivites/amount'],
+                    avatar: par['publicActivites/from']['users/avatar'],
                 }
             }),
             validatorsAnswers: z["publicEvents/validatorsAnswer"] === undefined ? undefined : z["publicEvents/validatorsAnswer"].map((val) => {
@@ -210,7 +211,8 @@ function eventStructure(data) {
                     transactionHash: val['publicActivites/transactionHash'],
                     date: val['publicActivites/date'],
                     answer: val['publicActivites/answer'],
-                    userId: val['publicActivites/from']['_id']
+                    userId: val['publicActivites/from']['_id'],
+                    avatar: val['publicActivites/from']['users/avatar'],
                 }
             }),
         }
