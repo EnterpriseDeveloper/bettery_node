@@ -47,7 +47,7 @@ const participate = (req, res) => {
     let answer = Number(req.body.answer);
     let transactionHash = req.body.transactionHash;
     let from = Number(req.body.from)
-    if (!eventId || !date || !answer || !transactionHash || !from) {
+    if (eventId == undefined || date == undefined  || answer == undefined  || transactionHash == undefined  || from == undefined ) {
         res.status(400);
         res.send({ "error": "structure is incorrect" });
     } else {
@@ -89,7 +89,7 @@ const validate = (req, res) => {
     let answerNumber = Number(req.body.answerNumber);
     let transactionHash = req.body.transactionHash;
     let from = Number(req.body.from)
-    if (!eventId || !date || !answer || !transactionHash || !from || !answerNumber) {
+    if (eventId == undefined || date == undefined  || answer == undefined  || transactionHash == undefined  || from == undefined  || answerNumber == undefined ) {
         res.status(400);
         res.send({ "error": "structure is incorrect" });
     } else {

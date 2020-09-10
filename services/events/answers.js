@@ -20,6 +20,12 @@ const setOneAnswer = async (req, res) => {
     let currencyType = req.body.currencyType
     let validatedAmount = Number(req.body.validated);
     let partsOrValidate = req.body.from;
+    let amount = req.body.amount;
+    if (eventId == undefined || from == undefined || currencyType == undefined || validatedAmount == undefined || partsOrValidate == undefined || amount == undefined) {
+        res.status(400);
+        res.send({ message: "Structure is incorrect" });
+        return;
+    }
 
     // add to the publicActivites table
     let publicActivites = {
@@ -30,7 +36,8 @@ const setOneAnswer = async (req, res) => {
         date: Math.floor(Date.now() / 1000),
         transactionHash: req.body.transactionHash,
         currencyType: currencyType,
-        eventId: eventId
+        eventId: eventId,
+        amount: amount
     }
     setAnswer.push(publicActivites);
 

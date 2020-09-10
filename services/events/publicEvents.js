@@ -201,7 +201,8 @@ function eventStructure(data) {
                     transactionHash: par['publicActivites/transactionHash'],
                     date: par['publicActivites/date'],
                     answer: par['publicActivites/answer'],
-                    userId: par['publicActivites/from']['_id']
+                    userId: par['publicActivites/from']['_id'],
+                    amount: par['publicActivites/amount']
                 }
             }),
             validatorsAnswers: z["publicEvents/validatorsAnswer"] === undefined ? undefined : z["publicEvents/validatorsAnswer"].map((val) => {
