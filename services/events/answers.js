@@ -51,19 +51,21 @@ const setOneAnswer = async (req, res) => {
     }
     setAnswer.push(event)
 
-    if (to === 'validatorsAnswer') {
-        // get hold money from contract
-        if (validatedAmount === 1) {
-            let data = {
-                "select": [{ "publicEvents/host": ["users/wallet"] }],
-                "from": eventId
-            }
-            let userData = await axios.post(path.path + "/query", data)
-            let userWallet = userData.data[0]['publicEvents/host']['users/wallet']
+    // TO DO
 
-            await contract.receiveHoldMoney(userWallet, eventId);
-        }
-    }
+    // if (to === 'validatorsAnswer') {
+    //     // get hold money from contract
+    //     if (validatedAmount === 1) {
+    //         let data = {
+    //             "select": [{ "publicEvents/host": ["users/wallet"] }],
+    //             "from": eventId
+    //         }
+    //         let userData = await axios.post(path.path + "/query", data)
+    //         let userWallet = userData.data[0]['publicEvents/host']['users/wallet']
+
+    //         await contract.receiveHoldMoney(userWallet, eventId);
+    //     }
+    // }
     // add to users table
     let user = {
         _id: from,
