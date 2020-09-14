@@ -47,13 +47,14 @@ const participate = (req, res) => {
     let answer = Number(req.body.answer);
     let transactionHash = req.body.transactionHash;
     let from = Number(req.body.from)
-    if (eventId == undefined || date == undefined  || answer == undefined  || transactionHash == undefined  || from == undefined ) {
+    console.log(req.body)
+    if (eventId == undefined || date == undefined || answer == undefined || transactionHash == undefined || from == undefined) {
         res.status(400);
         res.send({ "error": "structure is incorrect" });
     } else {
         // private action structure
         let data = [{
-            _id: 'privateEvents$newEvents',
+            _id: 'privateActivites$newEvents',
             eventId: eventId,
             date: date,
             answer: answer,
@@ -64,12 +65,12 @@ const participate = (req, res) => {
         // add to user table
         data.push({
             _id: from,
-            privateActivites: ["privateEvents$newEvents"],
+            privateActivites: ["privateActivites$newEvents"],
         })
         // add to event
         data.push({
             _id: eventId,
-            parcipiantsAnswer: ["publicActivites$act1"],
+            parcipiantsAnswer: ["privateActivites$newEvents"],
         })
         axios.post(path.path + "/transact", data).then(() => {
             res.status(200);
@@ -85,20 +86,20 @@ const participate = (req, res) => {
 const validate = (req, res) => {
     let eventId = Number(req.body.eventId);
     let date = req.body.date;
-    let answer = Number(req.body.answer);
+    let answer = req.body.answer;
     let answerNumber = Number(req.body.answerNumber);
     let transactionHash = req.body.transactionHash;
     let from = Number(req.body.from)
-    if (eventId == undefined || date == undefined  || answer == undefined  || transactionHash == undefined  || from == undefined  || answerNumber == undefined ) {
+    if (eventId == undefined || date == undefined || answer == undefined || transactionHash == undefined || from == undefined || answerNumber == undefined) {
         res.status(400);
         res.send({ "error": "structure is incorrect" });
     } else {
         // private action structure
         let data = [{
-            _id: 'privateEvents$newEvents',
+            _id: 'privateActivites$newEvents',
             eventId: eventId,
             date: date,
-            answer: answer,
+            answer: answerNumber,
             transactionHash: transactionHash,
             from: from,
             role: "validate"
@@ -106,12 +107,12 @@ const validate = (req, res) => {
         // add to user table
         data.push({
             _id: from,
-            privateActivites: ["privateEvents$newEvents"],
+            privateActivites: ["privateActivites$newEvents"],
         })
         // add to event
         data.push({
             _id: eventId,
-            parcipiantsAnswer: ["publicActivites$act1"],
+            parcipiantsAnswer: ["privateActivites$newEvents"],
             finalAnswerNumber: answerNumber,
             finalAnswer: answer
         })
@@ -134,7 +135,7 @@ const getById = (req, res) => {
     } else {
         let conf = {
             "select": ["*",
-                { 'privateEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
+                { 'privateEvents/parcipiantsAnswer': ["*", { "privateActivites/from": ["*"] }] },
                 { 'privateEvents/host': ["*"] }
             ],
             "from": id
@@ -143,6 +144,8 @@ const getById = (req, res) => {
         axios.post(path.path + "/query", conf).then((x) => {
             if (x.data.length != 0) {
                 let obj = eventStructure([x.data[0]])
+                let filter = _.filter(obj[0].parcipiantAnswers, (o) => { return o.role !== 'validate'; });
+                obj[0].parcipiantAnswers = filter;
                 res.status(200)
                 res.send(obj[0])
             } else {
@@ -181,7 +184,9 @@ function eventStructure(data) {
                     transactionHash: par['privateActivites/transactionHash'],
                     date: par['privateActivites/date'],
                     answer: par['privateActivites/answer'],
-                    userId: par['privateActivites/from']['_id']
+                    userId: par['privateActivites/from']['_id'],
+                    avatar: par['privateActivites/from']['users/avatar'],
+                    role: par['privateActivites/role']
                 }
             }),
         }
