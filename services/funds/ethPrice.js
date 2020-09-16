@@ -2,6 +2,7 @@ const axios = require("axios");
 const Contract = require("../../contract-services/contract");
 const key = require("../../config/key");
 const Web3 = require("web3");
+const config = require('../../config/networks')
 
 const setEthPriceToContract = async () => {
     // get Price
@@ -25,6 +26,7 @@ const setEthPriceToContract = async () => {
             gasPrice: 0
         });
     } catch (err) {
+        console.log("error from setEthPriceToContract")
         console.log(err)
     }
 

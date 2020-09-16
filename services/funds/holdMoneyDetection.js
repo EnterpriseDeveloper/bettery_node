@@ -12,6 +12,7 @@ const receiveHoldMoney = async (userWallet, eventId) => {
             gasPrice: 0
         });
     } catch (err) {
+        console.log("error from receiveHoldMoney")
         console.log(err);
     }
 

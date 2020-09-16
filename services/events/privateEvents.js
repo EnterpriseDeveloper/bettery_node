@@ -112,7 +112,7 @@ const validate = (req, res) => {
         // add to event
         data.push({
             _id: eventId,
-            parcipiantsAnswer: ["privateActivites$newEvents"],
+            validatorAnswer: "privateActivites$newEvents",
             finalAnswerNumber: answerNumber,
             finalAnswer: answer
         })
@@ -136,6 +136,7 @@ const getById = (req, res) => {
         let conf = {
             "select": ["*",
                 { 'privateEvents/parcipiantsAnswer': ["*", { "privateActivites/from": ["*"] }] },
+                { 'privateEvents/validatorAnswer': ["*", { "privateActivites/from": ["*"] }] },
                 { 'privateEvents/host': ["*"] }
             ],
             "from": id
@@ -144,8 +145,6 @@ const getById = (req, res) => {
         axios.post(path.path + "/query", conf).then((x) => {
             if (x.data.length != 0) {
                 let obj = eventStructure([x.data[0]])
-                let filter = _.filter(obj[0].parcipiantAnswers, (o) => { return o.role !== 'validate'; });
-                obj[0].parcipiantAnswers = filter;
                 res.status(200)
                 res.send(obj[0])
             } else {
@@ -189,6 +188,15 @@ function eventStructure(data) {
                     role: par['privateActivites/role']
                 }
             }),
+            validatorAnswer: z["privateEvents/validatorAnswer"] === undefined ? undefined : {
+                transactionHash: z['privateEvents/validatorAnswer']['privateActivites/transactionHash'],
+                date: z['privateEvents/validatorAnswer']['privateActivites/date'],
+                answer: z['privateEvents/validatorAnswer']['privateActivites/answer'],
+                userId: z['privateEvents/validatorAnswer']['privateActivites/from']['_id'],
+                avatar: z['privateEvents/validatorAnswer']['privateActivites/from']['users/avatar'],
+                role: z['privateEvents/validatorAnswer']['privateActivites/role'],
+                nickName: z['privateEvents/validatorAnswer']['privateActivites/from']['users/nickName'],
+            }
         }
     })
 }
