@@ -30,9 +30,9 @@ const setEthPriceToContract = async () => {
         console.log(err)
     }
 
-    setInterval(() => {
-        setEthPriceToContract();
-    }, 3 * 60 * 60 * 1000) // each 3 hours
+    // setInterval(() => {
+    //     setEthPriceToContract();
+    // }, 3 * 60 * 60 * 1000) // each 3 hours
 }
 
 const getEthPrice = async (req, res) => {
