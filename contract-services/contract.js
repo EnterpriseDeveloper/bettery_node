@@ -76,9 +76,10 @@ class Contract {
                 // set to Db
                 setAnswer.setCorrectAnswer(eventData, eventId);
 
-                setTimeout(() => {
-                    history.setReceiveHistory(eventData, eventId, ether);
-                }, 5000)
+                // TO DO
+                // setTimeout(() => {
+                //     history.setReceiveHistory(eventData, eventId, ether);
+                // }, 5000)
 
             }
         })
