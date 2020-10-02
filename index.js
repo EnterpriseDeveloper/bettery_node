@@ -12,22 +12,24 @@ var fs = require('fs');
 var http = require('http');
 var https = require('https');
 
-// var credentials = {
+var credentials = {
 
-//     key: fs.readFileSync("./keys/server.key"),
+    key: fs.readFileSync("./keys/server.key"),
 
-//     cert: fs.readFileSync("./keys/api_siawallet_io.crt"),
+    // cert: fs.readFileSync("./keys/bettery.crt"),
 
-//     ca: [
+    cert: fs.readFileSync("./keys/13_229_200_135.crt"),
 
-//         fs.readFileSync('./keys/AddTrustExternalCARoot.crt'),
+    ca: [
 
-//         fs.readFileSync('./keys/SectigoRSADomainValidationSecureServerCA.crt'),
+        fs.readFileSync('./keys/AAACertificateServices.crt'),
 
-//         fs.readFileSync('./keys/USERTrustRSAAddTrustCA.crt')
+        fs.readFileSync('./keys/SectigoRSADomainValidationSecureServerCA.crt'),
 
-//     ]
-// };
+        fs.readFileSync('./keys/USERTrustRSAAAACA.crt')
+
+    ]
+};
 
 
 
@@ -47,10 +49,17 @@ require('./services/funds')(app);
 require('./services/history')(app);
 require('./services/users')(app);
 
-var httpServer = http.createServer(app);
-//var httpsServer = https.createServer(credentials, app);
+// app.get("/.well-known/pki-validation/39840D6583E10EEF80C3F7113D7FFEF6.txt", async (req, res) => {
+//     fs.readFile('./keys/39840D6583E10EEF80C3F7113D7FFEF6.txt', (e, data) => {
+//         if (e) throw e;
+//         res.send(data);
+//     });
+// })
 
-//httpsServer.listen(443);
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+httpsServer.listen(443);
 
 httpServer.listen(80, async () => {
     let contract = new Contract.Contract();
