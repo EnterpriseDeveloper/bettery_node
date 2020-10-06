@@ -219,9 +219,46 @@ function eventStructure(data) {
     })
 }
 
+const getBetteryEvent = async (req, res) => {
+    let email = req.body.email
+    if (email == undefined) {
+        res.status(400);
+        res.send("email is undefined");
+    } else {
+        let userInfo = {
+            "select": ["_id"],
+            "where": `users/email = \"${email}\"`
+        }
+        let getUserInfo = await axios.post(path.path + "/query", userInfo).catch((err) => {
+            res.status(400);
+            res.send(err.response.data);
+            return
+        })
+        if (getUserInfo) {
+            let id = getUserInfo.data[0]._id;
+            let conf = {
+                "select": ["publicEvents/question", "_id", "publicEvents/startTime"],
+                "where": `publicEvents/host = ${id}`
+            }
+            let data = await axios.post(path.path + "/query", conf).catch((err) => {
+                res.status(400);
+                res.send(err.response.data);
+                return
+            })
+            if (data) {
+                let sortByTime = _.sortBy(data.data, [function (o) { return o["publicEvents/startTime"]; }]);
+                let getLast = sortByTime.slice(Math.max(sortByTime.length - 5, 0))
+                res.status(200);
+                res.send(getLast);
+            }
+        }
+    }
+}
+
 module.exports = {
     setQuestion,
     getById,
     getAll,
-    createId
+    createId,
+    getBetteryEvent
 }

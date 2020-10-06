@@ -60,4 +60,8 @@ module.exports = app => {
     app.post("/delete_event_id", async (req, res) => {
         deleteEvent.deleteEventID(req, res);
     })
+
+    app.post("/bettery_event", async (req, res) => {
+        publicEvents.getBetteryEvent(req, res)
+    })
 }
