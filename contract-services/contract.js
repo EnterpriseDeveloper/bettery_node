@@ -66,6 +66,10 @@ class Contract {
         QuizeInstance.events.eventIsFinish(async (err, event) => {
             if (err) {
                 console.error('Error eventIsFinish', err)
+                setTimeout(()=>{
+                    console.log("RESTART EVENT HANDEL")
+                    await this.loadHandlerContract()
+                }, 3000)
             } else {
                 console.log("EVENT IS finish work")
                 console.log(event.returnValues)
@@ -96,7 +100,7 @@ class Contract {
 
         QuizeInstance.events.revertedEvent(async (err, event) => {
             if (err) {
-                console.error('Error payEvent', err)
+                console.error('Error revertedEvent', err)
             } else {
                 let eventData = event.returnValues;
                 onHoldHistory.setRevertedHistoryMoney(eventData);

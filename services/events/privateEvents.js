@@ -127,7 +127,7 @@ const validate = (req, res) => {
     }
 }
 
-const getById = (req, res) => {
+const getById = async (req, res) => {
     let id = Number(req.body.id);
     if (!id) {
         res.status(400);
@@ -142,20 +142,21 @@ const getById = (req, res) => {
             "from": id
         }
 
-        axios.post(path.path + "/query", conf).then((x) => {
-            if (x.data.length != 0) {
-                let obj = eventStructure([x.data[0]])
+        let event = await axios.post(path.path + "/query", conf).catch((err) => {
+            res.status(400);
+            res.send(err.response.data);
+            console.log("DB error: " + err.response.data)
+        })
+        if (event) {
+            if (event.data.length != 0) {
+                let obj = eventStructure([event.data[0]])
                 res.status(200)
                 res.send(obj[0])
             } else {
                 res.status(404);
                 res.send({ "error": "event not found" });
             }
-        }).catch((err) => {
-            res.status(400);
-            res.send(err.response.data.message);
-            console.log("DB error: " + err.response.data.message)
-        })
+        }
     }
 }
 
