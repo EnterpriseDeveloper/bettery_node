@@ -179,6 +179,7 @@ function eventStructure(data) {
                 wallet: z['privateEvents/host']['users/wallet']
             },
             finalAnswer: z["privateEvents/finalAnswer"],
+            finalAnswerNumber: z["privateEvents/finalAnswerNumber"],
             parcipiantAnswers: z["privateEvents/parcipiantsAnswer"] === undefined ? undefined : z["privateEvents/parcipiantsAnswer"].map((par) => {
                 return {
                     transactionHash: par['privateActivites/transactionHash'],
