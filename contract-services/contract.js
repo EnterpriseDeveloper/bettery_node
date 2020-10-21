@@ -66,7 +66,7 @@ class Contract {
         QuizeInstance.events.eventIsFinish(async (err, event) => {
             if (err) {
                 console.error('Error eventIsFinish', err)
-                setTimeout(()=>{
+                setTimeout(async () => {
                     console.log("RESTART EVENT HANDEL")
                     await this.loadHandlerContract()
                 }, 3000)

@@ -1,5 +1,6 @@
 const setEthPrice = require("./ethPrice");
 const withdrawal = require("./withdrawal");
+const bettertToken = require('./betteryToken');
 
 
 module.exports = app => {
@@ -9,5 +10,9 @@ module.exports = app => {
 
     app.post("/withdrawal/init", async (req, res) => {
         withdrawal.setInitWithd(req, res);
+    })
+
+    app.post("/tokens/bty", async (req, res) => {
+        bettertToken.getBTYToken(req, res);
     })
 }
