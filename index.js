@@ -10,8 +10,8 @@ const upload = multer();
 
 var fs = require('fs');
 var http = require('http');
-var https = require('https');
 
+var https = require('https');
 var credentials = {
 
     key: fs.readFileSync("./keys/server.key"),
@@ -31,8 +31,6 @@ var credentials = {
     ]
 };
 
-
-
 var cors = require('cors');
 
 app.use(cors({
@@ -43,11 +41,15 @@ app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+var httpServer = http.createServer(app);
+var io = require('socket.io')(httpServer);
+var httpsServer = https.createServer(credentials, app);
 
 require('./services/events')(app);
 require('./services/funds')(app);
 require('./services/history')(app);
 require('./services/users')(app);
+require('./services/comments')(io);
 
 // app.get("/.well-known/pki-validation/39840D6583E10EEF80C3F7113D7FFEF6.txt", async (req, res) => {
 //     fs.readFile('./keys/39840D6583E10EEF80C3F7113D7FFEF6.txt', (e, data) => {
@@ -56,16 +58,13 @@ require('./services/users')(app);
 //     });
 // })
 
-var httpServer = http.createServer(app);
-var httpsServer = https.createServer(credentials, app);
-
 httpsServer.listen(443);
 
 httpServer.listen(80, async () => {
     let contract = new Contract.Contract();
     contract.loadHandlerContract();
     setEthPrice.setEthPriceToContract();
-    
+
     console.log("server run port 80");
 
 });
