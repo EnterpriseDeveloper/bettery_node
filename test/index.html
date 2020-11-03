@@ -61,15 +61,23 @@
     <script>
         var socket = io('http://localhost:80');
         // socket.on('connect', function () { console.log("test") });
+        // var test = {
+        //     eventId: 457396837155024,
+        //     userId: 351843720888337,
+        //     comment: "new test bla bla bla"
+        // }
+        // socket.emit('create comment', test);
+
+//        socket.emit('get comments', test.eventId);
         var test = {
             eventId: 457396837155024,
-            userId: 351843720888337,
-            comment: "new test bla bla bla"
+            userId: 351843720888341,
+            commentId: 474989023199236,
+            type: "star"
         }
-        socket.emit('create comment', test);
+        socket.emit('activities', test);
 
-        // socket.emit('get comments', test.eventId);
-        socket.on('resieve comments', function (msg) {
+        socket.on('receive comments', function (msg) {
              console.log(msg)
          });
     </script>

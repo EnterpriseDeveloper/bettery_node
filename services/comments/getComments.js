@@ -27,6 +27,10 @@ const commentsStructure = (comments) => {
         return {
             comment: x['comments/comment'],
             date: x['comments/date'],
+            wink: x['comments/wink'] == undefined ? 0 : x['comments/wink'].length,
+            angry: x['comments/angry'] == undefined ? 0 : x['comments/angry'].length,
+            smile: x['comments/smile'] == undefined ? 0 : x['comments/smile'].length,
+            star: x['comments/star'] == undefined ? 0 : x['comments/star'].length,
             user: {
                 id: x['comments/from']._id,
                 nickName: x['comments/from']['users/nickName'],
