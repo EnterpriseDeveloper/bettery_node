@@ -36,7 +36,12 @@ const commentsStructure = (comments) => {
                 id: x['comments/from']._id,
                 nickName: x['comments/from']['users/nickName'],
                 avatar: x['comments/from']['users/avatar']
-            }
+            },
+            activites:
+                x['comments/wink'] == undefined ? 0 : x['comments/wink'].length +
+                    x['comments/angry'] == undefined ? 0 : x['comments/angry'].length +
+                        x['comments/smile'] == undefined ? 0 : x['comments/smile'].length +
+                            x['comments/star'] == undefined ? 0 : x['comments/star'].length
         }
     })
 }
