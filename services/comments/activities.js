@@ -12,24 +12,33 @@ const iconActivities = async (msg) => {
 
     let findActivites = {
         "select": ["*"],
-        "where": `commentsIconActivites/from = ${Number(userId)}`
+        "where": `commentsIconActivites/commentId = ${Number(commentId)}`
     }
 
     let activites = await axios.post(`${path.path}/query`, findActivites).catch(err => {
         console.log(err)
     })
     if (activites) {
-        let findEvent = _.findIndex(activites.data, (x) => { return x[`commentsIconActivites/${eventType}`]["_id"] == eventId })
+        let findEvent = _.findIndex(activites.data, (x) => { return x['commentsIconActivites/from']["_id"] == Number(userId) })
         if (findEvent !== -1) {
-            let deleteEvent = [{
-                "_id": activites.data[findEvent]["_id"],
-                "_action": "delete"
-            }]
-            await axios.post(`${path.path}/transact`, deleteEvent).catch(err => {
-                console.log(err)
-            })
-
-            await createNewActivites(eventId, userId, type, commentId, eventType)
+            if (activites.data[findEvent]['commentsIconActivites/type'] == type) {
+                let deleteEvent = [{
+                    "_id": activites.data[findEvent]["_id"],
+                    "_action": "delete"
+                }]
+                await axios.post(`${path.path}/transact`, deleteEvent).catch(err => {
+                    console.log(err)
+                })
+            } else {
+                let deleteEvent = [{
+                    "_id": activites.data[findEvent]["_id"],
+                    "_action": "delete"
+                }]
+                await axios.post(`${path.path}/transact`, deleteEvent).catch(err => {
+                    console.log(err)
+                })
+                await createNewActivites(eventId, userId, type, commentId, eventType)
+            }
 
         } else {
             await createNewActivites(eventId, userId, type, commentId, eventType)

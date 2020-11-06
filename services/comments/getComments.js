@@ -25,6 +25,7 @@ const getAllCommentsById = async (msg) => {
 const commentsStructure = (comments) => {
     return comments.map((x) => {
         return {
+            id: x['_id'],
             comment: x['comments/comment'],
             date: x['comments/date'],
             wink: x['comments/wink'] == undefined ? 0 : x['comments/wink'].length,
