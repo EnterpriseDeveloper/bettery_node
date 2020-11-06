@@ -22,6 +22,12 @@ module.exports = io => {
             await activities.iconActivities(msg)
             io.to(eventId).emit('receive comments', await getComments.getAllCommentsById(eventId));
         });
+
+        socket.on("typing in", async (msg) =>{
+            let eventId = msg.eventId
+            socket.join(eventId);
+            socket.broadcast.to(eventId).emit('typing out', {nickname: data.nickname});
+        })
     });
 
 }
