@@ -26,7 +26,14 @@ module.exports = io => {
         socket.on("typing in", async (msg) =>{
             let eventId = msg.eventId
             socket.join(eventId);
-            socket.broadcast.to(eventId).emit('typing out', {nickname: data.nickname});
+            io.to(eventId).emit('typing out', msg.text);
+        })
+
+        socket.on("reply", async (msg) =>{
+            let eventId = msg.eventId
+            socket.join(eventId);
+            await createComments.replyToComment(msg);
+            io.to(eventId).emit('receive comments', await getComments.getAllCommentsById(eventId));
         })
     });
 

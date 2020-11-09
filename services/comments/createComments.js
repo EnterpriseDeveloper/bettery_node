@@ -20,6 +20,29 @@ const createComment = async (msg) => {
     }
 }
 
+const replyToComment = async (msg) =>{
+    let eventId = msg.eventId;
+    let commentId = msg.commentId;
+    let userId = msg.userId;
+    let text = msg.text;
+    let type = await eventType(msg.eventId);
+
+    let comments = [{
+        _id: "comments$newComment",
+        from: userId,
+        date: Math.floor(Date.now() / 1000),
+        comment: text,
+        [type]: eventId
+    },{
+        _id: commentId,
+        reply: ["comments$newComment"]
+    }]
+    await axios.post(`${path.path}/transact`, comments).catch(err => {
+        console.log(err)
+    })
+
+}
+
 const eventType = async (id) => {
     let conf = {
         "select": ["*"],
@@ -41,5 +64,6 @@ const eventType = async (id) => {
 
 module.exports = {
     createComment,
-    eventType
+    eventType,
+    replyToComment
 }

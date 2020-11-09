@@ -72,10 +72,10 @@
         var test = {
             eventId: 457396837155024,
             userId: 351843720888341,
-            commentId: 474989023199236,
-            type: "star"
+            commentId: 474989023199340,
+            text: "test TWO"
         }
-        socket.emit('activities', test);
+        socket.emit('reply', test);
 
         socket.on('receive comments', function (msg) {
              console.log(msg)

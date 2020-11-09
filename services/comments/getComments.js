@@ -6,7 +6,10 @@ const getAllCommentsById = async (msg) => {
     let eventType = await createComments.eventType(msg);
 
     let conf = {
-        "select": ["*", { 'comments/from': ["users/nickName", "users/avatar"] }],
+        "select": ["*", { 
+            'comments/from': ["users/nickName", "users/avatar"],
+            'comments/reply': ["*", {'comments/from': ["users/nickName", "users/avatar"]}] 
+        }],
         "where": `comments/${eventType} = ${Number(msg)}`
     }
 
@@ -37,11 +40,12 @@ const commentsStructure = (comments) => {
                 nickName: x['comments/from']['users/nickName'],
                 avatar: x['comments/from']['users/avatar']
             },
+            replies: x['comments/reply'] == undefined ? [] : commentsStructure(x['comments/reply']),
             activites:
-                x['comments/wink'] == undefined ? 0 : x['comments/wink'].length +
-                    x['comments/angry'] == undefined ? 0 : x['comments/angry'].length +
-                        x['comments/smile'] == undefined ? 0 : x['comments/smile'].length +
-                            x['comments/star'] == undefined ? 0 : x['comments/star'].length
+                (x['comments/wink'] == undefined ? 0 : x['comments/wink'].length) +
+                    (x['comments/angry'] == undefined ? 0 : x['comments/angry'].length) +
+                        (x['comments/smile'] == undefined ? 0 : x['comments/smile'].length) +
+                            (x['comments/star'] == undefined ? 0 : x['comments/star'].length)
         }
     })
 }
