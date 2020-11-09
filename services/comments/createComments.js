@@ -24,7 +24,7 @@ const replyToComment = async (msg) =>{
     let eventId = msg.eventId;
     let commentId = msg.commentId;
     let userId = msg.userId;
-    let text = msg.text;
+    let text = msg.comment;
     let type = await eventType(msg.eventId);
 
     let comments = [{
