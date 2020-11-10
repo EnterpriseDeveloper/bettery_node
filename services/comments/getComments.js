@@ -8,10 +8,10 @@ const getAllCommentsById = async (msg) => {
     let conf = {
         "select": ["*", {
             'comments/from': ["users/nickName", "users/avatar"],
-            'comments/wink': ["*", {'commentsIconActivites/from': ["*"]}],
-            'comments/angry': ["*", {'commentsIconActivites/from': ["*"]}],
-            'comments/smile': ["*", {'commentsIconActivites/from': ["*"]}],
-            'comments/star': ["*", {'commentsIconActivites/from': ["*"]}],
+            'comments/wink': ["*", { 'commentsIconActivites/from': ["*"] }],
+            'comments/angry': ["*", { 'commentsIconActivites/from': ["*"] }],
+            'comments/smile': ["*", { 'commentsIconActivites/from': ["*"] }],
+            'comments/star': ["*", { 'commentsIconActivites/from': ["*"] }],
             'comments/reply': ["*", { 'comments/from': ["users/nickName", "users/avatar"] }]
         }],
         "where": `comments/${eventType} = ${Number(msg)}`
@@ -44,7 +44,7 @@ const commentsStructure = (comments) => {
                 nickName: x['comments/from']['users/nickName'],
                 avatar: x['comments/from']['users/avatar']
             },
-            replies: x['comments/reply'] == undefined ? [] : commentsStructure(x['comments/reply']),
+            replies: x['comments/reply'] == undefined ? [] : replyStructure(x['comments/reply']),
             activites:
                 (x['comments/wink'] == undefined ? 0 : x['comments/wink'].length) +
                 (x['comments/angry'] == undefined ? 0 : x['comments/angry'].length) +
@@ -54,9 +54,25 @@ const commentsStructure = (comments) => {
     })
 }
 
+const replyStructure = (x) => {
+    return x.map((z) => {
+        return {
+            id: z['_id'],
+            date: z['comments/date'],
+            user: {
+                id: z['comments/from']._id,
+                nickName: z['comments/from']['users/nickName'],
+                avatar: z['comments/from']['users/avatar']
+            },
+        }
+    })
+
+}
+
 const activitesStructure = (x) => {
     return x.map((z) => {
         return {
+            id: z['_id'],
             date: z['commentsIconActivites/date'],
             user: {
                 id: z['commentsIconActivites/from']._id,

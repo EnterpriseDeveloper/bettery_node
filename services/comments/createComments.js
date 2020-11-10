@@ -32,10 +32,8 @@ const replyToComment = async (msg) =>{
         from: userId,
         date: Math.floor(Date.now() / 1000),
         comment: text,
-        [type]: eventId
-    },{
-        _id: commentId,
-        reply: ["comments$newComment"]
+        [type]: eventId,
+        reply: [commentId]
     }]
     await axios.post(`${path.path}/transact`, comments).catch(err => {
         console.log(err)

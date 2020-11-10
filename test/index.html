@@ -60,20 +60,20 @@
     <script src="socket.io/socket.io.js"></script>
     <script>
         var socket = io('http://localhost:80');
-        // socket.on('connect', function () { console.log("test") });
+        socket.on('connect', function () { console.log("test") });
         // var test = {
-        //     eventId: 457396837155024,
+        //     eventId: 457396837155066,
         //     userId: 351843720888337,
         //     comment: "new test bla bla bla"
         // }
         // socket.emit('create comment', test);
 
-//        socket.emit('get comments', test.eventId);
+    //    socket.emit('get comments', test.eventId);
         var test = {
-            eventId: 457396837155024,
-            userId: 351843720888341,
-            commentId: 474989023199340,
-            text: "test TWO"
+            eventId: 457396837155067,
+            userId: 351843720888337,
+            commentId: 474989023199367,
+            comment: "test TWO"
         }
         socket.emit('reply', test);
 
