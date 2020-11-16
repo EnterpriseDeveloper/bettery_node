@@ -42,8 +42,8 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 var httpServer = http.createServer(app);
-var io = require('socket.io')(httpServer);
 var httpsServer = https.createServer(credentials, app);
+var io = require('socket.io')(httpsServer);
 
 require('./services/events')(app);
 require('./services/funds')(app);
