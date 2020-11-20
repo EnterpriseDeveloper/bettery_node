@@ -2,6 +2,7 @@ const axios = require("axios");
 const path = require("../../config/path");
 const invites = require("./invites");
 const _ = require("lodash");
+const createRoom = require('../rooms/createRoom');
 
 const createId = (req, res) => {
     let data = {
@@ -24,6 +25,23 @@ const setQuestion = (req, res) => {
     delete allData['finalAnswers'];
     allData.invites = []
     let data = []
+
+    // add room
+    if (req.body.whichRoom == "new") {
+        let room = createRoom.createRoom(allData, "publicEventsId");
+        allData.room = [room._id]
+        delete allData.roomName;
+        delete allData.roomColor;
+        delete allData.whichRoom;
+        delete allData.roomId;
+        data.push(room);
+    } else {
+        allData.room = [Number(allData.roomId)]
+        delete allData.roomName;
+        delete allData.roomColor;
+        delete allData.whichRoom;
+        delete allData.roomId;
+    }
 
     // ADD Hashtags
     if (allData.hashtags.length !== 0) {
@@ -123,7 +141,8 @@ const getById = (req, res) => {
         "select": ["*",
             { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
             { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-            { 'publicEvents/host': ["*"] }
+            { 'publicEvents/host': ["*"] },
+            { 'publicEvents/room': ["*"] }
         ],
         "from": id
     }
@@ -152,7 +171,8 @@ const getAll = (req, res) => {
         "select": ["*",
             { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
             { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-            { 'publicEvents/host': ["*"] }
+            { 'publicEvents/host': ["*"] },
+            { 'publicEvents/room': ["*"] }
         ],
         "from": "publicEvents"
     }
@@ -215,6 +235,11 @@ function eventStructure(data) {
                     avatar: val['publicActivites/from']['users/avatar'],
                 }
             }),
+            room: {
+                name: z['publicEvents/room'][0]['room/name'],
+                color: z['publicEvents/room'][0]['room/color'],
+                owner: z['publicEvents/room'][0]['room/owner']['_id']
+            }
         }
     })
 }

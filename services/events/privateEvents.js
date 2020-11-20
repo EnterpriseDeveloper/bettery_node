@@ -1,6 +1,7 @@
 const axios = require("axios");
 const path = require("../../config/path");
 const _ = require("lodash");
+const createRoom = require('../rooms/createRoom');
 
 const createId = (req, res) => {
     let data = [{
@@ -18,8 +19,29 @@ const createId = (req, res) => {
 
 const createPrivateEvent = async (req, res) => {
     let allData = req.body;
-    let data = [];
-    data.push(allData);
+    let data;
+    if (req.body.whichRoom == "new") {
+        let room = createRoom.createRoom(allData, "privateEventsId");
+        allData.room = [room._id]
+        delete allData.roomName;
+        delete allData.roomColor;
+        delete allData.whichRoom;
+        delete allData.roomId;
+        data = [
+            room,
+            allData
+        ];
+    } else {
+        allData.room = [Number(allData.roomId)]
+        delete allData.roomName;
+        delete allData.roomColor;
+        delete allData.whichRoom;
+        delete allData.roomId;
+        data = [
+            allData
+        ]
+    }
+
     axios.post(path.path + "/transact", data).then(() => {
         // ADD to host
         let hostData = [{
@@ -137,7 +159,8 @@ const getById = async (req, res) => {
             "select": ["*",
                 { 'privateEvents/parcipiantsAnswer': ["*", { "privateActivites/from": ["*"] }] },
                 { 'privateEvents/validatorAnswer': ["*", { "privateActivites/from": ["*"] }] },
-                { 'privateEvents/host': ["*"] }
+                { 'privateEvents/host': ["*"] },
+                { 'privateEvents/room': ["*"] }
             ],
             "from": id
         }
@@ -198,6 +221,11 @@ function eventStructure(data) {
                 avatar: z['privateEvents/validatorAnswer']['privateActivites/from']['users/avatar'],
                 role: z['privateEvents/validatorAnswer']['privateActivites/role'],
                 nickName: z['privateEvents/validatorAnswer']['privateActivites/from']['users/nickName'],
+            },
+            room: {
+                name: z['privateEvents/room'][0]['room/name'],
+                color: z['privateEvents/room'][0]['room/color'],
+                owner: z['privateEvents/room'][0]['room/owner']['_id']
             }
         }
     })
