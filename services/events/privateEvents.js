@@ -32,12 +32,17 @@ const createPrivateEvent = async (req, res) => {
             allData
         ];
     } else {
+        let room = {
+            _id: Number(allData.roomId),
+            privateEventsId: [Number(allData._id)]
+        }
         allData.room = [Number(allData.roomId)]
         delete allData.roomName;
         delete allData.roomColor;
         delete allData.whichRoom;
         delete allData.roomId;
         data = [
+            room,
             allData
         ]
     }

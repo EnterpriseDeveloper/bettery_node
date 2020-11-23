@@ -36,6 +36,11 @@ const setQuestion = (req, res) => {
         delete allData.roomId;
         data.push(room);
     } else {
+        let room = {
+            _id: Number(allData.roomId),
+            publicEventsId: [Number(allData._id)]
+        }
+        data.push(room);
         allData.room = [Number(allData.roomId)]
         delete allData.roomName;
         delete allData.roomColor;
