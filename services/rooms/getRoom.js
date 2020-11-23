@@ -5,8 +5,26 @@ const _ = require('lodash');
 const getByUserId = async (req, res) => {
     let userId = req.body.id
     let getRooms = {
-        "select": ["*"],
+        "select": ["*", { 'room/owner': ["users/nickName", "users/avatar"] }],
         "where": `room/owner = ${Number(userId)}`
+    }
+
+    let rooms = await axios.post(`${path.path}/query`, getRooms).catch(err => {
+        res.status(400);
+        res.send(err.response.data.message);
+        console.log("DB error: " + err.response.data.message)
+    })
+    if (rooms) {
+        let obj = roomStruct(rooms.data)
+        res.status(200)
+        res.send(obj)
+    }
+}
+
+const getAllRooms = async (req, res) =>{
+    let getRooms = {
+        "select": ["*", { 'room/owner': ["users/nickName", "users/avatar"] }],
+        "from": "room"
     }
 
     let rooms = await axios.post(`${path.path}/query`, getRooms).catch(err => {
@@ -54,7 +72,11 @@ const roomStruct = (data) => {
     return data.map((z) => {
         return {
             id: z["_id"],
-            onwer: z['room/owner']["_id"],
+            user: {
+                id: z['room/owner']._id,
+                nickName: z['room/owner']['users/nickName'],
+                avatar: z['room/owner']['users/avatar']
+            },
             name: z['room/name'],
             color: z['room/color'],
             privateEventsId: z['room/privateEventsId'] == undefined ? [] : z['room/privateEventsId'],
@@ -65,5 +87,6 @@ const roomStruct = (data) => {
 
 module.exports = {
     getByUserId,
-    roomValidation
+    roomValidation,
+    getAllRooms
 }
