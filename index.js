@@ -50,6 +50,7 @@ require('./services/funds')(app);
 require('./services/history')(app);
 require('./services/users')(app);
 require('./services/rooms')(app);
+require('./contract-services/tokensale')(app);
 require('./services/comments')(io);
 
 // app.get("/.well-known/pki-validation/39840D6583E10EEF80C3F7113D7FFEF6.txt", async (req, res) => {
