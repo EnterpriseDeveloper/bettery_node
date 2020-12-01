@@ -3,11 +3,20 @@ const TokenSaleContract = require('../abi/QuizeTokenSale.json')
 const BetteryTokenContract = require('../abi/EthERC20Coin.json');
 const { readFileSync } = require('fs');
 const path = require('path');
+const config = require('../../config/networks');
 
 module.exports = app => {
-    app.get("/tokensale/info", async (req, res) => {
-        let provider = "https://goerli.infura.io/v3/2b5ec85db4a74c8d8ed304ff2398690d";
-        let networkId = 5;
+    app.post("/tokensale/info", async (req, res) => {
+        let from = req.body.from;
+        let provider;
+        let networkId;
+        if (from == "prod") {
+            provider = config.mainnet;
+            provider = config.mainnetID
+        } else if (from == "dev") {
+            provider = config.goerli;
+            provider = config.mainId;
+        }
         let tokenMarket = await tokenSale(provider, networkId);
         let tokenSold = await tokenMarket.methods.tokensSold().call();
         let price = await tokenMarket.methods.tokenPrice().call();
