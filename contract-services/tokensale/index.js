@@ -10,7 +10,6 @@ module.exports = app => {
         let from = req.body.from;
         let provider;
         let networkId;
-        console.log(from);
         if (from == "prod") {
             provider = config.mainnet;
             networkId = config.mainnetID
