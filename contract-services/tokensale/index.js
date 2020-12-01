@@ -10,12 +10,13 @@ module.exports = app => {
         let from = req.body.from;
         let provider;
         let networkId;
+        console.log(from);
         if (from == "prod") {
             provider = config.mainnet;
-            provider = config.mainnetID
+            networkId = config.mainnetID
         } else if (from == "dev") {
             provider = config.goerli;
-            provider = config.mainId;
+            networkId = config.mainId;
         }
         let tokenMarket = await tokenSale(provider, networkId);
         let tokenSold = await tokenMarket.methods.tokensSold().call();
