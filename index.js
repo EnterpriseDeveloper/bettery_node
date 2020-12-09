@@ -50,6 +50,7 @@ require('./services/funds')(app);
 require('./services/history')(app);
 require('./services/users')(app);
 require('./services/rooms')(app);
+require('./services/subscribe')(app);
 require('./contract-services/tokensale')(app);
 require('./services/comments')(io);
 
