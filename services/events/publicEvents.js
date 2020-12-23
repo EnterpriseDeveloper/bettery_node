@@ -14,7 +14,7 @@ const createId = (req, res) => {
         res.send({ "_id": x.data.tempids['publicEvents$newEvents'] })
     }).catch((err) => {
         res.status(400);
-        res.send(err.response.data.message);
+        res.send(err.response);
     })
 }
 

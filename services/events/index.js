@@ -4,13 +4,15 @@ const hashtags = require("./hashtags");
 const invites = require("./invites");
 const answer = require("./answers");
 const deleteEvent = require("./deleteEvent");
+const eventLimitPrivate = require('../../middlewares/eventLimitsPrivate')
+const eventLimitPublic = require('../../middlewares/eventLimitsPublic')
 
 module.exports = app => {
     app.post("/publicEvents/set", async (req, res) => {
         publicEvents.setQuestion(req, res);
     })
 
-    app.get("/publicEvents/createId", async (req, res) => {
+    app.post("/publicEvents/createId", eventLimitPublic, async (req, res) => {
         publicEvents.createId(req, res);
     })
 
@@ -22,7 +24,7 @@ module.exports = app => {
         publicEvents.getAll(req, res);
     })
 
-    app.get("/privateEvents/createId", async (req, res) => {
+    app.post("/privateEvents/createId", eventLimitPrivate, async (req, res) => {
         privateEvents.createId(req, res);
     })
 
