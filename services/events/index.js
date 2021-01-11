@@ -20,7 +20,7 @@ module.exports = app => {
         publicEvents.getById(req, res);
     })
 
-    app.get("/publicEvents/get_all_private", async (req, res) => {
+    app.get("/publicEvents/get_all", async (req, res) => {
         publicEvents.getAll(req, res);
     })
 
