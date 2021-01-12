@@ -2,6 +2,7 @@ const axios = require("axios");
 const path = require("../../config/path");
 const _ = require("lodash");
 const createRoom = require('../rooms/createRoom');
+const structure = require('../../structure/event.struct');
 
 const createId = (req, res) => {
     let data = [{
@@ -177,7 +178,7 @@ const getById = async (req, res) => {
         })
         if (event) {
             if (event.data.length != 0) {
-                let obj = eventStructure([event.data[0]])
+                let obj = structure.privateEventStructure([event.data[0]])
                 res.status(200)
                 res.send(obj[0])
             } else {
@@ -186,54 +187,6 @@ const getById = async (req, res) => {
             }
         }
     }
-}
-
-function eventStructure(data) {
-    return data.map((z) => {
-        return {
-            winner: z['privateEvents/winner'],
-            loser: z['privateEvents/loser'],
-            startTime: z['privateEvents/startTime'],
-            endTime: z['privateEvents/endTime'],
-            transactionHash: z['privateEvents/transactionHash'],
-            id: z._id,
-            status: z['privateEvents/status'],
-            question: z['privateEvents/question'],
-            answers: z["privateEvents/answers"],
-            host: {
-                id: z['privateEvents/host']["_id"],
-                nickName: z['privateEvents/host']['users/nickName'],
-                avatat: z['privateEvents/host']['users/avatar'],
-                wallet: z['privateEvents/host']['users/wallet']
-            },
-            finalAnswer: z["privateEvents/finalAnswer"],
-            finalAnswerNumber: z["privateEvents/finalAnswerNumber"],
-            parcipiantAnswers: z["privateEvents/parcipiantsAnswer"] === undefined ? undefined : z["privateEvents/parcipiantsAnswer"].map((par) => {
-                return {
-                    transactionHash: par['privateActivites/transactionHash'],
-                    date: par['privateActivites/date'],
-                    answer: par['privateActivites/answer'],
-                    userId: par['privateActivites/from']['_id'],
-                    avatar: par['privateActivites/from']['users/avatar'],
-                    role: par['privateActivites/role']
-                }
-            }),
-            validatorAnswer: z["privateEvents/validatorAnswer"] === undefined ? undefined : {
-                transactionHash: z['privateEvents/validatorAnswer']['privateActivites/transactionHash'],
-                date: z['privateEvents/validatorAnswer']['privateActivites/date'],
-                answer: z['privateEvents/validatorAnswer']['privateActivites/answer'],
-                userId: z['privateEvents/validatorAnswer']['privateActivites/from']['_id'],
-                avatar: z['privateEvents/validatorAnswer']['privateActivites/from']['users/avatar'],
-                role: z['privateEvents/validatorAnswer']['privateActivites/role'],
-                nickName: z['privateEvents/validatorAnswer']['privateActivites/from']['users/nickName'],
-            },
-            room: {
-                name: z['privateEvents/room'][0]['room/name'],
-                color: z['privateEvents/room'][0]['room/color'],
-                owner: z['privateEvents/room'][0]['room/owner']['_id']
-            }
-        }
-    })
 }
 
 module.exports = {

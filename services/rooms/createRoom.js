@@ -1,6 +1,3 @@
-const axios = require('axios');
-const path = require("../../config/path");
-
 const createRoom = (data, type) =>{
     return newRoom = {
        _id: "room$newRoom",

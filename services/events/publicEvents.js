@@ -3,6 +3,7 @@ const path = require("../../config/path");
 const invites = require("./invites");
 const _ = require("lodash");
 const createRoom = require('../rooms/createRoom');
+const structire = require('../../structure/event.struct');
 
 const createId = (req, res) => {
     let data = {
@@ -154,7 +155,7 @@ const getById = (req, res) => {
 
     axios.post(path.path + "/query", conf).then((x) => {
         if (x.data.length !== 0) {
-            let obj = eventStructure([x.data[0]])
+            let obj = structire.publicEventStructure([x.data[0]]);
             res.status(200)
             res.send(obj[0])
         } else {
@@ -183,7 +184,7 @@ const getAll = (req, res) => {
     }
 
     axios.post(path.path + "/query", conf).then((x) => {
-        let obj = eventStructure(x.data)
+        let obj = structire.publicEventStructure(x.data)
         let allData = _.filter(obj, (o) => { return o.private === false })
         res.status(200)
         res.send(allData)
@@ -191,61 +192,6 @@ const getAll = (req, res) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
-    })
-}
-
-function eventStructure(data) {
-    return data.map((z) => {
-        return {
-            answerAmount: z['publicEvents/answerAmount'],
-            startTime: z['publicEvents/startTime'],
-            id: z._id,
-            hashtags: z['publicEvents/hashtags'],
-            host: {
-                id: z['publicEvents/host']["_id"],
-                nickName: z['publicEvents/host']['users/nickName'],
-                avatat: z['publicEvents/host']['users/avatar'],
-                wallet: z['publicEvents/host']['users/wallet']
-            },
-            validated: z['publicEvents/validated'],
-            status: z['publicEvents/status'],
-            answers: z['publicEvents/answers'],
-            money: z['publicEvents/money'],
-            finalAnswer: z['publicEvents/finalAnswerNumber'] === undefined ? null : z['publicEvents/finalAnswerNumber'],
-            validatorsAmount: z['publicEvents/validatorsAmount'],
-            endTime: z['publicEvents/endTime'],
-            transactionHash: z['publicEvents/transactionHash'],
-            showDistribution: z['publicEvents/showDistribution'],
-            question: z['publicEvents/question'],
-            currencyType: z['publicEvents/currencyType'] === undefined ? false : z['publicEvents/currencyType'],
-            private: z['publicEvents/private'] === undefined ? false : z['publicEvents/private'],
-            reverted: z['publicEvents/reverted'] === undefined ? false : z['publicEvents/reverted'],
-            multiChoise: z['publicEvents/multiChoise'] === undefined ? false : z['publicEvents/multiChoise'],
-            parcipiantAnswers: z["publicEvents/parcipiantsAnswer"] === undefined ? undefined : z["publicEvents/parcipiantsAnswer"].map((par) => {
-                return {
-                    transactionHash: par['publicActivites/transactionHash'],
-                    date: par['publicActivites/date'],
-                    answer: par['publicActivites/answer'],
-                    userId: par['publicActivites/from']['_id'],
-                    amount: par['publicActivites/amount'],
-                    avatar: par['publicActivites/from']['users/avatar'],
-                }
-            }),
-            validatorsAnswers: z["publicEvents/validatorsAnswer"] === undefined ? undefined : z["publicEvents/validatorsAnswer"].map((val) => {
-                return {
-                    transactionHash: val['publicActivites/transactionHash'],
-                    date: val['publicActivites/date'],
-                    answer: val['publicActivites/answer'],
-                    userId: val['publicActivites/from']['_id'],
-                    avatar: val['publicActivites/from']['users/avatar'],
-                }
-            }),
-            room: {
-                name: z['publicEvents/room'][0]['room/name'],
-                color: z['publicEvents/room'][0]['room/color'],
-                owner: z['publicEvents/room'][0]['room/owner']['_id']
-            }
-        }
     })
 }
 
