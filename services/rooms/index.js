@@ -12,6 +12,9 @@ module.exports = app => {
     app.post("/room/get_event_by_room_id", async (req, res) => {
         roomEvent.getEventByRoomId(req, res);
     })
+    app.post("/room/info", async (req, res) => {
+        roomEvent.roomInfo(req, res);
+    })
     app.get("/room/get_all", async (req, res) => {
         getRoom.getAllRooms(req, res);
     })
