@@ -171,7 +171,9 @@ const getById = (req, res) => {
 
 }
 
-const getAll = (req, res) => {
+const getAll = async (req, res) => {
+    let from = req.body.from;
+    let to = req.body.to;
 
     let conf = {
         "select": ["*",
@@ -183,16 +185,51 @@ const getAll = (req, res) => {
         "from": "publicEvents"
     }
 
-    axios.post(path.path + "/query", conf).then((x) => {
-        let obj = structire.publicEventStructure(x.data)
-        let allData = _.filter(obj, (o) => { return o.private === false })
-        res.status(200)
-        res.send(allData)
-    }).catch((err) => {
-        res.status(400);
-        res.send(err.response.data.message);
-        console.log("DB error: " + err.response.data.message)
-    })
+    let x = await axios.post(path.path + "/query", conf)
+        .catch((err) => {
+            res.status(400);
+            res.send(err.response.data.message);
+            console.log("DB error: " + err.response.data.message)
+            return;
+        })
+
+    let obj = structire.publicEventStructure(x.data)
+    let allData = _.filter(obj, (o) => { return o.private === false })
+    let events = {
+        amount: allData.length,
+        events: await getCommentsAmount(allData.slice(from, to), res)
+    }
+    res.status(200)
+    res.send(events)
+
+}
+
+const getCommentsAmount = async (events, res) => {
+    for (let i = 0; i < events.length; i++) {
+        let conf = {
+            "select": ["*"],
+            "where": `comments/publicEventsId = ${Number(events[i].id)}`
+        }
+        let comments = await axios.post(path.path + "/query", conf)
+            .catch((err) => {
+                res.status(400);
+                res.send(err.response.data.message);
+                console.log("DB error: " + err.response.data.message)
+                return;
+            })
+
+        events[i].commentsAmount = comments.data.length
+        if (comments.data.length != 0) {
+            let lastComments = _.maxBy(comments.data, function (o) {
+                return o['comments/date'];
+            })
+            events[i].lastComment = lastComments['comments/comment'];
+        } else {
+            events[i].lastComment = "null";
+        }
+    }
+
+    return events;
 }
 
 const getBetteryEvent = async (req, res) => {

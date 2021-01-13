@@ -8,10 +8,43 @@ const getEventByRoomId = async (req, res) => {
     let eventData = await getData(id, res);
 
     if (eventData !== undefined) {
-        let events = structure.publicEventStructure(eventData.data)
-        res.status(200);
-        res.send(events);
+        let obj = structure.publicEventStructure(eventData.data);
+        let allData = _.filter(obj, (o) => { return o.private === false })
+        let events = {
+            amount: allData.length,
+            events: await getCommentsAmount(allData.slice(from, to), res)
+        }
+        res.status(200)
+        res.send(events)
     }
+}
+
+const getCommentsAmount = async (events, res) => {
+    for (let i = 0; i < events.length; i++) {
+        let conf = {
+            "select": ["*"],
+            "where": `comments/publicEventsId = ${Number(events[i].id)}`
+        }
+        let comments = await axios.post(path.path + "/query", conf)
+            .catch((err) => {
+                res.status(400);
+                res.send(err.response.data.message);
+                console.log("DB error: " + err.response.data.message)
+                return;
+            })
+
+        events[i].commentsAmount = comments.data.length
+        if (comments.data.length != 0) {
+            let lastComments = _.maxBy(comments.data, function (o) {
+                return o['comments/date'];
+            })
+            events[i].lastComment = lastComments['comments/comment'];
+        } else {
+            events[i].lastComment = "null";
+        }
+    }
+
+    return events;
 }
 
 const roomInfo = async (req, res) => {
@@ -25,7 +58,7 @@ const roomInfo = async (req, res) => {
             color: eventData.data[0]["publicEvents/room"][0]["room/color"],
             hostId: hostData[0]['room/owner']['_id'],
             host: hostData[0]['room/owner']['users/nickName'],
-            hostAvatar: hostData[0]['room/owner']['users/avatar'], 
+            hostAvatar: hostData[0]['room/owner']['users/avatar'],
             events: eventData.data.length,
             activeEvents: getActiveEvents(eventData.data),
             members: "todo"
