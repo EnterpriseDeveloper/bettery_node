@@ -5,6 +5,9 @@ const _ = require("lodash");
 
 const getEventByRoomId = async (req, res) => {
     let id = req.body.id;
+    let from = req.body.from;
+    let to = req.body.to;
+    
     let eventData = await getData(id, res);
 
     if (eventData !== undefined) {
