@@ -17,6 +17,7 @@ module.exports = async (req, res, next) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
+        return;
     })
 
     // let's find finised answer
@@ -25,6 +26,7 @@ module.exports = async (req, res, next) => {
     if(filterData.length >= config.limit && prodDev){
         res.status(400);
         res.send("Limit is reached");
+        return;
     }
 
     next();
