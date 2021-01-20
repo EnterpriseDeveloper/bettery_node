@@ -1,6 +1,7 @@
 const axios = require('axios');
 const path = require("../../config/path");
 const _ = require('lodash');
+const struct = require('../../structure/room.struct');
 
 const getByUserId = async (req, res) => {
     let userId = req.body.id
@@ -33,9 +34,11 @@ const getAllRooms = async (req, res) =>{
         console.log("DB error: " + err.response.data.message)
     })
     if (rooms) {
-        let obj = roomStruct(rooms.data)
+        let obj = struct.roomStruct(rooms.data);
+        // filter private events
+        let data = _.filter(obj, (x)=>{return x.publicEventsId.length != 0})
         res.status(200)
-        res.send(obj)
+        res.send(data)
     }
 }
 
@@ -68,22 +71,7 @@ const roomValidation = async (req, res) => {
     }
 }
 
-const roomStruct = (data) => {
-    return data.map((z) => {
-        return {
-            id: z["_id"],
-            user: {
-                id: z['room/owner']._id,
-                nickName: z['room/owner']['users/nickName'],
-                avatar: z['room/owner']['users/avatar']
-            },
-            name: z['room/name'],
-            color: z['room/color'],
-            privateEventsId: z['room/privateEventsId'] == undefined ? [] : z['room/privateEventsId'],
-            publicEventsId: z['room/publicEventsId'] == undefined ? [] : z['room/publicEventsId']
-        }
-    })
-}
+
 
 module.exports = {
     getByUserId,
