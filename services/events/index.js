@@ -55,10 +55,6 @@ module.exports = app => {
         answer.setAnswer(req, res)
     })
 
-    app.post("/delete_event", async (req, res) => {
-        deleteEvent.deleteEvent(req, res);
-    })
-
     app.post("/delete_event_id", async (req, res) => {
         deleteEvent.deleteEventID(req, res);
     })
