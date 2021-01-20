@@ -87,7 +87,7 @@ const setRevertedHistoryMoney = async (contractData) =>{
         // add reverted to the event
         historyData.push({
             _id: eventId,
-            reverted: true
+            status: "reverted"
         })
 
 

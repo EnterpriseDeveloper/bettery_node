@@ -1,7 +1,7 @@
 const publicEventStructure = (data) => {
     return data.map((z) => {
         return {
-            answerAmount: z['publicEvents/answerAmount'],
+            answerAmount: z["publicEvents/parcipiantsAnswer"] === undefined ? 0 : z["publicEvents/parcipiantsAnswer"].length,
             startTime: z['publicEvents/startTime'],
             id: z._id,
             hashtags: z['publicEvents/hashtags'],
@@ -16,15 +16,12 @@ const publicEventStructure = (data) => {
             answers: z['publicEvents/answers'],
             money: z['publicEvents/money'],
             finalAnswer: z['publicEvents/finalAnswerNumber'] === undefined ? null : z['publicEvents/finalAnswerNumber'],
-            validatorsAmount: z['publicEvents/validatorsAmount'],
+            validatorsAmount: z["publicEvents/validatorsAnswer"] === undefined ? 0 : z["publicEvents/validatorsAnswer"].length,
             endTime: z['publicEvents/endTime'],
             transactionHash: z['publicEvents/transactionHash'],
-            showDistribution: z['publicEvents/showDistribution'],
             question: z['publicEvents/question'],
+            eventEnd: z['publicEvents/eventEnd'] === undefined ? 0 : z['publicEvents/eventEnd'],
             currencyType: z['publicEvents/currencyType'] === undefined ? false : z['publicEvents/currencyType'],
-            private: z['publicEvents/private'] === undefined ? false : z['publicEvents/private'],
-            reverted: z['publicEvents/reverted'] === undefined ? false : z['publicEvents/reverted'],
-            multiChoise: z['publicEvents/multiChoise'] === undefined ? false : z['publicEvents/multiChoise'],
             parcipiantAnswers: z["publicEvents/parcipiantsAnswer"] === undefined ? undefined : z["publicEvents/parcipiantsAnswer"].map((par) => {
                 return {
                     transactionHash: par['publicActivites/transactionHash'],

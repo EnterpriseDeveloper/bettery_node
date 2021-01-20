@@ -37,7 +37,7 @@ const getAllInvites = async (req, res) => {
                         return {
                             id: inv._id,
                             event: {
-                                answerAmount: inv['invites/eventId']['publicEvents/answerAmount'],
+                                answerAmount: inv['invites/eventId']["publicEvents/parcipiantsAnswer"] === undefined ? 0 : inv['invites/eventId']["publicEvents/parcipiantsAnswer"].length,
                                 startTime: inv['invites/eventId']['publicEvents/startTime'],
                                 id: inv['invites/eventId']._id,
                                 hashtags: inv['invites/eventId']['publicEvents/hashtags'],
@@ -47,15 +47,12 @@ const getAllInvites = async (req, res) => {
                                 answers: Object.assign([], inv['invites/eventId']['publicEvents/answers']).reverse(),
                                 money: inv['invites/eventId']['publicEvents/money'],
                                 finalAnswer: inv['invites/eventId']['publicEvents/finalAnswerNumber'] === undefined ? null : inv['invites/eventId']['publicEvents/finalAnswerNumber'],
-                                validatorsAmount: inv['invites/eventId']['publicEvents/validatorsAmount'],
+                                validatorsAmount: inv['invites/eventId']["publicEvents/validatorsAnswer"] === undefined ? 0 : inv['invites/eventId']["publicEvents/validatorsAnswer"].length,
+                                eventEnd: inv['invites/eventId']['publicEvents/eventEnd'] === undefined ? 0 : inv['invites/eventId']['publicEvents/eventEnd'],
                                 endTime: inv['invites/eventId']['publicEvents/endTime'],
                                 transactionHash: inv['invites/eventId']['publicEvents/transactionHash'],
-                                showDistribution: inv['invites/eventId']['publicEvents/showDistribution'],
                                 question: inv['invites/eventId']['publicEvents/question'],
-                                reverted: inv['invites/eventId']['publicEvents/reverted'] === undefined ? false : inv['invites/eventId']['publicEvents/reverted'],
                                 currencyType: inv['invites/eventId']['publicEvents/currencyType'] === undefined ? false : inv['invites/eventId']['publicEvents/currencyType'],
-                                private: inv['invites/eventId']['publicEvents/private'] === undefined ? false : inv['invites/eventId']['publicEvents/private'],
-                                multiChoise: inv['invites/eventId']['publicEvents/multiChoise'] === undefined ? false : inv['invites/eventId']['publicEvents/multiChoise'],
                                 parcipiantAnswers: inv['invites/eventId']["publicEvents/parcipiantsAnswer"] === undefined ? undefined : inv['invites/eventId']["publicEvents/parcipiantsAnswer"].map((par) => {
                                     return {
                                         transactionHash: par['publicActivites/transactionHash'],
@@ -203,7 +200,7 @@ async function fetchData(req, res) {
 function activitiesArchitecture(data, from, host) {
     return data.map((z) => {
         return {
-            answerAmount: z['publicEvents/answerAmount'],
+            answerAmount: z["publicEvents/parcipiantsAnswer"] === undefined ? 0 : z["publicEvents/parcipiantsAnswer"].length,
             startTime: z['publicEvents/startTime'],
             id: z._id,
             from: from,
@@ -214,15 +211,12 @@ function activitiesArchitecture(data, from, host) {
             answers: Object.assign([], z['publicEvents/answers']).reverse(),
             money: z['publicEvents/money'],
             finalAnswer: z['publicEvents/finalAnswerNumber'] === undefined ? null : z['publicEvents/finalAnswerNumber'],
-            validatorsAmount: z['publicEvents/validatorsAmount'],
+            validatorsAmount: z["publicEvents/validatorsAnswer"] === undefined ? 0 : z["publicEvents/validatorsAnswer"].length,
+            eventEnd: z['publicEvents/eventEnd'] === undefined ? 0 : z['publicEvents/eventEnd'],
             endTime: z['publicEvents/endTime'],
             transactionHash: z['publicEvents/transactionHash'],
-            showDistribution: z['publicEvents/showDistribution'],
             question: z['publicEvents/question'],
-            reverted: z['publicEvents/reverted'] === undefined ? false : z['publicEvents/reverted'],
             currencyType: z['publicEvents/currencyType'] === undefined ? false : z['publicEvents/currencyType'],
-            private: z['publicEvents/private'] === undefined ? false : z['publicEvents/private'],
-            multiChoise: z['publicEvents/multiChoise'] === undefined ? false : z['publicEvents/multiChoise'],
             parcipiantAnswers: z["publicEvents/parcipiantsAnswer"] === undefined ? undefined : z["publicEvents/parcipiantsAnswer"].map((par) => {
                 return {
                     transactionHash: par['publicActivites/transactionHash'],

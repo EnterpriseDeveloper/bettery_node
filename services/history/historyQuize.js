@@ -143,7 +143,7 @@ function getAction(data, index) {
 function checkActivites(data) {
     if (data.asserted[0]["publicEvents/finalAnswerNumber"] !== undefined) {
         return "final answer is " + data.asserted[0]["publicEvents/finalAnswerNumber"]
-    }else if(data.asserted[0]["publicEvents/reverted"] === true){
+    }else if(data.asserted[0]["publicEvents/status"] === "reverted"){
         return "final answer is Undefined. Because event is reverted";
     } else if (data.asserted[0]['publicEvents/parcipiantsAnswer'] !== undefined) {
         return data.asserted[0]['publicEvents/parcipiantsAnswer'][0]["_id"]

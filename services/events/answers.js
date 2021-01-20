@@ -43,11 +43,9 @@ const setOneAnswer = async (req, res) => {
 
     // increace quntity of publicActivites in event table
     let to = partsOrValidate === "participant" ? "parcipiantsAnswer" : "validatorsAnswer";
-    let quantityPath = partsOrValidate === "participant" ? "answerAmount" : 'validated'
     let event = {
         _id: eventId,
         [to]: ["publicActivites$act1"],
-        [quantityPath]: partsOrValidate === "participant" ? req.body.answerAmount : validatedAmount
     }
     setAnswer.push(event)
 

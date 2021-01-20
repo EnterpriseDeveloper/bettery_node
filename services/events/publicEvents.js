@@ -194,10 +194,9 @@ const getAll = async (req, res) => {
         })
 
     let obj = structire.publicEventStructure(x.data)
-    let allData = _.filter(obj, (o) => { return o.private === false })
     let events = {
-        amount: allData.length,
-        events: await getCommentsAmount(allData.slice(from, to), res)
+        amount: obj.length,
+        events: await getCommentsAmount(obj.slice(from, to), res)
     }
     res.status(200)
     res.send(events)
