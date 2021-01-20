@@ -16,13 +16,15 @@ const getByUserId = async (req, res) => {
         console.log("DB error: " + err.response.data.message)
     })
     if (rooms) {
-        let obj = roomStruct(rooms.data)
+        let obj = struct.roomStruct(rooms.data)
+        // filter rooms with private events
+        let data = _.filter(obj, (x) => { return x.publicEventsId.length != 0 })
         res.status(200)
-        res.send(obj)
+        res.send(data)
     }
 }
 
-const getAllRooms = async (req, res) =>{
+const getAllRooms = async (req, res) => {
     let getRooms = {
         "select": ["*", { 'room/owner': ["users/nickName", "users/avatar"] }],
         "from": "room"
@@ -35,8 +37,8 @@ const getAllRooms = async (req, res) =>{
     })
     if (rooms) {
         let obj = struct.roomStruct(rooms.data);
-        // filter private events
-        let data = _.filter(obj, (x)=>{return x.publicEventsId.length != 0})
+        // filter rooms with private events
+        let data = _.filter(obj, (x) => { return x.publicEventsId.length != 0 }) 
         res.status(200)
         res.send(data)
     }
@@ -57,10 +59,10 @@ const roomValidation = async (req, res) => {
     if (rooms) {
         if (rooms.data.length !== 0) {
             let findUser = _.find(rooms.data, (x) => { return x['room/name'] == roomName })
-            if(findUser !== undefined){
+            if (findUser !== undefined) {
                 res.status(400);
                 res.send({ message: "room with this name already exist" })
-            }else{
+            } else {
                 res.status(200);
                 res.send({ message: "ok" })
             }
