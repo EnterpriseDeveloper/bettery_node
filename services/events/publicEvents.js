@@ -4,6 +4,8 @@ const invites = require("./invites");
 const _ = require("lodash");
 const createRoom = require('../rooms/createRoom');
 const structire = require('../../structure/event.struct');
+const helpers = require('../../helpers/helpers');
+
 
 const createId = (req, res) => {
     let data = {
@@ -174,6 +176,7 @@ const getById = (req, res) => {
 const getAll = async (req, res) => {
     let from = req.body.from;
     let to = req.body.to;
+    let search = req.body.search != undefined ? req.body.search : '';
 
     let conf = {
         "select": ["*",
@@ -194,13 +197,15 @@ const getAll = async (req, res) => {
         })
 
     let obj = structire.publicEventStructure(x.data)
+
+    let dataEvetns = search.length >= 1 ? helpers.searchData(obj, search) : obj;
+
     let events = {
-        amount: obj.length,
-        events: await getCommentsAmount(obj.slice(from, to), res)
+        amount: dataEvetns.length,
+        events: await getCommentsAmount(dataEvetns.slice(from, to), res)
     }
     res.status(200)
     res.send(events)
-
 }
 
 const getCommentsAmount = async (events, res) => {

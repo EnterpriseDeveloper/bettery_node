@@ -2,19 +2,25 @@ const axios = require('axios');
 const path = require('../../config/path');
 const structure = require('../../structure/event.struct');
 const _ = require("lodash");
+const helpers = require("../../helpers/helpers");
 
 const getEventByRoomId = async (req, res) => {
     let id = req.body.id;
     let from = req.body.from;
     let to = req.body.to;
-    
+    let search = req.body.search != undefined ? req.body.search : '';
+
     let eventData = await getData(id, res);
 
     if (eventData !== undefined) {
+
         let obj = structure.publicEventStructure(eventData.data);
+
+        let dataEvetns = search.length >= 1 ? helpers.searchData(obj, search) : obj;
+
         let events = {
-            amount: obj.length,
-            events: await getCommentsAmount(obj.slice(from, to), res)
+            amount: dataEvetns.length,
+            events: await getCommentsAmount(dataEvetns.slice(from, to), res)
         }
         res.status(200)
         res.send(events)
