@@ -2,7 +2,7 @@ const axios = require('axios');
 const path = require('../../config/path');
 const structure = require('../../structure/event.struct');
 const _ = require("lodash");
-const helpers = require("../../helpers/helpers");
+const helpers = require('../../helpers/filter');
 
 const getEventByRoomId = async (req, res) => {
     let id = req.body.id;

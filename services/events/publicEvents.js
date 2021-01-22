@@ -4,7 +4,8 @@ const invites = require("./invites");
 const _ = require("lodash");
 const createRoom = require('../rooms/createRoom');
 const structire = require('../../structure/event.struct');
-const helpers = require('../../helpers/helpers');
+const filterData = require('../../helpers/filter');
+const sortData = require('../../helpers/sorting');
 
 
 const createId = (req, res) => {
@@ -177,6 +178,7 @@ const getAll = async (req, res) => {
     let from = req.body.from;
     let to = req.body.to;
     let search = req.body.search != undefined ? req.body.search : '';
+    let sort = req.body.sort != undefined ? req.body.sort : 'trending' // controversial 
 
     let conf = {
         "select": ["*",
@@ -198,8 +200,24 @@ const getAll = async (req, res) => {
 
     let obj = structire.publicEventStructure(x.data)
 
-    let dataEvetns = search.length >= 1 ? helpers.searchData(obj, search) : obj;
+    // filter
+    let dataEvetns = search.length >= 1 ? filterData.searchData(obj, search) : obj;
 
+    let soringData;
+    // soring
+    switch (sort) {
+        case 'trending':
+            soringData = sortData.trendingSorting(dataEvetns);
+            sendResponceAllEvents(res, soringData, from, to);
+            break;
+        case 'controversial':
+            soringData = sortData.controversialSorting(dataEvetns);
+            sendResponceAllEvents(res, soringData, from, to);
+            break;
+    }
+}
+
+const sendResponceAllEvents = async (res, dataEvetns, from, to) => {
     let events = {
         amount: dataEvetns.length,
         events: await getCommentsAmount(dataEvetns.slice(from, to), res)
