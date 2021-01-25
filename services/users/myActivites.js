@@ -167,16 +167,20 @@ const getAllUserEvents = async (req, res) => {
         res.send(err.response.data.message);
     })
     let data = allData.data[0];
-    if (data['users/publicActivites'].length == 0 && data['users/hostPublicEvents'].length == 0) {
+    if (data['users/publicActivites'] == undefined && data['users/hostPublicEvents'] == undefined) {
         res.status(200);
-        res.send([]);
+        res.send({
+            allAmountEvents: 0,
+            amount: 0,
+            events: []
+        });
     } else {
-        if (data['users/publicActivites'].length != 0) {
+        if (data['users/publicActivites'] != undefined) {
             data['users/publicActivites'].forEach((x) => {
                 eventData.push(x['publicActivites/eventId']);
             })
         }
-        if (data['users/hostPublicEvents'].length != 0) {
+        if (data['users/hostPublicEvents'] != undefined) {
             data['users/hostPublicEvents'].forEach((x) => {
                 eventData.push(x);
             })
