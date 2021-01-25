@@ -26,12 +26,4 @@ module.exports = app => {
     app.post("/my_activites/invites", async (req, res) => {
         myActivites.getAllInvites(req, res);
     })
-
-    app.post("/my_activites/current", async (req, res) => {
-        myActivites.getCurrentEvent(req, res);
-    })
-
-    app.post("/my_activites/past", async (req, res) => {
-        myActivites.getPastEvent(req, res);
-    })
 }

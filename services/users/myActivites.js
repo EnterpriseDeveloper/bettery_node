@@ -129,117 +129,12 @@ const getAllInvites = async (req, res) => {
     })
 }
 
-const getCurrentEvent = async (req, res) => {
-    let allData = await fetchData(req, res)
-    let currentEvent = _.filter(allData, (e) => { return e.finalAnswer === null })
+const getAllUserEvents = async () =>{
 
-    res.status(200);
-    res.send(currentEvent);
-}
-
-const getPastEvent = async (req, res) => {
-
-    let allData = await fetchData(req, res)
-    let pastEvent = _.filter(allData, (e) => { return e.finalAnswer !== null })
-
-    res.status(200);
-    res.send(pastEvent);
-}
-
-async function fetchData(req, res) {
-    let allActivites = [];
-    let id = req.body.id
-    let config = {
-        select: [
-            {
-                "users/publicActivites": ["*", {
-                    'publicActivites/eventId': ["*",
-                        { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
-                        { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["_id"] }] }]
-                }]
-            },
-            {
-                "users/hostPublicEvents": ["*",
-                    { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["_id"] }] },
-                    { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["_id"] }] }]
-            }
-        ],
-        from: id
-    }
-
-    let allData = await axios.post(path.path + "/query", config).catch((err) => {
-        console.log(err)
-        res.status(400);
-        res.send(err.response.data.message);
-    })
-
-    // get users publicActivites
-    if (allData.data[0]['users/publicActivites'] !== undefined) {
-        allData.data[0]['users/publicActivites'].forEach((x) => {
-            let userActivites = activitiesArchitecture([x['publicActivites/eventId']], x['publicActivites/role'], false)
-            userActivites.forEach((o) => {
-                allActivites.push(o)
-
-            })
-        })
-
-    }
-
-    // get host publicActivites 
-    if (allData.data[0]['users/hostPublicEvents'] !== undefined) {
-        let hostActivites = activitiesArchitecture(allData.data[0]['users/hostPublicEvents'], 'none', true)
-        hostActivites.forEach((o) => {
-            allActivites.push(o)
-        })
-
-    }
-
-    return allActivites
-}
-
-function activitiesArchitecture(data, from, host) {
-    return data.map((z) => {
-        return {
-            answerAmount: z["publicEvents/parcipiantsAnswer"] === undefined ? 0 : z["publicEvents/parcipiantsAnswer"].length,
-            startTime: z['publicEvents/startTime'],
-            id: z._id,
-            from: from,
-            host: host,
-            validated: z['publicEvents/validated'],
-            hashtags: z['publicEvents/hashtags'],
-            status: z['publicEvents/status'],
-            answers: Object.assign([], z['publicEvents/answers']).reverse(),
-            money: z['publicEvents/money'],
-            finalAnswer: z['publicEvents/finalAnswerNumber'] === undefined ? null : z['publicEvents/finalAnswerNumber'],
-            validatorsAmount: z["publicEvents/validatorsAnswer"] === undefined ? 0 : z["publicEvents/validatorsAnswer"].length,
-            eventEnd: z['publicEvents/eventEnd'] === undefined ? 0 : z['publicEvents/eventEnd'],
-            endTime: z['publicEvents/endTime'],
-            transactionHash: z['publicEvents/transactionHash'],
-            question: z['publicEvents/question'],
-            currencyType: z['publicEvents/currencyType'] === undefined ? false : z['publicEvents/currencyType'],
-            parcipiantAnswers: z["publicEvents/parcipiantsAnswer"] === undefined ? undefined : z["publicEvents/parcipiantsAnswer"].map((par) => {
-                return {
-                    transactionHash: par['publicActivites/transactionHash'],
-                    date: par['publicActivites/date'],
-                    answer: par['publicActivites/answer'],
-                    userId: par['publicActivites/from']['_id']
-                }
-            }),
-            validatorsAnswers: z["publicEvents/validatorsAnswer"] === undefined ? undefined : z["publicEvents/validatorsAnswer"].map((val) => {
-                return {
-                    transactionHash: val['publicActivites/transactionHash'],
-                    date: val['publicActivites/date'],
-                    answer: val['publicActivites/answer'],
-                    userId: val['publicActivites/from']['_id']
-                }
-            }),
-        }
-    })
 }
 
 module.exports = {
     getAllInvites,
-    getCurrentEvent,
-    getPastEvent
+    getAllUserEvents
 }
 
