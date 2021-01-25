@@ -42,6 +42,7 @@ const publicEventStructure = (data) => {
                 }
             }),
             room: {
+                id: z['publicEvents/room'][0]['_id'],
                 name: z['publicEvents/room'][0]['room/name'],
                 color: z['publicEvents/room'][0]['room/color'],
                 owner: z['publicEvents/room'][0]['room/owner']['_id']

@@ -19,6 +19,7 @@ const getEventByRoomId = async (req, res) => {
         let dataEvetns = search.length >= 1 ? helpers.searchData(obj, search) : obj;
 
         let events = {
+            allAmountEvents: obj.length,
             amount: dataEvetns.length,
             events: await getCommentsAmount(dataEvetns.slice(from, to), res)
         }

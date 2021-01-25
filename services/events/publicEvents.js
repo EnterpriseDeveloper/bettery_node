@@ -208,31 +208,33 @@ const getAll = async (req, res) => {
     switch (sort) {
         case 'trending':
             soringData = sortData.trendingSorting(dataEvetns);
-            sendResponceAllEvents(res, soringData, from, to);
+            sendResponceAllEvents(res, soringData, from, to, obj);
             break;
         case 'controversial':
             soringData = sortData.controversialSorting(dataEvetns);
-            sendResponceAllEvents(res, soringData, from, to);
+            sendResponceAllEvents(res, soringData, from, to, obj);
             break;
     }
 }
 
-const sendResponceAllEvents = async (res, dataEvetns, from, to) => {
+const sendResponceAllEvents = async (res, dataEvetns, from, to, obj) => {
     let events = {
+        allAmountEvents: obj.length,
         amount: dataEvetns.length,
-        events: await getCommentsAmount(dataEvetns.slice(from, to), res)
+        events: await getAdditionalData(dataEvetns.slice(from, to), res)
     }
     res.status(200)
     res.send(events)
 }
 
-const getCommentsAmount = async (events, res) => {
+const getAdditionalData = async (events, res) => {
     for (let i = 0; i < events.length; i++) {
-        let conf = {
+        // get last comment
+        let confComment = {
             "select": ["*"],
             "where": `comments/publicEventsId = ${Number(events[i].id)}`
         }
-        let comments = await axios.post(path.path + "/query", conf)
+        let comments = await axios.post(path.path + "/query", confComment)
             .catch((err) => {
                 res.status(400);
                 res.send(err.response.data.message);
@@ -249,6 +251,19 @@ const getCommentsAmount = async (events, res) => {
         } else {
             events[i].lastComment = "null";
         }
+        // get rooms event amount
+        let confRoom = {
+            "select": ["*"],
+            "from": events[i].room.id
+        }
+        let rooms = await axios.post(path.path + "/query", confRoom)
+            .catch((err) => {
+                res.status(400);
+                res.send(err.response.data.message);
+                console.log("DB error: " + err.response.data.message)
+                return;
+            })
+        events[i].room.eventAmount = rooms.data[0]['room/publicEventsId'].length;
     }
 
     return events;
