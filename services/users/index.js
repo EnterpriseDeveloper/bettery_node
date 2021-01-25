@@ -24,6 +24,10 @@ module.exports = app => {
     })
 
     app.post("/my_activites/invites", async (req, res) => {
-        myActivites.getAllInvites(req, res);
+        await myActivites.getAllInvites(req, res);
+    })
+
+    app.post("/user/event_activites", async (req, res) =>{
+        await myActivites.getAllUserEvents(req, res);
     })
 }

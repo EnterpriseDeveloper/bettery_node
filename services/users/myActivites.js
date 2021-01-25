@@ -1,6 +1,9 @@
 const axios = require("axios");
 const path = require("../../config/path");
 const _ = require("lodash");
+const structure = require('../../structure/event.struct');
+const filterData = require('../../helpers/filter');
+const additionalData = require('../../helpers/additionalData');
 
 
 const getAllInvites = async (req, res) => {
@@ -129,9 +132,69 @@ const getAllInvites = async (req, res) => {
     })
 }
 
-const getAllUserEvents = async () =>{
+const getAllUserEvents = async (req, res) => {
+    let eventData = [];
+    let from = req.body.from;
+    let to = req.body.to;
+    let search = req.body.search != undefined ? req.body.search : '';
+    let userId = req.body.userId;
 
+    let config = {
+        select: [
+            {
+                "users/publicActivites": ["*", {
+                    'publicActivites/eventId': ["*",
+                        { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
+                        { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
+                        { 'publicEvents/host': ["*"] },
+                        { 'publicEvents/room': ["*"] }]
+                }]
+            },
+            {
+                "users/hostPublicEvents": ["*",
+                    { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
+                    { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
+                    { 'publicEvents/host': ["*"] },
+                    { 'publicEvents/room': ["*"] }]
+            }
+        ],
+        from: userId
+    }
+
+    let allData = await axios.post(path.path + "/query", config).catch((err) => {
+        console.log(err)
+        res.status(400);
+        res.send(err.response.data.message);
+    })
+    let data = allData.data[0];
+    if (data['users/publicActivites'].length == 0 && data['users/hostPublicEvents'].length == 0) {
+        res.status(200);
+        res.send([]);
+    } else {
+        if (data['users/publicActivites'].length != 0) {
+            data['users/publicActivites'].forEach((x) => {
+                eventData.push(x['publicActivites/eventId']);
+            })
+        }
+        if (data['users/hostPublicEvents'].length != 0) {
+            data['users/hostPublicEvents'].forEach((x) => {
+                eventData.push(x);
+            })
+        }
+
+        let unique = _.uniqBy(eventData, "_id");
+        let obj = structure.publicEventStructure(unique);
+        let dataEvetns = search.length >= 1 ? filterData.searchData(obj, search) : obj;
+        let events = {
+            allAmountEvents: obj.length,
+            amount: dataEvetns.length,
+            events: await additionalData.getAdditionalData(dataEvetns.slice(from, to), res)
+        }
+        res.status(200)
+        res.send(events)
+    }
 }
+
 
 module.exports = {
     getAllInvites,
