@@ -138,6 +138,7 @@ const getAllUserEvents = async (req, res) => {
     let to = req.body.to;
     let search = req.body.search != undefined ? req.body.search : '';
     let userId = req.body.userId;
+    let finished = req.body.finished;
 
     let config = {
         select: [
@@ -189,6 +190,9 @@ const getAllUserEvents = async (req, res) => {
         let unique = _.uniqBy(eventData, "_id");
         let obj = structure.publicEventStructure(unique);
         let dataEvetns = search.length >= 1 ? filterData.searchData(obj, search) : obj;
+        if (!finished) {
+            dataEvetns = _.filter(dataEvetns, (e) => { return e.finalAnswer === null })
+        }
         let events = {
             allAmountEvents: obj.length,
             amount: dataEvetns.length,

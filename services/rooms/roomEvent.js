@@ -9,6 +9,7 @@ const getEventByRoomId = async (req, res) => {
     let from = req.body.from;
     let to = req.body.to;
     let search = req.body.search != undefined ? req.body.search : '';
+    let finished = req.body.finished;
 
     let eventData = await getData(id, res);
 
@@ -17,6 +18,10 @@ const getEventByRoomId = async (req, res) => {
         let obj = structure.publicEventStructure(eventData.data);
 
         let dataEvetns = search.length >= 1 ? helpers.searchData(obj, search) : obj;
+
+        if (!finished) {
+            dataEvetns = _.filter(dataEvetns, (e) => { return e.finalAnswer === null })
+        }
 
         let events = {
             allAmountEvents: obj.length,

@@ -180,6 +180,7 @@ const getAll = async (req, res) => {
     let to = req.body.to;
     let search = req.body.search != undefined ? req.body.search : '';
     let sort = req.body.sort != undefined ? req.body.sort : 'trending' // controversial 
+    let finished = req.body.finished;
 
     let conf = {
         "select": ["*",
@@ -203,6 +204,10 @@ const getAll = async (req, res) => {
 
     // filter
     let dataEvetns = search.length >= 1 ? filterData.searchData(obj, search) : obj;
+
+    if (!finished) {
+        dataEvetns = _.filter(dataEvetns, (e) => { return e.finalAnswer === null })
+    }
 
     let soringData;
     // soring
