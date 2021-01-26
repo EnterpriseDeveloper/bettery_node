@@ -9,6 +9,7 @@ const roomStruct = (data) => {
             },
             name: z['room/name'],
             color: z['room/color'],
+            joinedUsers: z['room/joinedUsers'] == undefined ? 0 : z['room/joinedUsers'].length,
             privateEventsId: z['room/privateEventsId'] == undefined ? [] : z['room/privateEventsId'],
             publicEventsId: z['room/publicEventsId'] == undefined ? [] : z['room/publicEventsId']
         }

@@ -1,5 +1,6 @@
 const getRoom = require('./getRoom');
 const roomEvent = require('./roomEvent');
+const room = require('./createRoom');
 
 
 module.exports = app => {
@@ -17,5 +18,14 @@ module.exports = app => {
     })
     app.get("/room/get_all", async (req, res) => {
         getRoom.getAllRooms(req, res);
+    })
+    app.post("/room/join", async (req, res) => {
+        room.joinToRoom(req, res);
+    })
+    app.post("/room/leave", async (req, res) => {
+        room.leaveRoom(req, res);
+    })
+    app.post("/room/notification", async (req, res) => {
+        room.subscribeToNotification(req, res);
     })
 }

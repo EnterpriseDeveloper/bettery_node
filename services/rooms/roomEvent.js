@@ -62,9 +62,12 @@ const getCommentsAmount = async (events, res) => {
 }
 
 const roomInfo = async (req, res) => {
-    let id = req.body.id;
-    let eventData = await getData(id, res);
-    let hostData = await getHostData(id, res);
+    let roomId = req.body.roomId;
+    let userId = req.body.userId;
+    let eventData = await getData(roomId, res);
+    let hostData = await getHostData(roomId, res);
+
+    let joined = findJoined(userId, hostData[0]['room/joinedUsers'])
 
     if (eventData !== undefined) {
         let room = {
@@ -75,11 +78,18 @@ const roomInfo = async (req, res) => {
             hostAvatar: hostData[0]['room/owner']['users/avatar'],
             events: eventData.data.length,
             activeEvents: getActiveEvents(eventData.data),
-            members: "todo"
+            members: hostData[0]['room/joinedUsers'] == undefined ? 0 : hostData[0]['room/joinedUsers'].length,
+            joined: joined == undefined ? false : true,
+            notifications: joined == undefined ? undefined : joined['joinRoom/notifications'],
+            joinedId: joined == undefined ? undefined : joined["_id"]
         }
         res.status(200);
         res.send(room);
     }
+}
+
+const findJoined = (userId, data) => {
+    return _.find(data, (x) => { return x['joinRoom/userId']["_id"] == userId });
 }
 
 const getActiveEvents = (data) => {
@@ -90,7 +100,10 @@ const getActiveEvents = (data) => {
 const getHostData = async (id, res) => {
     let host = {
         "select": ["*",
-            { "room/owner": ["*"] }
+            {
+                "room/joinedUsers": ["*"],
+                "room/owner": ["*"]
+            }
         ],
         "from": id,
     }
