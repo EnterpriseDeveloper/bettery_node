@@ -70,7 +70,38 @@ const roomValidation = async (req, res) => {
         res.status(200);
         res.send({ message: "ok" })
     }
+}
 
+const getJoinedRoom = async (req, res) => {
+    let id = req.body.id;
+    let allRooms = [];
+    let config = {
+        "select": [{ "users/joinedRooms": [{ "joinRoom/roomId": ["*", { 'room/owner': ["*"] }] }] }],
+        "from": Number(id)
+    }
+
+    let rooms = await axios.post(`${path.path}/query`, config).catch(err => {
+        res.status(400);
+        res.send(err.response.data.message);
+        console.log("DB error: " + err.response.data.message)
+        return;
+    })
+
+    if (rooms.data[0]['users/joinedRooms'] !== undefined) {
+        rooms.data[0]['users/joinedRooms'].forEach((x) => {
+            allRooms.push(x['joinRoom/roomId'])
+        })
+
+        let obj = struct.roomStruct(allRooms);
+        // filter rooms with private events
+        console.log(obj);
+        let data = _.filter(obj, (x) => { return x.publicEventsId.length != 0 })
+        res.status(200)
+        res.send(data)
+    } else {
+        res.status(200);
+        res.send([]);
+    }
 }
 
 
@@ -78,5 +109,6 @@ const roomValidation = async (req, res) => {
 module.exports = {
     getByUserId,
     roomValidation,
-    getAllRooms
+    getAllRooms,
+    getJoinedRoom
 }

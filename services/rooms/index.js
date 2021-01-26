@@ -28,4 +28,7 @@ module.exports = app => {
     app.post("/room/notification", async (req, res) => {
         room.subscribeToNotification(req, res);
     })
+    app.post("/room/joined", async (req, res) => {
+        getRoom.getJoinedRoom(req, res);
+    })
 }
