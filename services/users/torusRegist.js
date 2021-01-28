@@ -8,8 +8,7 @@ const torusRegist = (req, res) => {
 
     let findEmail = {
         "select": ["*",
-            { "users/historyTransactions": ["*"] },
-            { "invites": ["*"] }
+            { "users/historyTransactions": ["*"] }
         ],
         "from": ["users/email", req.body.email]
     }
@@ -39,7 +38,6 @@ const torusRegist = (req, res) => {
                     listParticipantEvents: [],
                     listValidatorEvents: [],
                     historyTransaction: [],
-                    invitationList: [],
                     verifier: req.body.verifier,
                 })
             }).catch((err) => {
@@ -68,13 +66,6 @@ const torusRegist = (req, res) => {
                         role: history['historyTransactions/role'],
                         currencyType: history['historyTransactions/currencyType'],
                         eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
-                    }
-                }),
-                invitationList: x.data[0]["invites"] === undefined ? [] : x.data[0]["invites"].map((invites) => {
-                    return {
-                        eventId: invites["invites/eventId"]["_id"],
-                        role: invites["invites/role"],
-                        status: invites["status"]
                     }
                 })
             })

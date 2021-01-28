@@ -81,8 +81,18 @@ const setOneAnswer = async (req, res) => {
     })
 }
 
+const participate = async (req, res) =>{
+
+}
+
+const validate = async (req, res) =>{
+
+}
+
 
 
 module.exports = {
-    setAnswer
+    setAnswer,
+    participate,
+    validate
 }

@@ -1,6 +1,5 @@
 const axios = require("axios");
 const path = require("../../config/path");
-const invites = require("./invites");
 const _ = require("lodash");
 const createRoom = require('../rooms/createRoom');
 const structire = require('../../structure/event.struct');
@@ -33,7 +32,6 @@ const setQuestion = (req, res) => {
 
     delete allData['getCoinsForHold'];
     delete allData['finalAnswers'];
-    allData.invites = []
     let data = []
 
     // add room

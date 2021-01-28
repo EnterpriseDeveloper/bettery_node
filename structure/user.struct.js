@@ -17,13 +17,6 @@ const userStructure = (data) => {
                     currencyType: history['historyTransactions/currencyType'],
                     eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
                 }
-            }),
-            invitationList: x["invites"] === undefined ? [] : x["invites"].map((invites) => {
-                return {
-                    eventId: invites["invites/eventId"]["_id"],
-                    role: invites["invites/role"],
-                    status: invites["status"]
-                }
             })
         }
     })

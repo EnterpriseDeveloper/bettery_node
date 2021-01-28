@@ -52,8 +52,7 @@ const validate = (req, res) => {
     if (req.body.wallet !== undefined) {
         let conf = {
             "select": ["*",
-                { "historyTransactions": ["*"] },
-                { "invites": ["*"] }
+                { "historyTransactions": ["*"] }
             ],
             "from": ["users/wallet", req.body.wallet]
         }
@@ -89,8 +88,7 @@ const validate = (req, res) => {
 const getUserById = (req, res) => {
     let conf = {
         "select": ["*",
-            { "historyTransactions": ["*"] },
-            { "invites": ["*"] }
+            { "historyTransactions": ["*"] }
         ],
         "from": Number(req.body.id)
     }
@@ -117,8 +115,7 @@ const allUsers = (req, res) => {
 
     let conf = {
         "select": ["*",
-            { "historyTransactions": ["*"] },
-            { "invites": ["*"] }
+            { "historyTransactions": ["*"] }
         ],
         "from": "users"
     }
