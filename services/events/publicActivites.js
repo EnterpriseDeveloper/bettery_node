@@ -2,26 +2,72 @@ const axios = require("axios");
 const path = require("../../config/path");
 const contract = require("../funds/holdMoneyDetection");
 
-const setAnswer = (req, res) => {
+const participate = async (req, res) => {
+    let setAnswer = []
 
-    if (req.body.multy) {
+    let eventId = req.body.event_id;
+    let userId = Number(req.body.userId)
+    let currencyType = req.body.currencyType
+    let amount = req.body.amount;
+
+    if (eventId == undefined ||
+        userId == undefined ||
+        currencyType == undefined ||
+        amount == undefined) {
         res.status(400);
-        res.send("multy answer not work");
-    } else {
-        setOneAnswer(req, res)
+        res.send({ message: "Structure is incorrect" });
+        return;
     }
+
+    // add to the publicActivites table
+    let publicActivites = {
+        _id: "publicActivites$act",
+        from: userId,
+        answer: req.body.answer,
+        role: "participant",
+        date: Math.floor(Date.now() / 1000),
+        transactionHash: req.body.transactionHash,
+        currencyType: currencyType,
+        eventId: eventId,
+        amount: amount
+    }
+    setAnswer.push(publicActivites);
+
+    // increace quntity of publicActivites in event table
+    let event = {
+        _id: eventId,
+        "parcipiantsAnswer": ["publicActivites$act"],
+    }
+    setAnswer.push(event)
+
+    // add to users table
+    let user = {
+        _id: userId,
+        publicActivites: ["publicActivites$act"],
+    }
+    setAnswer.push(user)
+
+    axios.post(path.path + "/transact", setAnswer).then(() => {
+        res.status(200);
+        res.send({ done: "ok" });
+    }).catch((err) => {
+        res.status(400);
+        res.send(err.response.data.message);
+        console.log("DB error: " + err.response.data.message)
+    })
 }
 
-const setOneAnswer = async (req, res) => {
+const validate = async (req, res) => {
     let setAnswer = []
 
     let eventId = req.body.event_id;
     let from = Number(req.body.userId)
     let currencyType = req.body.currencyType
     let validatedAmount = Number(req.body.validated);
-    let partsOrValidate = req.body.from;
-    let amount = req.body.amount;
-    if (eventId == undefined || from == undefined || currencyType == undefined || validatedAmount == undefined || partsOrValidate == undefined || amount == undefined) {
+    if (eventId == undefined || 
+        from == undefined || 
+        currencyType == undefined || 
+        validatedAmount == undefined ) {
         res.status(400);
         res.send({ message: "Structure is incorrect" });
         return;
@@ -32,20 +78,19 @@ const setOneAnswer = async (req, res) => {
         _id: "publicActivites$act1",
         from: from,
         answer: req.body.answer,
-        role: partsOrValidate,
+        role: "validator",
         date: Math.floor(Date.now() / 1000),
         transactionHash: req.body.transactionHash,
         currencyType: currencyType,
         eventId: eventId,
-        amount: amount
+        amount: 0
     }
     setAnswer.push(publicActivites);
 
     // increace quntity of publicActivites in event table
-    let to = partsOrValidate === "participant" ? "parcipiantsAnswer" : "validatorsAnswer";
     let event = {
         _id: eventId,
-        [to]: ["publicActivites$act1"],
+        "validatorsAnswer": ["publicActivites$act1"],
     }
     setAnswer.push(event)
 
@@ -79,14 +124,6 @@ const setOneAnswer = async (req, res) => {
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
     })
-}
-
-const participate = async (req, res) =>{
-
-}
-
-const validate = async (req, res) =>{
-
 }
 
 
