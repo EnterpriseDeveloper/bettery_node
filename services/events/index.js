@@ -1,7 +1,6 @@
 const publicEvents = require("./publicEvents");
 const privateEvents = require("./privateEvents");
 const hashtags = require("./hashtags");
-const invites = require("./invites");
 const answer = require("./answers");
 const deleteEvent = require("./deleteEvent");
 const eventLimitPrivate = require('../../middlewares/eventLimitsPrivate')
