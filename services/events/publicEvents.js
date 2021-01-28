@@ -62,7 +62,6 @@ const setQuestion = (req, res) => {
         delete allData.roomId;
     }
 
-    // ADD Hashtags REMOVE
     if (allData.hashtags.length !== 0) {
         data.push({
             _id: hashtagsId,
@@ -71,60 +70,6 @@ const setQuestion = (req, res) => {
         delete allData['hashtagsId'];
     } else {
         delete allData['hashtagsId'];
-    }
-
-    if (allData.parcipiant.length !== 0) { // REMOVE
-        // create obj for Parcipiant 
-        let parc = invites.inviteUsers(allData.parcipiant, allData, "Participant")
-
-        parc.forEach((x) => {
-            data.push(x)
-        })
-
-        // add to users table
-        allData.parcipiant.forEach((x, i) => {
-            data.push({
-                _id: x,
-                invites: ["invites$par" + i]
-            })
-        })
-
-        // add to event table
-        parc.forEach((x) => {
-            allData.invites.push(x._id)
-        })
-
-        delete allData['parcipiant'];
-
-    } else {
-        delete allData['parcipiant'];
-    }
-
-    if (allData.validators.length !== 0) { // REMOVE
-        // create obj for Validate
-        let valid = invites.inviteUsers(allData.validators, allData, "Validate")
-
-        valid.forEach((x) => {
-            data.push(x)
-        })
-
-        // add to users table
-        allData.validators.forEach((x, i) => {
-            data.push({
-                _id: x,
-                invites: ["invites$valid" + i]
-            })
-        })
-
-        // add to event table
-        valid.forEach((x) => {
-            allData.invites.push(x._id)
-        })
-
-        delete allData['validators'];
-
-    } else {
-        delete allData['validators'];
     }
 
     data.push(allData)

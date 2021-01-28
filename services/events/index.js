@@ -46,11 +46,6 @@ module.exports = app => {
         hashtags.getAllHashtags(req, res);
     })
 
-    app.post("/invites/delete", async (req, res) => {
-        invites.deleteInvitation(req, res);
-    })
-
-
     app.post("/answer", async (req, res) => {
         answer.setAnswer(req, res)
     })
