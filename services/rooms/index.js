@@ -1,6 +1,7 @@
 const getRoom = require('./getRoom');
 const roomEvent = require('./roomEvent');
 const room = require('./createRoom');
+const notification = require('./notification');
 
 
 module.exports = app => {
@@ -26,9 +27,18 @@ module.exports = app => {
         room.leaveRoom(req, res);
     })
     app.post("/room/notification", async (req, res) => {
-        room.subscribeToNotification(req, res);
+        notification.subscribeToNotification(req, res);
     })
     app.post("/room/joined", async (req, res) => {
         getRoom.getJoinedRoom(req, res);
+    })
+    app.post("/notification/get_by_user_id", (req, res) => {
+        notification.getNotificationByUserId(req, res);
+    })
+    app.post("/notification/read", async (req, res) => {
+        notification.readNotification(req, res);
+    })
+    app.post("/notification/delete", async (req, res) => {
+        notification.deleteNotifications(req, res);
     })
 }

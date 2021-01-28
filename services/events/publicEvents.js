@@ -7,6 +7,7 @@ const structire = require('../../structure/event.struct');
 const filterData = require('../../helpers/filter');
 const sortData = require('../../helpers/sorting');
 const additionalData = require('../../helpers/additionalData');
+const notification = require('../rooms/notification');
 
 
 const createId = (req, res) => {
@@ -25,7 +26,11 @@ const createId = (req, res) => {
 
 const setQuestion = (req, res) => {
     let allData = req.body
-    let hashtagsId = req.body.hashtagsId
+    let hashtagsId = req.body.hashtagsId;
+    let hostId = allData.host;
+    let roomId = allData.roomId;
+    let eventId = allData._id;
+
     delete allData['getCoinsForHold'];
     delete allData['finalAnswers'];
     allData.invites = []
@@ -42,18 +47,22 @@ const setQuestion = (req, res) => {
         data.push(room);
     } else {
         let room = {
-            _id: Number(allData.roomId),
-            publicEventsId: [Number(allData._id)]
+            _id: Number(roomId),
+            publicEventsId: [Number(eventId)]
         }
         data.push(room);
-        allData.room = [Number(allData.roomId)]
+        allData.room = [Number(roomId)]
+
+        // Add notification
+        notification.sendNotificationToUser(roomId, eventId, res);
+
         delete allData.roomName;
         delete allData.roomColor;
         delete allData.whichRoom;
         delete allData.roomId;
     }
 
-    // ADD Hashtags
+    // ADD Hashtags REMOVE
     if (allData.hashtags.length !== 0) {
         data.push({
             _id: hashtagsId,
@@ -64,8 +73,8 @@ const setQuestion = (req, res) => {
         delete allData['hashtagsId'];
     }
 
-    if (allData.parcipiant.length !== 0) {
-        // create obj for Parcipiant
+    if (allData.parcipiant.length !== 0) { // REMOVE
+        // create obj for Parcipiant 
         let parc = invites.inviteUsers(allData.parcipiant, allData, "Participant")
 
         parc.forEach((x) => {
@@ -91,7 +100,7 @@ const setQuestion = (req, res) => {
         delete allData['parcipiant'];
     }
 
-    if (allData.validators.length !== 0) {
+    if (allData.validators.length !== 0) { // REMOVE
         // create obj for Validate
         let valid = invites.inviteUsers(allData.validators, allData, "Validate")
 
@@ -124,8 +133,8 @@ const setQuestion = (req, res) => {
 
         // ADD to host
         let hostData = [{
-            _id: allData.host,
-            hostPublicEvents: [allData._id],
+            _id: hostId,
+            hostPublicEvents: [eventId],
         }]
 
         axios.post(path.path + "/transact", hostData).then(() => {

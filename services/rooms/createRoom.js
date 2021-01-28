@@ -57,29 +57,9 @@ const leaveRoom = async (req, res) => {
     res.send({ status: "deleted" });
 }
 
-const subscribeToNotification = async (req, res) => {
-    let joinedId = req.body.joinedId;
-    let subscribe = req.body.subscribe
-    let config = [{
-        "_id": Number(joinedId),
-        "notifications": subscribe
-    }]
-
-    await axios.post(`${path.path}/transact`, config).catch((err) => {
-        res.status(400);
-        res.send(err.response.data.message);
-        console.log("DB error: " + err.response.data.message)
-        return;
-    })
-
-    res.status(200);
-    res.send({ status: subscribe == true ? "Subscribed" : "Unsubscribed" });
-}
-
 
 module.exports = {
     createRoom,
     joinToRoom,
-    leaveRoom,
-    subscribeToNotification
+    leaveRoom
 }
