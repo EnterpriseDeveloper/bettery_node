@@ -129,7 +129,6 @@ const validate = async (req, res) => {
 
 
 module.exports = {
-    setAnswer,
     participate,
     validate
 }
