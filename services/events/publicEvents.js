@@ -23,7 +23,7 @@ const createId = (req, res) => {
     })
 }
 
-const setQuestion = (req, res) => {
+const createEvent = (req, res) => {
     let allData = req.body
     let hashtagsId = req.body.hashtagsId;
     let hostId = allData.host;
@@ -222,7 +222,7 @@ const getBetteryEvent = async (req, res) => {
 }
 
 module.exports = {
-    setQuestion,
+    createEvent,
     getById,
     getAll,
     createId,

@@ -8,7 +8,7 @@ const eventLimitPublic = require('../../middlewares/eventLimitsPublic')
 
 module.exports = app => {
     app.post("/publicEvents/set", async (req, res) => {
-        publicEvents.setQuestion(req, res);
+        publicEvents.createEvent(req, res);
     })
 
     app.post("/publicEvents/createId", eventLimitPublic, async (req, res) => {
