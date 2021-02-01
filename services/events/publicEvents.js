@@ -23,19 +23,20 @@ const createId = (req, res) => {
     })
 }
 
-const createEvent = (req, res) => {
+const createEvent = async (req, res) => {
     let allData = req.body
     let hashtagsId = req.body.hashtagsId;
     let hostId = allData.host;
     let roomId = allData.roomId;
     let eventId = allData._id;
+    let whichRoom = req.body.whichRoom;
 
     delete allData['getCoinsForHold'];
     delete allData['finalAnswers'];
     let data = []
 
     // add room
-    if (req.body.whichRoom == "new") {
+    if (whichRoom == "new") {
         let room = createRoom.createRoom(allData, "publicEventsId");
         allData.room = [room._id]
         delete allData.roomName;
@@ -72,28 +73,51 @@ const createEvent = (req, res) => {
 
     data.push(allData)
 
-    axios.post(path.path + "/transact", data).then((x) => {
-
-        // ADD to host
-        let hostData = [{
-            _id: hostId,
-            hostPublicEvents: [eventId],
-        }]
-
-        axios.post(path.path + "/transact", hostData).then(() => {
-            res.status(200).send();
-        }).catch((err) => {
-            console.log("DB error: " + err.response.data.message)
-            res.status(400);
-            res.send(err.response.data.message);
-        })
-
-    }).catch((err) => {
+    await axios.post(path.path + "/transact", data).catch((err) => {
         console.log("DB error: " + err.response.data.message)
         res.status(400);
         res.send(err.response.data.message);
+        return;
     })
 
+    // ADD to host
+    let hostData = [{
+        _id: hostId,
+        hostPublicEvents: [eventId],
+    }]
+
+    await axios.post(path.path + "/transact", hostData).catch((err) => {
+        console.log("DB error: " + err.response.data.message)
+        res.status(400);
+        res.send(err.response.data.message);
+        return;
+    })
+
+    if (whichRoom == 'new') {
+        let roomId = await getRoomId(eventId);
+        res.status(200).send({
+            roomId: roomId
+        });
+    } else {
+        res.status(200).send({
+            roomId: roomId
+        });
+    }
+}
+
+const getRoomId = async (eventId, res) => {
+    let conf = {
+        "select": [{ "room": ["_id"] }],
+        "from": eventId
+    }
+
+    let data = await axios.post(`${path.path}/query`, conf).catch((err) => {
+        console.log("DB error: " + err.response.data.message)
+        res.status(400);
+        res.send(err.response.data.message);
+        return;
+    })
+    return data.data[0].room[0]['_id'];
 }
 
 const getById = (req, res) => {
