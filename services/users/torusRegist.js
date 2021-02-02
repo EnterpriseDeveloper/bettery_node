@@ -45,8 +45,6 @@ const torusRegist = async (req, res) => {
             }
         }
 
-        console.log(data);
-
         let x = await axios.post(`${path.path}/transact`, data).catch((err) => {
             res.status(400);
             res.send(err.response.data.message);
