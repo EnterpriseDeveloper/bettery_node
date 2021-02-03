@@ -15,7 +15,7 @@ const publicEventStructure = (data) => {
             status: z['publicEvents/status'],
             answers: z['publicEvents/answers'],
             finalAnswer: z['publicEvents/finalAnswerNumber'] === undefined ? null : z['publicEvents/finalAnswerNumber'],
-            validatorsAmount: z["publicEvents/validatorsAnswer"] === undefined ? 0 : z["publicEvents/validatorsAnswer"].length,
+            validatorsAmount: z["publicEvents/validatorsAmount"],
             endTime: z['publicEvents/endTime'],
             transactionHash: z['publicEvents/transactionHash'],
             question: z['publicEvents/question'],

@@ -1,6 +1,7 @@
 const axios = require("axios");
 const path = require("../../config/path");
 const contract = require("../funds/holdMoneyDetection");
+const refund = require('../../bot/refundBot');
 
 const participate = async (req, res) => {
     let setAnswer = []
@@ -47,27 +48,28 @@ const participate = async (req, res) => {
     }
     setAnswer.push(user)
 
-    axios.post(path.path + "/transact", setAnswer).then(() => {
-        res.status(200);
-        res.send({ done: "ok" });
-    }).catch((err) => {
+    await axios.post(`${path.path}/transact`, setAnswer).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
+        return;
     })
+
+    res.status(200);
+    res.send({ done: "ok" });
 }
 
 const validate = async (req, res) => {
     let setAnswer = []
 
-    let eventId = req.body.event_id;
+    let eventId = Number(req.body.event_id);
     let from = Number(req.body.userId)
     let currencyType = req.body.currencyType
-    let validatedAmount = Number(req.body.validated);
-    if (eventId == undefined || 
-        from == undefined || 
-        currencyType == undefined || 
-        validatedAmount == undefined ) {
+    let validated = Number(req.body.validated);
+    if (eventId == undefined ||
+        from == undefined ||
+        currencyType == undefined ||
+        validated == undefined) {
         res.status(400);
         res.send({ message: "Structure is incorrect" });
         return;
@@ -94,21 +96,22 @@ const validate = async (req, res) => {
     }
     setAnswer.push(event)
 
-    // TO DO
+    if (validated === 1) {
 
-    // if (to === 'validatorsAnswer') {
-    //     // get hold money from contract
-    //     if (validatedAmount === 1) {
-    //         let data = {
-    //             "select": [{ "publicEvents/host": ["users/wallet"] }],
-    //             "from": eventId
-    //         }
-    //         let userData = await axios.post(path.path + "/query", data)
-    //         let userWallet = userData.data[0]['publicEvents/host']['users/wallet']
+        // detect amount of validators
+        setAmountOfValidators(eventId);
 
-    //         await contract.receiveHoldMoney(userWallet, eventId);
-    //     }
-    // }
+        // TODO ON HOLD
+        //         let data = {
+        //             "select": [{ "publicEvents/host": ["users/wallet"] }],
+        //             "from": eventId
+        //         }
+        //         let userData = await axios.post(path.path + "/query", data)
+        //         let userWallet = userData.data[0]['publicEvents/host']['users/wallet']
+
+        //         await contract.receiveHoldMoney(userWallet, eventId);
+    }
+
     // add to users table
     let user = {
         _id: from,
@@ -116,14 +119,50 @@ const validate = async (req, res) => {
     }
     setAnswer.push(user)
 
-    axios.post(path.path + "/transact", setAnswer).then(() => {
-        res.status(200);
-        res.send({ done: "ok" });
-    }).catch((err) => {
+    await axios.post(`${path.path}/transact`, setAnswer).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
+        return;
     })
+
+    res.status(200);
+    res.send({ done: "ok" });
+}
+
+const setAmountOfValidators = async (id) => {
+    let config = {
+        "select": ["*",
+            { 'publicEvents/parcipiantsAnswer': ["*"] }
+        ],
+        "from": id
+    }
+
+    let data = await axios.post(`${path.path}/query`, config).catch((err) => {
+        console.log("DB error: " + err.response.data.message)
+        return;
+    })
+
+    // validatorsAmount
+    let events = data.data[0];
+    let participant = events["publicEvents/parcipiantsAnswer"]
+    if (participant === undefined) {
+        await refund.revertEvent(id, participant);
+    } else {
+        if (events['publicEvents/validatorsAmount'] == 0) {
+            let partAmount = (10 * participant.length) / 100;
+            let validAmount = partAmount <= 3 ? 3 : partAmount;
+
+            let send = [{
+                "_id": id,
+                "validatorsAmount": validAmount
+            }]
+            await axios.post(`${path.path}/transact`, send).catch((err) => {
+                console.log("DB error: " + err.response.data.message)
+                return;
+            })
+        }
+    }
 }
 
 

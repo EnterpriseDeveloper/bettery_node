@@ -22,8 +22,8 @@ module.exports = async (req, res, next) => {
 
     // let's find finised answer
 
-    let filterData = _.filter(data.data, (x)=>{return x['publicEvents/finalAnswerNumber'] == undefined});
-    if(filterData.length >= config.limit && prodDev){
+    let filterData = _.filter(data.data, (x) => { return x['publicEvents/finalAnswerNumber'] == undefined && x['publicEvents/status'] != "reverted" })
+    if (filterData.length >= config.limit && prodDev) {
         res.status(400);
         res.send("Limit is reached");
         return;

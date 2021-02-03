@@ -7,6 +7,7 @@ const setCorrectAnswer = (data, id) => {
     let finalAnswer = [{
         "_id": Number(id),
         "finalAnswerNumber": Number(data.correctAnswer),
+        "status": "finished",
         "eventEnd": Math.floor(new Date().getTime() / 1000.0)
     }]
 

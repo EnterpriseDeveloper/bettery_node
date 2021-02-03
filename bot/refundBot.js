@@ -18,48 +18,53 @@ const refundBot = async () => {
     })
 
     if (data.data.length != 0) {
-        let events = _.filter(data.data, (x) => { return x['publicEvents/finalAnswer'] == '' })
+        let events = _.filter(data.data, (x) => { return x['publicEvents/finalAnswerNumber'] == undefined && x['publicEvents/status'] != "reverted" })
         if (events.length != 0) {
             for (let i = 0; i < events.length; i++) {
                 let eventId = events[i]["_id"]
                 let endTime = events[i]["publicEvents/endTime"];
                 let timeNow = Math.floor(new Date().getTime() / 1000.0)
                 let week = epochWeek.epochWeek;
-                let status = events[i]["publicEvents/status"]
-                if (timeNow - endTime > week && status != "reverted") {
-                    let revert = [{
-                        "_id": eventId,
-                        "status": "reverted",
-                        "eventEnd": Math.floor(new Date().getTime() / 1000.0)
-                    }]
-
-                    await axios.post(`${url.path}/transact`, revert).catch((err) => {
-                        console.log(err);
-                        return;
-                    })
-
-                    if (events[i]["publicEvents/parcipiantsAnswer"] !== undefined) {
-                        // ADD providers for main network
-                        let contr = new Contract.Contract();
-                        let getContract = await contr.loadContract();
-                        let from = contr.getAccount();
-                        try {
-                            const gasEstimate = await getContract.methods.revertedPayment(eventId, "do not have enough validators").estimateGas({ from: from });
-                            await getContract.methods.revertedPayment(eventId, "do not have enough validators").send({
-                                gas: gasEstimate,
-                                gasPrice: 0
-                            });
-                        } catch (err) {
-                            console.log("error from setEthPriceToContract")
-                            console.log(err)
-                        }
-                    }
+                if (timeNow - endTime > week) {
+                    let participant = events[i]["publicEvents/parcipiantsAnswer"];
+                    await revertEvent(eventId, participant)
                 };
             }
         }
     }
 }
 
+const revertEvent = async (eventId, participant) => {
+    let revert = [{
+        "_id": eventId,
+        "status": "reverted",
+        "eventEnd": Math.floor(new Date().getTime() / 1000.0)
+    }]
+
+    await axios.post(`${url.path}/transact`, revert).catch((err) => {
+        console.log(err);
+        return;
+    })
+
+    if (participant !== undefined) {
+        // ADD providers for main network
+        let contr = new Contract.Contract();
+        let getContract = await contr.loadContract();
+        let from = contr.getAccount();
+        try {
+            const gasEstimate = await getContract.methods.revertedPayment(eventId, "do not have enough validators").estimateGas({ from: from });
+            await getContract.methods.revertedPayment(eventId, "do not have enough validators").send({
+                gas: gasEstimate,
+                gasPrice: 0
+            });
+        } catch (err) {
+            console.log("error from setEthPriceToContract")
+            console.log(err)
+        }
+    }
+}
+
 module.exports = {
-    refundBot
+    refundBot,
+    revertEvent
 }
