@@ -39,8 +39,12 @@ const getAllRooms = async (req, res) => {
     let obj = struct.roomStruct(rooms.data);
     // filter rooms with private events
     let data = _.filter(obj, (x) => { return x.publicEventsId.length != 0 })
+
+    for(let i = 0; i < data.length; i++){
+        data[i].publicEventsId = data[i].publicEventsId.reverse();
+    }
     res.status(200)
-    res.send(data)
+    res.send(data);
 
 }
 
