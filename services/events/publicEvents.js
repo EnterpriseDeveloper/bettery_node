@@ -227,7 +227,7 @@ const getBetteryEvent = async (req, res) => {
         if (getUserInfo) {
             let id = getUserInfo.data[0]._id;
             let conf = {
-                "select": ["publicEvents/question", "_id", "publicEvents/startTime"],
+                "select": ["publicEvents/question", "_id", "publicEvents/startTime", "room"],
                 "where": `publicEvents/host = ${id}`
             }
             let data = await axios.post(path.path + "/query", conf).catch((err) => {
