@@ -12,7 +12,8 @@ const notification = require('../rooms/notification');
 const createId = (req, res) => {
     let data = {
         _id: "publicEvents$newEvents",
-        finalAnswer: ''
+        finalAnswer: '',
+        dateCreation: Math.floor(Date.now() / 1000)
     }
     axios.post(path.path + "/transact", [data]).then((x) => {
         res.status(200);

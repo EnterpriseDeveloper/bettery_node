@@ -1,5 +1,10 @@
 const publicEventStructure = (data) => {
-    return data.map((z) => {
+    return data.filter((x) => {
+        if (x['publicEvents/startTime'] == undefined) {
+            return false;
+        }
+        return true;
+    }).map((z) => {
         return {
             answerAmount: z["publicEvents/parcipiantsAnswer"] === undefined ? 0 : z["publicEvents/parcipiantsAnswer"].length,
             startTime: z['publicEvents/startTime'],
@@ -51,7 +56,12 @@ const publicEventStructure = (data) => {
 }
 
 const privateEventStructure = (data) => {
-    return data.map((z) => {
+    return data.filter((x) => {
+        if (x['privateEvents/startTime'] == undefined) {
+            return false;
+        }
+        return true;
+    }).map((z) => {
         return {
             winner: z['privateEvents/winner'],
             loser: z['privateEvents/loser'],

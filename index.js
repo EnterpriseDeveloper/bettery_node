@@ -5,6 +5,7 @@ var app = express();
 const Contract = require("./contract-services/contract");
 const setEthPrice = require("./services/funds/ethPrice");
 const refundBot = require('./bot/refundBot');
+const deleteEventBor = require('./bot/deleteUncreatedEvents');
 
 const multer = require('multer');
 const upload = multer();
@@ -70,7 +71,11 @@ httpServer.listen(80, async () => {
     setEthPrice.setEthPriceToContract();
     setInterval(() => {
         refundBot.refundBot();
-    }, 1000 * 60 * 60 * 24 * 7);
+    }, 1000 * 60 * 60 * 24 * 3);
+    setInterval(() => {
+        deleteEventBor.deleteEventBot()
+    }, 1000 * 60 * 60)
+
     console.log("server run port 80");
 
 });
