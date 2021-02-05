@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon",
-    "start": "node index.js",
+    "dev": "NODE_ENV=test nodemon",
+    "start": "NODE_ENV=test node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "forever": "nohup node index.js > output.log &"
+    "forever": "NODE_ENV=test nohup node index.js > output.log &",
+    "forever_prod": "NODE_ENV=production nohup node index.js > output.log &"
   },
   "engines": {
     "node": "v8.12.0"
@@ -32,5 +33,8 @@
     "socket.io": "^2.3.0",
     "utf8": "^3.0.0",
     "web3": "^1.2.9"
+  },
+  "devDependencies": {
+    "node-env-run": "^4.0.2"
   }
 }
