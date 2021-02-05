@@ -34,7 +34,7 @@ const registration = async (req, res) => {
                 res.send(err.response.data.message);
             })
         if (userData.data.length !== 0) {
-            await betteryToken.transferBetteryToken(wallet);
+            await betteryToken.mintTokens(wallet);
             res.status(200);
             res.send({
                 "_id": userData.data.tempids['users$newUser'],

@@ -3,15 +3,15 @@ const Web3 = require("web3");
 const axios = require('axios');
 const path = require("../../config/path")
 
-const transferBetteryToken = async (address) => {
+const mintTokens = async (address) => {
     let web3 = new Web3();
     let amount = web3.utils.toWei("10", "ether");
 
     let contr = new Contract.Contract();
     let betteryContract = await contr.betteryToken();
 
-    let gasEstimate = await betteryContract.methods.transfer(address, amount).estimateGas();
-    return await betteryContract.methods.transfer(address, amount).send({
+    let gasEstimate = await betteryContract.methods.mint(amount, address).estimateGas();
+    return await betteryContract.methods.mint(amount, address).send({
         gas: gasEstimate,
         gasPrice: 0
     });
@@ -31,7 +31,7 @@ const getBTYToken = async (req, res) => {
         if (getWallet) {
             if (getWallet.data.length != 0) {
                 let wallet = getWallet.data[0].wallet;
-                let data = await transferBetteryToken(wallet)
+                let data = await mintTokens(wallet)
                 res.status(200);
                 res.send(data);
             } else {
@@ -48,6 +48,6 @@ const getBTYToken = async (req, res) => {
 }
 
 module.exports = {
-    transferBetteryToken,
+    mintTokens,
     getBTYToken
 }
