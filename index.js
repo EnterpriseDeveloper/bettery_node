@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser')
 var app = express();
+const fs = require('fs');
 
 const Contract = require("./contract-services/contract");
 const setEthPrice = require("./services/funds/ethPrice");
@@ -10,28 +11,25 @@ const deleteEventBor = require('./bot/deleteUncreatedEvents');
 const multer = require('multer');
 const upload = multer();
 
-var fs = require('fs');
 var http = require('http');
-
 var https = require('https');
+
+let key = process.env.NODE_ENV == "production" ? "./keys/key.pem" : "/home/ubuntu/node/keys/server.key",
+    cert = process.env.NODE_ENV == "production" ? "./keys/star_bettery_io.crt" : "/home/ubuntu/node/keys/13_229_200_135.crt",
+    ca1 = process.env.NODE_ENV == "production" ? "./keys/DigiCertCA.crt" : '/home/ubuntu/node/keys/AAACertificateServices.crt',
+    ca2 = process.env.NODE_ENV == "production" ? "./keys/My_CA_Bundle.crt" : '/home/ubuntu/node/keys/SectigoRSADomainValidationSecureServerCA.crt',
+    ca3 = process.env.NODE_ENV == "production" ? "./keys/TrustedRoot.crt" : '/home/ubuntu/node/keys/USERTrustRSAAAACA.crt';
+
 var credentials = {
-
-    key: fs.readFileSync("./keys/server.key"),
-
-    // cert: fs.readFileSync("./keys/bettery.crt"),
-
-    cert: fs.readFileSync("./keys/13_229_200_135.crt"),
-
+    key: fs.readFileSync(key, 'utf8'),
+    cert: fs.readFileSync(cert, 'utf8'),
     ca: [
-
-        fs.readFileSync('./keys/AAACertificateServices.crt'),
-
-        fs.readFileSync('./keys/SectigoRSADomainValidationSecureServerCA.crt'),
-
-        fs.readFileSync('./keys/USERTrustRSAAAACA.crt')
-
+        fs.readFileSync(ca1, 'utf8'),
+        fs.readFileSync(ca2, 'utf8'),
+        fs.readFileSync(ca3, 'utf8')
     ]
 };
+
 
 var cors = require('cors');
 
@@ -55,13 +53,6 @@ require('./services/rooms')(app);
 require('./services/subscribe')(app);
 require('./contract-services/tokensale')(app);
 require('./services/comments')(io);
-
-// app.get("/.well-known/pki-validation/39840D6583E10EEF80C3F7113D7FFEF6.txt", async (req, res) => {
-//     fs.readFile('./keys/39840D6583E10EEF80C3F7113D7FFEF6.txt', (e, data) => {
-//         if (e) throw e;
-//         res.send(data);
-//     });
-// })
 
 httpsServer.listen(443);
 
