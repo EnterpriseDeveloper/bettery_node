@@ -37,7 +37,7 @@ class Contract {
 
     async betteryToken() {
         let { web3, account } = await this.connectToNetwork(this.provider);
-        let networkId = networkConfig.maticId;
+        let networkId = networkConfig.maticMumbaiId;
         let abi = BetteryToken.abi;
         let address = BetteryToken.networks[networkId].address;
         return new web3.eth.Contract(abi, address, { from: account });
@@ -48,7 +48,7 @@ class Contract {
     }
 
     async _createContractInstance() {
-        const networkId = networkConfig.maticId
+        const networkId = networkConfig.maticMumbaiId
         this.currentNetwork = PublicEvent.networks[networkId]
         if (!this.currentNetwork) {
             throw Error('Contract not deployed on DAppChain')

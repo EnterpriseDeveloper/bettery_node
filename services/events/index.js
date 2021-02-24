@@ -31,11 +31,7 @@ module.exports = app => {
         publicActivites.validate(req, res);
     })
 
-    app.post("/privateEvents/createId", eventLimitPrivate, async (req, res) => {
-        privateEvents.createId(req, res);
-    })
-
-    app.post("/privateEvents/createEvent", async (req, res) => {
+    app.post("/privateEvents/createEvent", eventLimitPrivate, async (req, res) => {
         privateEvents.createPrivateEvent(req, res);
     })
 

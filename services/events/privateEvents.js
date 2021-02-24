@@ -3,24 +3,18 @@ const path = require("../../config/path");
 const _ = require("lodash");
 const createRoom = require('../rooms/createRoom');
 const structure = require('../../structure/event.struct');
-
-const createId = (req, res) => {
-    let data = [{
-        _id: "privateEvents$newEvents",
-        finalAnswer: '',
-        dateCreation: Math.floor(Date.now() / 1000)
-    }]
-    axios.post(path.path + "/transact", data).then((x) => {
-        res.status(200);
-        res.send({ "_id": x.data.tempids['privateEvents$newEvents'] })
-    }).catch((err) => {
-        res.status(400);
-        res.send(err.response);
-    })
-}
+const contractInit = require("../../contract-services/contractInit");
+const PrivateEvents = require("../../contract-services/abi/PrivateEvents.json");
 
 const createPrivateEvent = async (req, res) => {
     let allData = req.body;
+    let id = "privateEvents$newEvents";
+    allData.status = "deployed";
+    allData._id = id;
+    allData.finalAnswer = '';
+    allData.dateCreation = Math.floor(Date.now() / 1000)
+
+    delete allData.prodDev;
     let data;
     if (req.body.whichRoom == "new") {
         let room = createRoom.createRoom(allData, "privateEventsId");
@@ -49,25 +43,64 @@ const createPrivateEvent = async (req, res) => {
         ]
     }
 
-    axios.post(path.path + "/transact", data).then(() => {
-        // ADD to host
-        let hostData = [{
-            _id: allData.host,
-            hostPrivateEvents: [allData._id],
-        }]
+    // ADD to host
+    let hostData = {
+        _id: allData.host,
+        hostPrivateEvents: [id],
+    }
 
-        axios.post(path.path + "/transact", hostData).then(() => {
-            res.status(200).send();
-        }).catch((err) => {
+    data.push(hostData);
+    let eventData = await axios.post(`${path.path}/transact`, data)
+        .catch((err) => {
             console.log("DB error: " + err.response.data.message)
             res.status(400);
             res.send(err.response.data.message);
         })
-    }).catch((err) => {
+
+    let eventId = eventData.data.tempids['privateEvents$newEvents']
+    let startTime = req.body.startTime;
+    let endTime = req.body.endTime;
+    let questionQuantity = req.body.answers.length;
+
+    let userConfig = {
+        "select": ["users/wallet"],
+        "from": Number(req.body.host)
+    }
+    let hostDataWallet = await axios.post(`${path.path}/query`, userConfig).catch((err) => {
         console.log("DB error: " + err.response.data.message)
         res.status(400);
         res.send(err.response.data.message);
     })
+
+    let hostWallet = hostDataWallet.data[0]['users/wallet'];
+    let contract = await contractInit.init(process.env.NODE_ENV, PrivateEvents)
+    try {
+        let gasEstimate = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, hostWallet).estimateGas();
+        let transaction = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, hostWallet).send({
+            gas: gasEstimate,
+            gasPrice: 0
+        });
+        let transactionHash = transaction.transactionHash;
+
+        // ADD transaction
+        let transactionData = [{
+            _id: eventId,
+            transactionHash: transactionHash,
+        }]
+
+        await axios.post(`${path.path}/transact`, transactionData).catch((err) => {
+            console.log("DB error: " + err.response.data.message)
+            res.status(400);
+            res.send(err.response.data.message);
+        })
+
+        res.status(200).send({ id: eventId });
+
+    } catch (err) {
+        console.log(err)
+        res.status(400);
+        res.send(err);
+    }
 }
 
 const participate = (req, res) => {
@@ -191,7 +224,6 @@ const getById = async (req, res) => {
 }
 
 module.exports = {
-    createId,
     createPrivateEvent,
     getById,
     participate,
