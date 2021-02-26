@@ -6,6 +6,7 @@ const path = require('path');
 const config = require('../../config/networks');
 
 module.exports = app => {
+    // TODO
     app.post("/tokensale/info", async (req, res) => {
         let from = req.body.from;
         let provider;

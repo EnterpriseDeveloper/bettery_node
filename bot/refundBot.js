@@ -58,7 +58,7 @@ const revertEvent = async (eventId, participant) => {
                 gasPrice: 0
             });
         } catch (err) {
-            console.log("error from setEthPriceToContract")
+            console.log("error from refund Bot")
             console.log(err)
         }
     }

@@ -2,11 +2,9 @@ var express = require('express');
 var bodyParser = require('body-parser')
 var app = express();
 const fs = require('fs');
-
-const Contract = require("./contract-services/contract");
-const setEthPrice = require("./services/funds/ethPrice");
 const refundBot = require('./bot/refundBot');
 const deleteEventBor = require('./bot/deleteUncreatedEvents');
+const loadContractHandler = require("./contract-services/eventHandler");
 
 const multer = require('multer');
 const upload = multer();
@@ -55,11 +53,8 @@ require('./contract-services/tokensale')(app);
 // require('./services/comments')(io);
 
 //httpsServer.listen(443);
-
 httpServer.listen(80, async () => {
-    let contract = new Contract.Contract();
-    contract.loadHandlerContract();
-    setEthPrice.setEthPriceToContract();
+    await loadContractHandler.loadHandler();
     setInterval(() => {
         refundBot.refundBot();
     }, 1000 * 60 * 60 * 24 * 3);
