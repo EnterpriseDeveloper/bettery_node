@@ -1,6 +1,6 @@
 const publicEventStructure = (data) => {
     return data.filter((x) => {
-        if (x['publicEvents/startTime'] == undefined) {
+        if (x['publicEvents/status'] == "id created") {
             return false;
         }
         return true;
@@ -56,12 +56,7 @@ const publicEventStructure = (data) => {
 }
 
 const privateEventStructure = (data) => {
-    return data.filter((x) => {
-        if (x['privateEvents/startTime'] == undefined) {
-            return false;
-        }
-        return true;
-    }).map((z) => {
+    return data.map((z) => {
         return {
             winner: z['privateEvents/winner'],
             loser: z['privateEvents/loser'],

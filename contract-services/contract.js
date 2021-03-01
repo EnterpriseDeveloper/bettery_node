@@ -13,7 +13,7 @@ const networkConfig = require("../config/networks");
 
 class Contract {
     constructor() {
-        this.provider = networkConfig.maticMumbai;
+        this.provider = networkConfig.maticMumbaiWSS;
     }
     async loadContract() {
         await this.connectToNetwork(this.provider)

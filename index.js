@@ -3,7 +3,6 @@ var bodyParser = require('body-parser')
 var app = express();
 const fs = require('fs');
 const refundBot = require('./bot/refundBot');
-const deleteEventBor = require('./bot/deleteUncreatedEvents');
 const loadContractHandler = require("./contract-services/eventHandler");
 
 const multer = require('multer');
@@ -58,9 +57,6 @@ httpServer.listen(80, async () => {
     setInterval(() => {
         refundBot.refundBot();
     }, 1000 * 60 * 60 * 24 * 3);
-    setInterval(() => {
-        deleteEventBor.deleteEventBot()
-    }, 1000 * 60 * 60)
 
     console.log("server run port 80");
 

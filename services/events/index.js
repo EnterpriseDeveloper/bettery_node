@@ -7,12 +7,8 @@ const eventLimitPrivate = require('../../middlewares/eventLimitsPrivate')
 const eventLimitPublic = require('../../middlewares/eventLimitsPublic')
 
 module.exports = app => {
-    app.post("/publicEvents/set", async (req, res) => {
+    app.post("/publicEvents/createEvent", eventLimitPublic, async (req, res) => {
         publicEvents.createEvent(req, res);
-    })
-
-    app.post("/publicEvents/createId", eventLimitPublic, async (req, res) => {
-        publicEvents.createId(req, res);
     })
 
     app.post("/publicEvents/get_by_id", async (req, res) => {

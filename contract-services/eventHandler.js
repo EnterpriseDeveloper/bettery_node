@@ -1,11 +1,11 @@
-const PublicEventContract = require("./abi/PublicEvent.json");
+const PublicEventContract = require("./abi/PublicEvents.json");
 const ContractInit = require("./contractInit.js");
 const ExpertsCalcOracle = require('./oracels/exprestCalc');
 const TokenCalcOracle = require('./oracels/tokensCalc');
 
 
 const loadHandler = async () => {
-    let publicEvent = await ContractInit.init(process.env.NODE_ENV, PublicEventContract);
+    let publicEvent = await ContractInit.webSoketInit(process.env.NODE_ENV, PublicEventContract);
     publicEventsHandler(publicEvent);
 }
 
