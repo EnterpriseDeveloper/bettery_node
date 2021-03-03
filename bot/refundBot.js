@@ -2,8 +2,6 @@ const axios = require("axios");
 const url = require("../config/path");
 const _ = require("lodash")
 const epochWeek = require('../config/limits');
-const Contract = require("../contract-services/contract");
-
 
 const refundBot = async () => {
     let config = {
@@ -48,19 +46,20 @@ const revertEvent = async (eventId, participant) => {
 
     if (participant !== undefined) {
         // ADD providers for main network
-        let contr = new Contract.Contract();
-        let getContract = await contr.loadContract();
-        let from = contr.getAccount();
-        try {
-            const gasEstimate = await getContract.methods.revertedPayment(eventId, "do not have enough validators").estimateGas({ from: from });
-            await getContract.methods.revertedPayment(eventId, "do not have enough validators").send({
-                gas: gasEstimate,
-                gasPrice: 0
-            });
-        } catch (err) {
-            console.log("error from refund Bot")
-            console.log(err)
-        }
+        // rebuild for new token sale technology
+        // let contr = new Contract.Contract();
+        // let getContract = await contr.loadContract();
+        // let from = contr.getAccount();
+        // try {
+        //     const gasEstimate = await getContract.methods.revertedPayment(eventId, "do not have enough validators").estimateGas({ from: from });
+        //     await getContract.methods.revertedPayment(eventId, "do not have enough validators").send({
+        //         gas: gasEstimate,
+        //         gasPrice: 0
+        //     });
+        // } catch (err) {
+        //     console.log("error from refund Bot")
+        //     console.log(err)
+        // }
     }
 }
 

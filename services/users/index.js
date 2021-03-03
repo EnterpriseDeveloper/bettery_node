@@ -3,16 +3,8 @@ const torusRegist = require("./torusRegist");
 const myActivites = require("./myActivites");
 
 module.exports = app => {
-    app.post("/user/validate", async (req, res) => {
-        auth.validate(req, res);
-    })
-
     app.post("/user/getUserById", async (req, res) => {
         auth.getUserById(req, res);
-    })
-
-    app.post("/user/regist", async (req, res) => {
-        auth.registration(req, res);
     })
 
     app.get("/user/all", async (req, res) => {

@@ -1,5 +1,5 @@
 const ContractInit = require("../contractInit.js");
-const PublicEventContract = require("../abi/PublicEvent.json");
+const PublicEventContract = require("../abi/PublicEvents.json");
 const Web3 = require("web3");
 
 const tokensAmountCalc = async (data) => {
