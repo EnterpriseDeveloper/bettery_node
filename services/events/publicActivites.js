@@ -47,6 +47,9 @@ const participate = async (req, res) => {
 
 
         if (transaction) {
+
+            // TODO add to the history of money transaction
+
             // add to the publicActivites table
             let publicActivites = {
                 _id: "publicActivites$act",

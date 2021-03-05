@@ -55,6 +55,8 @@ const createEvent = async (req, res) => {
             delete allData.calculateExperts;
             ////////////////////////
 
+            //TODO add to the history of tokens in premium events
+
 
             allData._id = id;
             allData.finalAnswer = "";

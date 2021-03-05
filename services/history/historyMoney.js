@@ -3,6 +3,7 @@ const path = require("../../config/path");
 const Web3 = require('web3');
 
 const setHistoryMoney = async (contractData) => {
+    // TODO rewrite history for public events
     let web3 = new Web3();
     let userWallet = contractData.wallet;
     let eventId = Number(contractData.question_id);
@@ -47,65 +48,8 @@ const setHistoryMoney = async (contractData) => {
 
 }
 
-const setRevertedHistoryMoney = async (contractData) =>{
-    let eventId = Number(contractData.question_id);
-    let data = {
-        "select": ["*", {"publicEvents/parcipiantsAnswer": [{"publicActivites/from":["_id"]}]}],
-        "from": eventId
-    }
-
-    let eventData = await axios.post(path.path + "/query", data).catch((err)=>{
-        console.log("db err: " + err)
-    })
-
-    if(eventData.data.length !== 0){
-
-        let money = Number(eventData.data[0]["publicEvents/money"]);
-        let currencyType = eventData.data[0]["publicEvents/currencyType"];
-
-        let historyData = eventData.data[0]["publicEvents/parcipiantsAnswer"].map((x, i)=>{
-            return {
-                _id: x["publicActivites/from"]["_id"],
-                historyTransactions: ["historyTransactions$quizHoldMoney" + i],
-            }
-        })
-
-        historyData.forEach((x)=>{
-           historyData.push(
-            {
-                _id: x.historyTransactions[0],
-                eventId: eventId,
-                role: "Revert",
-                amount: money,
-                paymentWay: "receive",
-                currencyType: currencyType,
-                date: Math.floor(Date.now() / 1000)
-            }
-           )
-        })
-
-        // add reverted to the event
-        historyData.push({
-            _id: eventId,
-            status: "reverted"
-        })
-
-
-        await axios.post(path.path + "/transact", historyData)
-        .catch((err) => {
-            console.log("DB error: " + err.response.data.message)
-        })
-
-
-    }else{
-        console.log("setRevertedHistoryMoney error");
-    }
-    
-}
-
 
 
 module.exports = {
-    setHistoryMoney,
-    setRevertedHistoryMoney
+    setHistoryMoney
 }

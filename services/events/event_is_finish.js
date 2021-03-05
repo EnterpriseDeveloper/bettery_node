@@ -2,10 +2,10 @@ const axios = require("axios");
 const path = require("../../config/path");
 
 
-const setCorrectAnswer = (data, id) => {
+const setCorrectAnswer = (data) => {
 
     let finalAnswer = [{
-        "_id": Number(id),
+        "_id": Number(data.id),
         "finalAnswerNumber": Number(data.correctAnswer),
         "status": "finished",
         "eventEnd": Math.floor(new Date().getTime() / 1000.0)
