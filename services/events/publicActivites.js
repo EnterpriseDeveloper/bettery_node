@@ -29,17 +29,13 @@ const participate = async (req, res) => {
             eventId,
             answerIndex,
             amount,
-            playerWallet,
-            userId,
-            0 // TODO add referals deep
+            playerWallet
         ).estimateGas();
         let transaction = await contract.methods.setAnswer(
             eventId,
             answerIndex,
             amount,
-            playerWallet,
-            userId,
-            0 // TODO add referals deep
+            playerWallet
         ).send({
             gas: gasEstimate,
             gasPrice: 0
