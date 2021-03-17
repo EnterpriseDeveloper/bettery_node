@@ -12,6 +12,10 @@ module.exports = app => {
         withdrawal.setInitWithd(req, res);
     })
 
+    app.post("/withdrawal/exit", async (req, res) => {
+        withdrawal.setInitWithd(req, res);
+    })
+
     app.post("/tokens/bty", async (req, res) => {
         bettertToken.getBTYToken(req, res);
     })

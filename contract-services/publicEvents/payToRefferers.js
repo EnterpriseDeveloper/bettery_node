@@ -1,14 +1,19 @@
-const PublicEventContract = require("../abi/PublicEvents.json");
+const PlayerPaymentContract = require("../abi/PlayerPayment.json");
 
-const payToRefferers = (data) => {
+const payToRefferers = async (data) => {
     console.log("from payToRefferers")
     console.log(data);
     let id = data.id;
 
-    let contract = await ContractInit.init(process.env.NODE_ENV, PublicEventContract);
+    // TODO get fake address from contract
+    let addr1 = [];
+    let addr2 = [];
+    let addr3 = [];
+
+    let contract = await ContractInit.init(process.env.NODE_ENV, PlayerPaymentContract);
     try {
-        let gasEstimate = await contract.methods.payToReff(id).estimateGas();
-        await contract.methods.payToReff(id).send({
+        let gasEstimate = await contract.methods.payToReff(id, addr1, addr2, addr3).estimateGas();
+        await contract.methods.payToReff(id, addr1, addr2, addr3).send({
             gas: gasEstimate,
             gasPrice: 0
         });

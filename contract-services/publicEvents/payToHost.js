@@ -1,6 +1,6 @@
-const PublicEventContract = require("../abi/PublicEvents.json");
+const MiddlePaymentContract = require("../abi/MiddlePayment.json");
 
-const payToHost = (data) => {
+const payToHost = async (data) => {
     console.log("from payToHost")
     console.log(data);
     let id = data.id;
@@ -9,7 +9,7 @@ const payToHost = (data) => {
     let mintCMF = data.mintCMF; // in wei
     let mintMF = data.mintMF; // in wei
 
-    let contract = await ContractInit.init(process.env.NODE_ENV, PublicEventContract);
+    let contract = await ContractInit.init(process.env.NODE_ENV, MiddlePaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPaytoHost(id).estimateGas();
         await contract.methods.letsPaytoHost(id).send({

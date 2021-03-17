@@ -8,9 +8,7 @@ const setInitWithd = (req, res) => {
         "date": Math.floor(Date.now() / 1000),
         "transactionHash": req.body.transactionHash,
         "status": "pending",
-        "amount": req.body.amount,
-        "coinType": req.body.coinType,
-        "sign": req.body.sign
+        "amount": req.body.amount
     }]
     axios.post(path.path + "/transact", data).then(() => {
         res.status(200);
@@ -21,6 +19,11 @@ const setInitWithd = (req, res) => {
     })
 }
 
+const getWithdInfo = (req, res) => {
+   // TODO
+}
+
 module.exports = {
-    setInitWithd
+    setInitWithd,
+    getWithdInfo
 }

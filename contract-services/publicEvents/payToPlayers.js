@@ -1,11 +1,11 @@
-const PublicEventContract = require("../abi/PublicEvents.json");
+const PlayerPaymentContract = require("../abi/PlayerPayment.json");
 
-const payToPlayers = (data) =>{
+const payToPlayers = async (data) =>{
     console.log("from payToPlayers")
     console.log(data)
     let id = data.id;
 
-    let contract = await ContractInit.init(process.env.NODE_ENV, PublicEventContract);
+    let contract = await ContractInit.init(process.env.NODE_ENV, PlayerPaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPayToPlayers(id).estimateGas();
         await contract.methods.letsPayToPlayers(id).send({

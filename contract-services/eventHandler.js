@@ -1,4 +1,7 @@
 const PublicEventContract = require("./abi/PublicEvents.json");
+const MiddlePaymentContract = require("./abi/MiddlePayment.json");
+const PlayerPaymentContract = require("./abi/PlayerPayment.json");
+
 const ContractInit = require("./contractInit.js");
 const ExpertsCalcOracle = require('./oracels/exprestCalc');
 const setAnswer = require("../services/events/event_is_finish");
@@ -8,6 +11,11 @@ const publicEvents = require("./publicEvents/index");
 const loadHandler = async () => {
     let publicEvent = await ContractInit.webSoketInit(process.env.NODE_ENV, PublicEventContract);
     publicEventsHandler(publicEvent);
+    let mpEvent = await ContractInit.webSoketInit(process.env.NODE_ENV, MiddlePaymentContract);
+    MiddlePayment(mpEvent); 
+    let ppEvent = await ContractInit.webSoketInit(process.env.NODE_ENV, PlayerPaymentContract);
+    PlayerPayment(ppEvent);
+
 }
 
 const publicEventsHandler = (publicEvent) => {
@@ -30,7 +38,11 @@ const publicEventsHandler = (publicEvent) => {
         }
     })
 
-    publicEvent.events.payToCompanies(async (err, event) => {
+   
+}
+
+const MiddlePayment = async (middlePayment) =>{
+    middlePayment.events.payToCompanies(async (err, event) => {
         if (err) {
             console.error('Error from find pay to companies events', err)
             restartHandler();
@@ -39,7 +51,7 @@ const publicEventsHandler = (publicEvent) => {
         }
     })
 
-    publicEvent.events.payToHost(async (err, event) => {
+    middlePayment.events.payToHost(async (err, event) => {
         if (err) {
             console.error('Error from find pay to host events', err)
             restartHandler();
@@ -48,7 +60,7 @@ const publicEventsHandler = (publicEvent) => {
         }
     })
 
-    publicEvent.events.payToExperts(async (err, event) => {
+    middlePayment.events.payToExperts(async (err, event) => {
         if (err) {
             console.error('Error from find pay to expert events', err)
             restartHandler();
@@ -57,7 +69,7 @@ const publicEventsHandler = (publicEvent) => {
         }
     })
 
-    publicEvent.events.payToPlayers(async (err, event) => {
+    middlePayment.events.payToPlayers(async (err, event) => {
         if (err) {
             console.error('Error from find pay to players events', err)
             restartHandler();
@@ -66,7 +78,19 @@ const publicEventsHandler = (publicEvent) => {
         }
     })
 
-    publicEvent.events.payToLosers(async (err, event) => {
+    middlePayment.events.revertedEvent(async (err, event) => {
+        if (err) {
+            console.error('Error from reverted event', err)
+            restartHandler();
+        } else {
+            console.log("event revertedEvent work")
+            // TODO 
+        }
+    })
+}
+
+const PlayerPayment = async (playerPayment) =>{
+    playerPayment.events.payToLosers(async (err, event) => {
         if (err) {
             console.error('Error from find pay to losers events', err)
             restartHandler();
@@ -75,7 +99,7 @@ const publicEventsHandler = (publicEvent) => {
         }
     })
 
-    publicEvent.events.payToRefferers(async (err, event) => {
+    playerPayment.events.payToRefferers(async (err, event) => {
         if (err) {
             console.error('Error from find pay to refferers events', err)
             restartHandler();
@@ -84,7 +108,7 @@ const publicEventsHandler = (publicEvent) => {
         }
     })
     
-    QuizeInstance.events.eventFinish(async (err, event) => {
+    playerPayment.events.eventFinish(async (err, event) => {
         if (err) {
             console.error('Error from event finish event', err)
             restartHandler();
@@ -92,16 +116,6 @@ const publicEventsHandler = (publicEvent) => {
             console.log("event finish work")
             setAnswer.setCorrectAnswer(event.returnValues);
             // TODO add calcalation of tokens
-        }
-    })
-
-    publicEvent.events.revertedEvent(async (err, event) => {
-        if (err) {
-            console.error('Error from reverted event', err)
-            restartHandler();
-        } else {
-            console.log("event revertedEvent work")
-            // TODO 
         }
     })
 }
