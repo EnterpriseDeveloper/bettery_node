@@ -1,6 +1,6 @@
 const Web3 = require("web3");
 const TokenSaleContract = require('../abi/QuizeTokenSale.json')
-const BetteryTokenContract = require('../abi/EthERC20Coin.json');
+const BetteryTokenContract = require('../abi/BTYmain.json'); // TODO rename
 const { readFileSync } = require('fs');
 const path = require('path');
 const config = require('../../config/networks');
