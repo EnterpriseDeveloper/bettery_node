@@ -3,8 +3,10 @@ const path = require("../../config/path");
 const contractInit = require("../../contract-services/contractInit");
 const PublicEvents = require("../../contract-services/abi/PublicEvents.json");
 const userData = require("../../helpers/userData");
+const Web3 = require("web3");
 
 const participate = async (req, res) => {
+    let web3 = new Web3();
     let setAnswer = []
 
     let eventId = req.body.event_id;
@@ -24,17 +26,18 @@ const participate = async (req, res) => {
     try {
         let playerWallet = await userData.getUserWallet(userId, res)
         let contract = await contractInit.init(process.env.NODE_ENV, PublicEvents)
+        let tokens = web3.utils.toWei(String(amount), "ether");
 
         let gasEstimate = await contract.methods.setAnswer(
             eventId,
             answerIndex,
-            amount,
+            tokens,
             playerWallet
         ).estimateGas();
         let transaction = await contract.methods.setAnswer(
             eventId,
             answerIndex,
-            amount,
+            tokens,
             playerWallet
         ).send({
             gas: gasEstimate,
@@ -88,7 +91,7 @@ const participate = async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(400);
-        res.send(err);
+        res.send(err.data);
     }
 }
 
