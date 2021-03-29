@@ -114,8 +114,7 @@ const PlayerPayment = async (playerPayment) =>{
             restartHandler();
         } else {
             console.log("event finish work")
-            setAnswer.setCorrectAnswer(event.returnValues);
-            // TODO add calcalation of tokens
+            setAnswer.eventEnd(event.returnValues);
         }
     })
 }

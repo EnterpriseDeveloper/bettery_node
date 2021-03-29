@@ -1,11 +1,22 @@
 const MiddlePaymentContract = require("../abi/MiddlePayment.json");
+const Web3 = require("web3");
+const setAnswer = require("../../services/events/event_is_finish");
 
 const payToCompanies = async (data) => {
     console.log("from payToCompanies")
     console.log(data);
+    let web3 = new Web3();
     let id = data.id;
-    let tokens = data.tokens;
-    let correctAnswer = data.correctAnswer; // in WEI
+    let tokens = web3.utils.fromWei(String(data.tokens), "ether");
+    let correctAnswer = Number(data.correctAnswer); 
+
+    let data = [{
+        id: Number(id),
+        correctAnswer: correctAnswer,
+        tokens: tokens
+    }]
+
+    await setAnswer.setCorrectAnswer(data);
 
     let contract = await ContractInit.init(process.env.NODE_ENV, MiddlePaymentContract);
     try {
@@ -15,7 +26,6 @@ const payToCompanies = async (data) => {
             gasPrice: 0
         });
 
-        // TODO send correct data to DB
     } catch (err) {
         console.log("err from pay to companies", err)
     }
