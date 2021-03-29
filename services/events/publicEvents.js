@@ -140,7 +140,7 @@ const createEvent = async (req, res) => {
                 res.send(err.response.data.message);
             })
         res.status(400);
-        res.send(err);
+        console.log(err.message);
     }
 }
 

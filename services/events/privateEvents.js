@@ -90,9 +90,9 @@ const createPrivateEvent = async (req, res) => {
             res.status(200).send({ id: eventId });
         }
     } catch (err) {
-        console.log(err)
+        console.log(err.message)
         res.status(400);
-        res.send(err);
+        res.send(err.message);
     }
 }
 
@@ -144,9 +144,9 @@ const participate = async (req, res) => {
                 res.send({ done: "ok" });
             }
         } catch (err) {
-            console.log(err)
+            console.log(err.message)
             res.status(400);
-            res.send(err);
+            res.send(err.message);
         }
     }
 }
@@ -202,9 +202,9 @@ const validate = async (req, res) => {
                 })
             }
         } catch (err) {
-            console.log(err.toString())
+            console.log(err.message);
             res.status(400);
-            res.send(err.toString());
+            res.send(err.message);
         }
     }
 }

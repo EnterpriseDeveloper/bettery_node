@@ -89,9 +89,9 @@ const participate = async (req, res) => {
         }
 
     } catch (err) {
-        console.log(err);
+        console.log(err.message);
         res.status(400);
-        res.send(err.data);
+        res.send(err.message);
     }
 }
 
@@ -137,7 +137,7 @@ const validate = async (req, res) => {
                 role: "validator",
                 date: Math.floor(Date.now() / 1000),
                 transactionHash: transaction.transactionHash,
-             // currencyType: currencyType, TODO remove from DB Shema
+                // currencyType: currencyType, TODO remove from DB Shema
                 eventId: eventId,
                 amount: 0
             }
@@ -167,9 +167,9 @@ const validate = async (req, res) => {
             res.send({ done: "ok" });
         }
     } catch (err) {
-        console.log(err);
+        console.log(err.message);
         res.status(400);
-        res.send(err);
+        res.send(err.message);
     }
 }
 
