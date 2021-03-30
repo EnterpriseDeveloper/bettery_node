@@ -2,13 +2,13 @@ const MiddlePaymentContract = require("../abi/MiddlePayment.json");
 const Web3 = require("web3");
 const setAnswer = require("../../services/events/event_is_finish");
 
-const payToCompanies = async (data) => {
+const payToCompanies = async (x) => {
     console.log("from payToCompanies")
-    console.log(data);
+    console.log(x);
     let web3 = new Web3();
-    let id = data.id;
-    let tokens = web3.utils.fromWei(String(data.tokens), "ether");
-    let correctAnswer = Number(data.correctAnswer); 
+    let id = x.id;
+    let tokens = web3.utils.fromWei(String(x.tokens), "ether");
+    let correctAnswer = Number(x.correctAnswer);
 
     let data = [{
         id: Number(id),
