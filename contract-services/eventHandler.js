@@ -86,7 +86,7 @@ const MiddlePayment = async (middlePayment) => {
             restartHandler();
         } else {
             console.log("event revertedEvent work")
-            // TODO 
+            publicEvents.reverted.reverted(event.returnValues)
         }
     })
 }

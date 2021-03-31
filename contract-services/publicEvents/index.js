@@ -5,6 +5,7 @@ const payToHost = require("./payToHost");
 const payToLosers = require("./payToLosers");
 const payToPlayers = require("./payToPlayers");
 const payToRefferers = require("./payToRefferers");
+const reverted = require("./reverted");
 
 module.exports = {
     findCorrectAnswer,
@@ -13,5 +14,6 @@ module.exports = {
     payToHost,
     payToLosers,
     payToPlayers,
-    payToRefferers
+    payToRefferers,
+    reverted
 }
