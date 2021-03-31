@@ -112,20 +112,20 @@ const validate = async (req, res) => {
     }
 
     try {
-        let { wallet, reputation } = await userData.getUserWallet(userId, res)
+        let { wallet, reputation } = await userData.getUserWallet(from, res)
         // TODO add prodaction 
         let pathContr = "test" // process.env.NODE_ENV
         let contract = await contractInit.init(pathContr, PublicEvents)
 
         let gasEstimate = await contract.methods.setValidator(
             eventId,
-            answerIndex,
+            answer,
             wallet,
             reputation
         ).estimateGas();
         let transaction = await contract.methods.setValidator(
             eventId,
-            answerIndex,
+            answer,
             wallet,
             reputation
         ).send({
