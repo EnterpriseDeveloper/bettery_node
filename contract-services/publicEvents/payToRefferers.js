@@ -1,4 +1,5 @@
 const PlayerPaymentContract = require("../abi/PlayerPayment.json");
+const ContractInit = require("../contractInit");
 
 const payToRefferers = async (data) => {
     console.log("from payToRefferers")

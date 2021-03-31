@@ -1,6 +1,7 @@
 const MiddlePaymentContract = require("../abi/MiddlePayment.json");
 const Web3 = require("web3");
 const setAnswer = require("../../services/events/event_is_finish");
+const ContractInit = require("../contractInit");
 
 const payToCompanies = async (x) => {
     console.log("from payToCompanies")

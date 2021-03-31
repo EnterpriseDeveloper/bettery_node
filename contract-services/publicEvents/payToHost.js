@@ -1,4 +1,5 @@
 const MiddlePaymentContract = require("../abi/MiddlePayment.json");
+const ContractInit = require("../contractInit");
 
 const payToHost = async (data) => {
     console.log("from payToHost")
