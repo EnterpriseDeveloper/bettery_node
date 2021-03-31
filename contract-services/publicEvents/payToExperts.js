@@ -5,7 +5,9 @@ const payToExperts = async (data) => {
     console.log(data);
     let id = data.id;
 
-    let contract = await ContractInit.init(process.env.NODE_ENV, MiddlePaymentContract);
+    // TODO add prodaction 
+    let path = "test" // process.env.NODE_ENV
+    let contract = await ContractInit.init(path, MiddlePaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPayToExperts(id).estimateGas();
         await contract.methods.letsPayToExperts(id).send({

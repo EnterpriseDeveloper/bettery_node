@@ -10,7 +10,9 @@ const expertCalc = async (data) => {
     let experts = players / (players ** 0.5 + 2 - (2 ** 0.5));
     let expertsAmount = experts.toFixed(0);
     console.log("expertsAmount: " + expertsAmount);
-    let contract = await ContractInit.init(process.env.NODE_ENV, PublicEventContract);
+    // TODO add prodaction 
+    let pathContr = "test" // process.env.NODE_ENV
+    let contract = await ContractInit.init(pathContr, PublicEventContract);
 
     try {
         let gasEstimate = await contract.methods.setActiveExpertsFromOracl(Number(expertsAmount), id).estimateGas();

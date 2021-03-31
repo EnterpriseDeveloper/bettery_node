@@ -65,7 +65,9 @@ const createPrivateEvent = async (req, res) => {
 
     try {
         let { wallet } = await userData.getUserWallet(req.body.host, res)
-        let contract = await contractInit.init(process.env.NODE_ENV, PrivateEvents)
+        // TODO add prodaction 
+        let pathContr = "test" // process.env.NODE_ENV
+        let contract = await contractInit.init(pathContr, PrivateEvents)
 
         let gasEstimate = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).estimateGas();
         let transaction = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).send({
@@ -106,7 +108,9 @@ const participate = async (req, res) => {
     } else {
         try {
             let { wallet } = await userData.getUserWallet(from, res)
-            let contract = await contractInit.init(process.env.NODE_ENV, PrivateEvents)
+            // TODO add prodaction 
+            let pathContr = "test" // process.env.NODE_ENV
+            let contract = await contractInit.init(pathContr, PrivateEvents)
             let gasEstimate = await contract.methods.setAnswer(eventId, answer, wallet).estimateGas();
             let transaction = await contract.methods.setAnswer(eventId, answer, wallet).send({
                 gas: gasEstimate,
@@ -162,7 +166,9 @@ const validate = async (req, res) => {
     } else {
         try {
             let { wallet } = await userData.getUserWallet(from, res)
-            let contract = await contractInit.init(process.env.NODE_ENV, PrivateEvents)
+            // TODO add prodaction 
+            let pathContr = "test" // process.env.NODE_ENV
+            let contract = await contractInit.init(pathContr, PrivateEvents)
             let gasEstimate = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).estimateGas();
             let transaction = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).send({
                 gas: gasEstimate,

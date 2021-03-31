@@ -25,7 +25,9 @@ const participate = async (req, res) => {
 
     try {
         let { wallet } = await userData.getUserWallet(userId, res)
-        let contract = await contractInit.init(process.env.NODE_ENV, PublicEvents)
+        // TODO add prodaction 
+        let pathContr = "test" // process.env.NODE_ENV
+        let contract = await contractInit.init(pathContr, PublicEvents)
         let tokens = web3.utils.toWei(String(amount), "ether");
 
         let gasEstimate = await contract.methods.setAnswer(
@@ -111,7 +113,9 @@ const validate = async (req, res) => {
 
     try {
         let { wallet, reputation } = await userData.getUserWallet(userId, res)
-        let contract = await contractInit.init(process.env.NODE_ENV, PublicEvents)
+        // TODO add prodaction 
+        let pathContr = "test" // process.env.NODE_ENV
+        let contract = await contractInit.init(pathContr, PublicEvents)
 
         let gasEstimate = await contract.methods.setValidator(
             eventId,

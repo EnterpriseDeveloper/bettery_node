@@ -32,9 +32,11 @@ const createEvent = async (req, res) => {
         let questionQuantity = req.body.answers.length;
         let amountExperts = req.body.calculateExperts === "company" ? 0 : req.body.validatorsAmount;
         let calculateExperts = req.body.calculateExperts === "company" ? true : false
-        let {wallet} = await userData.getUserWallet(req.body.host, res)
+        let { wallet } = await userData.getUserWallet(req.body.host, res)
         let amountPremiumEvent = req.body.amount;
-        let contract = await contractInit.init(process.env.NODE_ENV, PublicEvents)
+        // TODO add prodaction 
+        let pathContr = "test" // process.env.NODE_ENV
+        let contract = await contractInit.init(pathContr, PublicEvents)
 
         let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).estimateGas();
         let transaction = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).send({
@@ -52,7 +54,7 @@ const createEvent = async (req, res) => {
             delete allData.calculateExperts;
 
             //TODO add to the history host tokens amount in premium events
-             
+
             allData.premiumTokens = amountPremiumEvent
             allData._id = id;
             allData.finalAnswer = "";

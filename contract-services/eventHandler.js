@@ -9,11 +9,13 @@ const publicEvents = require("./publicEvents/index");
 
 
 const loadHandler = async () => {
-    let publicEvent = await ContractInit.webSoketInit(process.env.NODE_ENV, PublicEventContract);
+    // TODO add prodaction 
+    let path = "test" // process.env.NODE_ENV
+    let publicEvent = await ContractInit.webSoketInit(path, PublicEventContract);
     publicEventsHandler(publicEvent);
-    let mpEvent = await ContractInit.webSoketInit(process.env.NODE_ENV, MiddlePaymentContract);
-    MiddlePayment(mpEvent); 
-    let ppEvent = await ContractInit.webSoketInit(process.env.NODE_ENV, PlayerPaymentContract);
+    let mpEvent = await ContractInit.webSoketInit(path, MiddlePaymentContract);
+    MiddlePayment(mpEvent);
+    let ppEvent = await ContractInit.webSoketInit(path, PlayerPaymentContract);
     PlayerPayment(ppEvent);
 
 }
@@ -38,10 +40,10 @@ const publicEventsHandler = (publicEvent) => {
         }
     })
 
-   
+
 }
 
-const MiddlePayment = async (middlePayment) =>{
+const MiddlePayment = async (middlePayment) => {
     middlePayment.events.payToCompanies(async (err, event) => {
         if (err) {
             console.error('Error from find pay to companies events', err)
@@ -89,7 +91,7 @@ const MiddlePayment = async (middlePayment) =>{
     })
 }
 
-const PlayerPayment = async (playerPayment) =>{
+const PlayerPayment = async (playerPayment) => {
     playerPayment.events.payToLosers(async (err, event) => {
         if (err) {
             console.error('Error from find pay to losers events', err)
@@ -107,7 +109,7 @@ const PlayerPayment = async (playerPayment) =>{
             publicEvents.payToRefferers.payToRefferers(event.returnValues);
         }
     })
-    
+
     playerPayment.events.eventFinish(async (err, event) => {
         if (err) {
             console.error('Error from event finish event', err)

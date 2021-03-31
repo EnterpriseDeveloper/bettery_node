@@ -10,7 +10,9 @@ const payToRefferers = async (data) => {
     let addr2 = [];
     let addr3 = [];
 
-    let contract = await ContractInit.init(process.env.NODE_ENV, PlayerPaymentContract);
+    // TODO add prodaction 
+    let path = "test" // process.env.NODE_ENV
+    let contract = await ContractInit.init(path, PlayerPaymentContract);
     try {
         let gasEstimate = await contract.methods.payToReff(id, addr1, addr2, addr3).estimateGas();
         await contract.methods.payToReff(id, addr1, addr2, addr3).send({
