@@ -11,11 +11,11 @@ const payToCompanies = async (x) => {
     let tokens = web3.utils.fromWei(String(x.tokens), "ether");
     let correctAnswer = Number(x.correctAnswer);
 
-    let data = [{
+    let data = {
         id: Number(id),
         correctAnswer: correctAnswer,
         tokens: tokens
-    }]
+    }
 
     await setAnswer.setCorrectAnswer(data);
 
