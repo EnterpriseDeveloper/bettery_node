@@ -1,5 +1,10 @@
 const notificationStruct = (data) => {
-    return data.map((x) => {
+    return data.filter((x) => {
+        if (x['notificationFromRoom/publicEventsId']['publicEvents/room'] == undefined) {
+            return false;
+        }
+        return true;
+    }).map((x) => {
         return {
             id: x["_id"],
             read: x['notificationFromRoom/read'],

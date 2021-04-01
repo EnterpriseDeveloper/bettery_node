@@ -34,6 +34,9 @@ const publicEventStructure = (data) => {
                     userId: par['publicActivites/from']['_id'],
                     amount: par['publicActivites/amount'],
                     avatar: par['publicActivites/from']['users/avatar'],
+                    premiumToken: par["publicActivites/premiumToken"] == undefined ? 0 : par["publicActivites/premiumToken"],
+                    mintedToken: par["publicActivites/mintedToken"] == undefined ? 0 : par["publicActivites/mintedToken"],
+                    payToken: par["publicActivites/payToken"] == undefined ? 0 : par["publicActivites/payToken"]
                 }
             }),
             validatorsAnswers: z["publicEvents/validatorsAnswer"] === undefined ? undefined : z["publicEvents/validatorsAnswer"].map((val) => {
@@ -43,6 +46,9 @@ const publicEventStructure = (data) => {
                     answer: val['publicActivites/answer'],
                     userId: val['publicActivites/from']['_id'],
                     avatar: val['publicActivites/from']['users/avatar'],
+                    premiumToken: val["publicActivites/premiumToken"] == undefined ? 0 : val["publicActivites/premiumToken"],
+                    mintedToken: val["publicActivites/mintedToken"] == undefined ? 0 : val["publicActivites/mintedToken"],
+                    payToken: val["publicActivites/payToken"] == undefined ? 0 : val["publicActivites/payToken"]
                 }
             }),
             room: {

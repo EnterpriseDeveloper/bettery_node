@@ -22,7 +22,7 @@ const expertCalc = async (data) => {
         });
 
         let send = [{
-            "_id": id,
+            "_id": Number(id),
             "validatorsAmount": expertsAmount
         }]
         await axios.post(`${path.path}/transact`, send).catch((err) => {
