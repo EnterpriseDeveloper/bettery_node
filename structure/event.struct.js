@@ -14,7 +14,11 @@ const publicEventStructure = (data) => {
                 id: z['publicEvents/host']["_id"],
                 nickName: z['publicEvents/host']['users/nickName'],
                 avatat: z['publicEvents/host']['users/avatar'],
-                wallet: z['publicEvents/host']['users/wallet']
+                wallet: z['publicEvents/host']['users/wallet'],
+                mintedHostAmount: z['publicEvents/mintedHostAmount'] === undefined ? 0 : z['publicEvents/mintedHostAmount'],
+                payHostAmount: z['publicEvents/payHostAmount'] === undefined ? 0 : z['publicEvents/payHostAmount'],
+                mintedAdvisorAmount: z['publicEvents/mintedAdvisorAmount'] === undefined ? 0 : z['publicEvents/mintedAdvisorAmount'],
+                payAdvisorAmount: z['publicEvents/payAdvisorAmount'] === undefined ? 0 : z['publicEvents/payAdvisorAmount']
             },
             validated: z['publicEvents/validated'],
             status: z['publicEvents/status'],
