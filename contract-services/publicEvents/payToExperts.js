@@ -5,11 +5,12 @@ const url = require("../../config/path");
 
 const payToExperts = async (data) => {
     console.log("from payToExperts")
+    console.log(data);
     let id = data.id;
     let mintHost = data.mintHost;
     let payHost = data.payHost;
     let mintAdv = data.mintAdv;
-    let payAdv = data.payAdv;
+    let payAdv = data.payAdv; 
 
     // TODO add prodaction 
     let path = "test" // process.env.NODE_ENV
@@ -21,7 +22,7 @@ const payToExperts = async (data) => {
             gasPrice: 0
         });
 
-        await setToDb(mintHost, payHost, mintAdv, payAdv);
+        await setToDb(id, mintHost, payHost, mintAdv, payAdv);
     } catch (err) {
         console.log("err from pay to experts", err)
     }
