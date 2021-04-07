@@ -1,6 +1,6 @@
 const notificationStruct = (data) => {
     return data.filter((x) => {
-        if (x['notificationFromRoom/publicEventsId']['publicEvents/room'] == undefined) {
+        if (x['notificationFromRoom/publicEventsId'] == undefined) {
             return false;
         }
         return true;
