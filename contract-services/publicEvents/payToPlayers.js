@@ -1,5 +1,6 @@
 const PlayerPaymentContract = require("../abi/PlayerPayment.json");
 const ContractInit = require("../contractInit");
+const reputationConvert = require("../../helpers/reputationConvert")
 
 const url = require("../../config/path");
 const axios = require('axios');
@@ -25,7 +26,7 @@ const payToPlayers = async (data) => {
                     {
                         "publicActivites/from": [
                             "users/_id",
-                            "users/reputation"
+                            "users/expertReputPoins"
                         ]
                     }
                 ]
@@ -59,27 +60,25 @@ const payToPlayers = async (data) => {
     let payToValidators = [];
 
     for (let i = 0; i < rightValidators.length; i++) {
-        let reputation = rightValidators[i]['publicActivites/from']['users/reputation']
-        if (reputation === undefined) {
-            reputation = 0
-        }
+        let reputation = reputationConvert(rightValidators[i]['publicActivites/from']['users/expertReputPoins'])
 
-        let amountMint = expertPercMint * mintedTokens * (reputation + 1) / allReputation / 100
+            let amountMint = expertPercMint * mintedTokens * (reputation + 1) / allReputation / 100
 
-        let payToken = amountLoserToken * percent * (reputation + 1) / allReputation / 100
+            let payToken = amountLoserToken * percent * (reputation + 1) / allReputation / 100
 
-        let premiumAmount
+            let premiumAmount
 
-        if (allData.data[0]['publicEvents/premium']) {
-            premiumAmount = premiumTokens * expertPremiumPerc * (reputation + 1) / allReputation / 100
-        }
-        let obj = {
-            "_id": Number(rightValidators[i]._id),
-            "mintedToken": amountMint,
-            "payToken": payToken,
-            "premiumToken": premiumAmount === undefined ? 0 : premiumAmount
-        }
-        payToValidators.push(obj)
+            if (allData.data[0]['publicEvents/premium']) {
+                premiumAmount = premiumTokens * expertPremiumPerc * (reputation + 1) / allReputation / 100
+            }
+            let obj = {
+                "_id": Number(rightValidators[i]._id),
+                "mintedToken": amountMint,
+                "payToken": payToken,
+                "premiumToken": premiumAmount === undefined ? 0 : premiumAmount
+            }
+            payToValidators.push(obj)
+
     }
 
     sendToDb(payToValidators.concat(forSendReputation))
@@ -112,19 +111,21 @@ const calculateReput = (allData, correctAnswer) => {
     let rightValidators = []
 
     for (let i = 0; i < allValidators.length; i++) {
-        let rep = allValidators[i]['publicActivites/from']['users/reputation'] == undefined ? 0 : allValidators[i]['publicActivites/from']['users/reputation']
+        let rep = allValidators[i]['publicActivites/from']['users/expertReputPoins'] == undefined ? 0 : allValidators[i]['publicActivites/from']['users/expertReputPoins']
 
         if (correctAnswer === allValidators[i]["publicActivites/answer"]) {
-            rightValidators.push(allValidators[i]);
+            if(rep >= 0){
+                rightValidators.push(allValidators[i]);
+            }
             let x = {
                 "_id": Number(allValidators[i]['publicActivites/from']._id),
-                "reputation": Number(rep + 1),
+                "expertReputPoins": Number(rep + 1),
             }
             forSendReputation.push(x)
         } else {
             let x = {
                 "_id": Number(allValidators[i]['publicActivites/from']._id),
-                "reputation": Number(rep - 2),
+                "expertReputPoins": Number(rep - 2),
             }
             forSendReputation.push(x)
         }
@@ -147,13 +148,18 @@ const calculateLoserPool = (allData, correctAnswer) => {
 }
 
 const calculateAllReput = (rightValidators) => {
-    return  _.reduce(rightValidators, (sum, n) => {
-        let rep = n['publicActivites/from']['users/reputation']
-        if (rep === undefined) {
-            rep = 0
+    let total = 0;
+
+    rightValidators.forEach((num) => {
+        let exRep = num['publicActivites/from']['users/expertReputPoins'];
+        if(exRep == undefined){
+            exRep = 0
         }
-        return sum + Number(rep + 1)
-    }, 0)
+        if(exRep >= 0){
+            total +=  reputationConvert(exRep) + 1
+        }
+    });
+    return Number(total)
 }
 
 module.exports = {
