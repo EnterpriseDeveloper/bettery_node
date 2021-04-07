@@ -1,9 +1,10 @@
 const path = require("../config/path");
 const axios = require("axios");
+const reputationConvert = require("../helpers/reputationConvert")
 
 const getUserWallet = async (id, res) => {
     let userConfig = {
-        "select": ["users/wallet", "users/reputation"],
+        "select": ["users/wallet", "users/expertReputPoins"],
         "from": Number(id)
     }
     let hostDataWallet = await axios.post(`${path.path}/query`, userConfig).catch((err) => {
@@ -13,10 +14,9 @@ const getUserWallet = async (id, res) => {
         return;
     })
 
-    let reput = hostDataWallet.data[0]['users/reputation'];
     return {
         wallet: hostDataWallet.data[0]['users/wallet'],
-        reputation: reput == undefined ? 0 : reput
+        reputation: reputationConvert(hostDataWallet.data[0]['users/expertReputPoins'])
     };
 }
 
