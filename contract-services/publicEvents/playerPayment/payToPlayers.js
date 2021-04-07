@@ -1,8 +1,8 @@
-const PlayerPaymentContract = require("../abi/PlayerPayment.json");
-const ContractInit = require("../contractInit");
-const reputationConvert = require("../../helpers/reputationConvert")
+const PlayerPaymentContract = require("../../abi/PlayerPayment.json");
+const ContractInit = require("../../contractInit");
+const reputationConvert = require("../../../helpers/reputationConvert")
 
-const url = require("../../config/path");
+const url = require("../../../config/path");
 const axios = require('axios');
 const _ = require('lodash');
 
@@ -10,6 +10,7 @@ const payToPlayers = async (data) => {
     console.log("from payToPlayers", data)
     let id = data.id;
 
+    // calculate expert win and send to DB
     let expertPercMint = data.expertPercMint
     let percent = data.percent
     let expertPremiumPerc = data.expertPremiumPerc
@@ -49,7 +50,7 @@ const payToPlayers = async (data) => {
     let premiumTokens = allData.data[0]['publicEvents/premiumTokens'];
     let correctAnswer = allData.data[0]['publicEvents/finalAnswerNumber'];
 
-    let {rightValidators, forSendReputation} = calculateReput(allData, correctAnswer)
+    let { rightValidators, forSendReputation } = calculateReput(allData, correctAnswer)
 
 
     let amountLoserToken = calculateLoserPool(allData, correctAnswer)
@@ -59,10 +60,13 @@ const payToPlayers = async (data) => {
 
     let payToValidators = [];
 
-    for (let i = 0; i < rightValidators.length; i++) {
-        let reputation = reputationConvert(rightValidators[i]['publicActivites/from']['users/expertReputPoins'])
-
-            let amountMint = expertPercMint * mintedTokens * (reputation + 1) / allReputation / 100
+    if (allReputation > 0) {
+        for (let i = 0; i < rightValidators.length; i++) {
+            let reputation = reputationConvert(rightValidators[i]['publicActivites/from']['users/expertReputPoins'])
+            let amountMint = 0;
+            if (mintedTokens > 0) {
+                amountMint = expertPercMint * mintedTokens * (reputation + 1) / allReputation / 100
+            }
 
             let payToken = amountLoserToken * percent * (reputation + 1) / allReputation / 100
 
@@ -79,9 +83,14 @@ const payToPlayers = async (data) => {
             }
             payToValidators.push(obj)
 
+        }
+    }else{
+        // TODO add to db percent of expert to the Marketing Fund 
+        console.log("ALL validators have minus reputation");
     }
 
-    sendToDb(payToValidators.concat(forSendReputation))
+
+    await sendToDb(payToValidators.concat(forSendReputation))
 
     // TODO add prodaction
     let path = "test" // process.env.NODE_ENV
@@ -114,7 +123,7 @@ const calculateReput = (allData, correctAnswer) => {
         let rep = allValidators[i]['publicActivites/from']['users/expertReputPoins'] == undefined ? 0 : allValidators[i]['publicActivites/from']['users/expertReputPoins']
 
         if (correctAnswer === allValidators[i]["publicActivites/answer"]) {
-            if(rep >= 0){
+            if (rep >= 0) {
                 rightValidators.push(allValidators[i]);
             }
             let x = {
@@ -152,11 +161,11 @@ const calculateAllReput = (rightValidators) => {
 
     rightValidators.forEach((num) => {
         let exRep = num['publicActivites/from']['users/expertReputPoins'];
-        if(exRep == undefined){
+        if (exRep == undefined) {
             exRep = 0
         }
-        if(exRep >= 0){
-            total +=  reputationConvert(exRep) + 1
+        if (exRep >= 0) {
+            total += reputationConvert(exRep) + 1
         }
     });
     return Number(total)

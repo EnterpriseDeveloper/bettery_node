@@ -6,6 +6,7 @@ const ContractInit = require("./contractInit.js");
 const ExpertsCalcOracle = require('./oracels/exprestCalc');
 const setAnswer = require("../services/events/event_is_finish");
 const publicEvents = require("./publicEvents/index");
+const playPaymentSentToDB = require("./publicEvents/playerPayment/setPaymentToDB");
 
 
 const loadHandler = async () => {
@@ -116,6 +117,17 @@ const PlayerPayment = async (playerPayment) => {
             restartHandler();
         } else {
             console.log("event finish work")
+            await playPaymentSentToDB.setToDB(event.returnValues);
+            setAnswer.eventEnd(event.returnValues);
+        }
+    })
+
+    playerPayment.events.eventMintedFinish(async (err, event) => {
+        if (err) {
+            console.error('Error from event finish event', err)
+            restartHandler();
+        } else {
+            console.log("event minted finish work")
             setAnswer.eventEnd(event.returnValues);
         }
     })
