@@ -33,10 +33,10 @@ const setToDb = async (id, mintHost, payHost, mintAdv, payAdv) => {
     let web3 = new Web3();
     let data = [{
         "_id": Number(id),
-        "mintedHostAmount": web3.utils.fromWei(String(mintHost), "ether"),
-        "payHostAmount": web3.utils.fromWei(String(payHost), "ether"),
-        "mintedAdvisorAmount": web3.utils.fromWei(String(mintAdv), "ether"),
-        "payAdvisorAmount": web3.utils.fromWei(String(payAdv), "ether")
+        "mintedHostAmount": Number(web3.utils.fromWei(String(mintHost), "ether")),
+        "payHostAmount": Number(web3.utils.fromWei(String(payHost), "ether")),
+        "mintedAdvisorAmount": Number(web3.utils.fromWei(String(mintAdv), "ether")),
+        "payAdvisorAmount": Number(web3.utils.fromWei(String(payAdv), "ether"))
     }]
     await axios.post(`${url.path}/transact`, data).catch((err) => {
         console.log("DB error from transact payToLosers: " + err.response.data.message)

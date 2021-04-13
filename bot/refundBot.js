@@ -52,7 +52,7 @@ const revertEvent = async (eventId, participant, week) => {
         let betteryContract = await contractInit.init(path, MPContr)
         try {
             const gasEstimate = await betteryContract.methods.revertedPayment(eventId, "do not have enough validators").estimateGas();
-            await getContract.methods.revertedPayment(eventId, "do not have enough validators").send({
+            await betteryContract.methods.revertedPayment(eventId, "do not have enough validators").send({
                 gas: gasEstimate,
                 gasPrice: 0
             });

@@ -98,7 +98,6 @@ const getJoinedRoom = async (req, res) => {
 
         let obj = struct.roomStruct(allRooms);
         // filter rooms with private events
-        console.log(obj);
         let data = _.filter(obj, (x) => { return x.publicEventsId.length != 0 })
         res.status(200)
         res.send(data)

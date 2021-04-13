@@ -70,7 +70,7 @@ const payToPlayers = async (data) => {
 
             let payToken = amountLoserToken * percent * (reputation + 1) / allReputation / 100
 
-            let premiumAmount
+            let premiumAmount = 0;
 
             if (allData.data[0]['publicEvents/premium']) {
                 premiumAmount = premiumTokens * expertPremiumPerc * (reputation + 1) / allReputation / 100
