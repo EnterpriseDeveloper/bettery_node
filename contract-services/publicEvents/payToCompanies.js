@@ -8,7 +8,7 @@ const payToCompanies = async (x) => {
     console.log(x);
     let web3 = new Web3();
     let id = x.id;
-    let tokens = web3.utils.fromWei(String(x.tokens), "ether");
+    let tokens = Number(web3.utils.fromWei(String(x.tokens), "ether"));
     let correctAnswer = Number(x.correctAnswer);
 
     let data = {

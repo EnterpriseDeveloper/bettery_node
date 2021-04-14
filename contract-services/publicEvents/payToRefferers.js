@@ -1,41 +1,229 @@
 const PlayerPaymentContract = require("../abi/PlayerPayment.json");
 const ContractInit = require("../contractInit");
+const axios = require("axios");
+const url = require("../../config/path");
+const _ = require("lodash");
+const Web3 = require("web3");
 
 const payToRefferers = async (data) => {
     console.log("from payToRefferers")
     console.log(data);
-    let id = data.id;
-
-    // TODO get fake address from contract
-    // let addr1 = [];
-    // let addr2 = [];
-    // let addr3 = [];
-
     // TODO add prodaction 
     let path = "test" // process.env.NODE_ENV
     let contract = await ContractInit.init(path, PlayerPaymentContract);
+
+    let id = data.id;
+    let getPlayers = await fetchDataFromDb(id);
+
+    let mintedTokens = Number(getPlayers.data[0]["publicEvents/mintedTokens"]);
+    let players = getPlayers.data[0]["publicEvents/parcipiantsAnswer"];
+    const ref = letFindAllRef(players);
+    let refAmount = getRefAmount(ref);
+    let contrPercet = await getPercentFromContract(contract)
+    let allData = calcTokens(ref, refAmount, mintedTokens, contrPercet);
+    let fakeAddr = await contract.methods.fakeAddr().call();
+    let { payRefAddr, payRefAmount, payComp } = getRefStruct(allData, fakeAddr, refAmount, mintedTokens, contrPercet);
+
     try {
-        let gasEstimate = await contract.methods.payRefToComp(id, 1).estimateGas();
-        await contract.methods.payRefToComp(id, 1).send({
+        let gasEstimate = await contract.methods.payToReff(
+            id,
+            payRefAddr[0],
+            payRefAmount[0],
+            payRefAddr[1],
+            payRefAmount[1],
+            payRefAddr[2],
+            payRefAmount[2],
+            payComp
+        ).estimateGas();
+        await contract.methods.payToReff(
+            id,
+            payRefAddr[0],
+            payRefAmount[0],
+            payRefAddr[1],
+            payRefAmount[1],
+            payRefAddr[2],
+            payRefAmount[2],
+            payComp
+        ).send({
             gas: gasEstimate,
             gasPrice: 0
         });
 
+        // TODO add to db ref payments
     } catch (err) {
         console.log("err from pay to pay to refferers", err)
     }
-    // try {
-    //     let gasEstimate = await contract.methods.payToReff(id, addr1, addr2, addr3).estimateGas();
-    //     await contract.methods.payToReff(id, addr1, addr2, addr3).send({
-    //         gas: gasEstimate,
-    //         gasPrice: 0
-    //     });
+}
 
-    //     // TODO add to db event finish
-    // } catch (err) {
-    //     console.log("err from pay to pay to refferers", err)
-    // }
+const fetchDataFromDb = async (id) => {
+    let fetchData = {
+        "select": [
+            "mintedTokens",
+            {
+                "publicEvents/parcipiantsAnswer": [
+                    {
+                        "publicActivites/from": [
+                            {
+                                "users/invitedBy": [
+                                    "users/wallet",
+                                    {
+                                        "users/invitedBy": [
+                                            "users/wallet",
+                                            { "users/invitedBy": ["_id", "users/wallet"] }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "from": Number(id)
+    }
 
+    return await axios.post(`${url.path}/query`, fetchData).catch((err) => {
+        console.log("DB error from query payToRefferers: " + err.response.data.message)
+        return;
+    })
+}
+
+const letFindAllRef = (players) => {
+    let allData = [];
+    for (let i = 0; i < players.length; i++) {
+        // find L1
+        if (players[i]['publicActivites/from']['users/invitedBy']) {
+            let walletRef = players[i]['publicActivites/from']['users/invitedBy']['users/wallet']
+            let findRef = _.findIndex(allData, (x) => { return x.wallet == walletRef && x.level == 0 })
+            if (findRef == -1) {
+                allData.push({
+                    wallet: walletRef,
+                    amount: 1,
+                    level: 0
+                })
+            } else {
+                allData[findRef].amount++;
+            }
+            //  find L2
+            if (players[i]['publicActivites/from']['users/invitedBy']['users/invitedBy']) {
+                let walletRef = players[i]['publicActivites/from']['users/invitedBy']['users/invitedBy']['users/wallet']
+                let findRef = _.findIndex(allData, (x) => { return x.wallet == walletRef && x.level == 1 })
+                if (findRef == -1) {
+                    allData.push({
+                        wallet: walletRef,
+                        amount: 1,
+                        level: 1
+                    })
+                } else {
+                    allData[findRef].amount++;
+                }
+
+                // find L3
+                if (players[i]['publicActivites/from']['users/invitedBy']['users/invitedBy']['users/invitedBy']) {
+                    let walletRef = players[i]['publicActivites/from']['users/invitedBy']['users/invitedBy']['users/invitedBy']['users/wallet']
+                    let findRef = _.findIndex(allData, (x) => { return x.wallet == walletRef && x.level == 2 })
+                    if (findRef == -1) {
+                        allData.push({
+                            wallet: walletRef,
+                            amount: 1,
+                            level: 2
+                        })
+                    } else {
+                        allData[findRef].amount++;
+                    }
+                }
+            }
+        }
+    }
+    return allData;
+}
+
+const getRefAmount = (allData) => {
+    let ref1 = 0, ref2 = 0, ref3 = 0, refAmount = [];
+    for (let i = 0; i < allData.length; i++) {
+        if (allData[i].level == 0) {
+            ref1 = ref1 + allData[i].amount;
+        }
+        if (allData[i].level == 1) {
+            ref2 = ref2 + allData[i].amount;
+        }
+        if (allData[i].level == 2) {
+            ref3 = ref3 + allData[i].amount;
+        }
+    }
+    refAmount[0] = ref1;
+    refAmount[1] = ref2;
+    refAmount[2] = ref3;
+    return refAmount;
+}
+
+const calcTokens = (allData, refAmount, mintedTokens, percent) => {
+    return allData.map((x) => {
+        return {
+            ...x,
+            tokens: (percent[x.level] * mintedTokens / 100) * x.amount / refAmount[x.level]
+        }
+    })
+}
+
+const getPercentFromContract = async (contract) => {
+    let percent = [];
+    percent[0] = Number(await contract.methods.firstRefer().call());
+    percent[1] = Number(await contract.methods.secontRefer().call());
+    percent[2] = Number(await contract.methods.thirdRefer().call());
+    return percent;
+}
+
+const getRefStruct = (allData, fakeAddr, refAmount, mintedTokens, contrPercet) => {
+    let web3 = new Web3();
+    let payRefAddr = [[], [], []];
+    let payRefAmount = [[], [], []];
+    let payComp = 0;
+    if (refAmount[0] > 0) {
+        for (let i = 0; i < allData.length; i++) {
+            if (allData[i].level == 0) {
+                payRefAddr[0].push(allData[i].wallet);
+                payRefAmount[0].push(web3.utils.toWei(String(allData[i].tokens), "ether"))
+            }
+        }
+        if (refAmount[1] > 0) {
+            for (let i = 0; i < allData.length; i++) {
+                if (allData[i].level == 1) {
+                    payRefAddr[1].push(allData[i].wallet);
+                    payRefAmount[1].push(web3.utils.toWei(String(allData[i].tokens), "ether"))
+                }
+            }
+            if (refAmount[2] > 100) {
+                for (let i = 0; i < allData.length; i++) {
+                    if (allData[i].level == 2) {
+                        payRefAddr[2].push(allData[i].wallet);
+                        payRefAmount[2].push(web3.utils.toWei(String(allData[i].tokens), "ether"))
+                    }
+                }
+            } else {
+                payRefAddr[2][0] = fakeAddr;
+                payRefAmount[2][0] = '0';
+                payComp = web3.utils.toWei(String((contrPercet[2]) * mintedTokens / 100), "ether");
+            }
+        } else {
+            payRefAddr[1][0] = fakeAddr;
+            payRefAddr[2][0] = fakeAddr;
+            payRefAmount[1][0] = '0';
+            payRefAmount[2][0] = '0';
+            payComp = web3.utils.toWei(String((contrPercet[1] + contrPercet[2]) * mintedTokens / 100), "ether");
+        }
+
+    } else {
+        payRefAddr[0][0] = fakeAddr;
+        payRefAddr[1][0] = fakeAddr;
+        payRefAddr[2][0] = fakeAddr;
+        payRefAmount[0][0] = '0';
+        payRefAmount[1][0] = '0';
+        payRefAmount[2][0] = '0';
+        payComp = web3.utils.toWei(String((contrPercet[0] + contrPercet[1] + contrPercet[2]) * mintedTokens / 100), "ether");
+    }
+
+    return { payRefAddr, payRefAmount, payComp }
 }
 
 module.exports = {

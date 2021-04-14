@@ -5,11 +5,11 @@ const Web3 = require("web3");
 const setToDB = async (data) => {
     let web3 = new Web3();
     let id = Number(data.id);
-    let avarageBet = web3.utils.fromWei(String(data.avarageBet), "ether");
-    let calcMintedToken = web3.utils.fromWei(String(data.calcMintedToken), "ether");
-    let winPool = web3.utils.fromWei(String(data.winPool), "ether");
-    let avarageBetWin = web3.utils.fromWei(String(data.avarageBetWin), "ether");
-    let premimWin = web3.utils.fromWei(String(data.premimWin), "ether");
+    let avarageBet = Number(web3.utils.fromWei(String(data.avarageBet), "ether"));
+    let calcMintedToken = Number(web3.utils.fromWei(String(data.calcMintedToken), "ether"));
+    let winPool = Number(web3.utils.fromWei(String(data.winPool), "ether"));
+    let avarageBetWin = Number(web3.utils.fromWei(String(data.avarageBetWin), "ether"));
+    let premimWin = Number(web3.utils.fromWei(String(data.premimWin), "ether"));
 
     let getData = {
         "select": [
