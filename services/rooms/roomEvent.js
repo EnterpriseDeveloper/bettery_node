@@ -32,8 +32,9 @@ const getEventByRoomId = async (req, res) => {
 const getCommentsAmount = async (events, res) => {
     for (let i = 0; i < events.length; i++) {
         let conf = {
-            "select": ["*"],
-            "where": `comments/publicEventsId = ${Number(events[i].id)}`
+            "select": ["comments/comment", "comments/date"],
+            "where": `comments/publicEventsId = ${Number(events[i].id)}`,
+            "opts": {"orderBy": ["DESC", "comments/date"] }
         }
         let comments = await axios.post(path.path + "/query", conf)
             .catch((err) => {
@@ -45,10 +46,7 @@ const getCommentsAmount = async (events, res) => {
 
         events[i].commentsAmount = comments.data.length
         if (comments.data.length != 0) {
-            let lastComments = _.maxBy(comments.data, function (o) {
-                return o['comments/date'];
-            })
-            events[i].lastComment = lastComments['comments/comment'];
+            events[i].lastComment = comments.data[0]['comments/comment'];
         } else {
             events[i].lastComment = "null";
         }

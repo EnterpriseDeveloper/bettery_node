@@ -24,19 +24,6 @@ const getAdditionalData = async (events, res) => {
         } else {
             events[i].lastComment = "null";
         }
-        // get rooms event amount
-        let confRoom = {
-            "select": ["room/publicEventsId"],
-            "from": events[i].room.id
-        }
-        let rooms = await axios.post(path.path + "/query", confRoom)
-            .catch((err) => {
-                res.status(400);
-                res.send(err.response.data.message);
-                console.log("DB error: " + err.response.data.message)
-                return;
-            })
-        events[i].room.eventAmount = rooms.data[0]['room/publicEventsId'].length;
     }
 
     return events;
