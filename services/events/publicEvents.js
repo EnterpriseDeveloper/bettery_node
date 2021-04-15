@@ -221,7 +221,7 @@ const getAll = async (req, res) => {
     let dataEvetns = search.length >= 1 ? filterData.searchData(obj, search) : obj;
 
     if (!finished) {
-        dataEvetns = _.filter(dataEvetns, (e) => { return e.finalAnswer === null })
+        dataEvetns = _.filter(dataEvetns, (e) => { return e.finalAnswer === null && e.status.search("reverted") == -1 })
     }
 
     let soringData;
