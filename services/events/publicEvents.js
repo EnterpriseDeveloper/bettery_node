@@ -267,7 +267,8 @@ const getBetteryEvent = async (req, res) => {
             let id = getUserInfo.data[0]._id;
             let conf = {
                 "select": ["publicEvents/question", "_id", "publicEvents/startTime", "room"],
-                "where": `publicEvents/host = ${id}`
+                "where": `publicEvents/host = ${id}`,
+                "opts": {"orderBy": ["DESC", "publicEvents/startTime"]}
             }
             let data = await axios.post(path.path + "/query", conf).catch((err) => {
                 res.status(400);
@@ -275,8 +276,7 @@ const getBetteryEvent = async (req, res) => {
                 return
             })
             if (data) {
-                let sortByTime = _.sortBy(data.data, [function (o) { return o["publicEvents/startTime"]; }]);
-                let getLast = sortByTime.slice(Math.max(sortByTime.length - 5, 0))
+                let getLast = data.data.slice(Math.max(data.data.length - 5, 0))
                 res.status(200);
                 res.send(getLast);
             }

@@ -14,9 +14,7 @@ const getEventByRoomId = async (req, res) => {
 
     if (eventData !== undefined) {
 
-        let obj = structure.publicEventStructure(eventData.data);
-        obj = _.sortBy(obj, (o) => { return o.startTime; });
-        let roomEvent = obj.reverse()
+        let roomEvent = structure.publicEventStructure(eventData.data);
         let dataEvetns = search.length >= 1 ? helpers.searchData(roomEvent, search) : roomEvent;
 
         let events = {
@@ -122,7 +120,8 @@ const getData = async (id, res) => {
             { 'publicEvents/host': ["*"] },
             { 'publicEvents/room': ["*"] }
         ],
-        "where": `publicEvents/room = ${Number(id)}`
+        "where": `publicEvents/room = ${Number(id)}`,
+        "opts": {"orderBy": ["DESC", "publicEvents/startTime"]}
     }
 
     const eventData = await axios.post(`${path.path}/query`, event).catch((err) => {
