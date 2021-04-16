@@ -34,7 +34,7 @@ const getCommentsAmount = async (events, res) => {
         let conf = {
             "select": ["comments/comment", "comments/date"],
             "where": `comments/publicEventsId = ${Number(events[i].id)}`,
-            "opts": {"orderBy": ["DESC", "comments/date"] }
+            "opts": {"orderBy": ["DESC", "comments/date"], "limit": 1 }
         }
         let comments = await axios.post(path.path + "/query", conf)
             .catch((err) => {
