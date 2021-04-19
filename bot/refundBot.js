@@ -47,8 +47,7 @@ const revertEvent = async (eventId, participant) => {
     })
 
     if (participant !== undefined) {
-        // TODO add prodaction 
-        let path = "test" // process.env.NODE_ENV
+        let path = process.env.NODE_ENV
         let betteryContract = await contractInit.init(path, MPContr)
         try {
             const gasEstimate = await betteryContract.methods.revertedPayment(eventId, "do not have enough validators").estimateGas();

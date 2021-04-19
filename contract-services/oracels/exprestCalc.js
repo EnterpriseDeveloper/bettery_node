@@ -15,8 +15,7 @@ const expertCalc = async (data) => {
 
     let expertsAmount = Math.round(experts);
     console.log("expertsAmount: " + expertsAmount);
-    // TODO add prodaction 
-    let pathContr = "test" // process.env.NODE_ENV
+    let pathContr = process.env.NODE_ENV
     let contract = await ContractInit.init(pathContr, PublicEventContract);
 
     try {

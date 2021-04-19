@@ -10,8 +10,7 @@ const playPaymentSentToDB = require("./publicEvents/playerPayment/setPaymentToDB
 
 
 const loadHandler = async () => {
-    // TODO add prodaction 
-    let path = "test" // process.env.NODE_ENV
+    let path = process.env.NODE_ENV
     let publicEvent = await ContractInit.webSoketInit(path, PublicEventContract);
     publicEventsHandler(publicEvent);
     let mpEvent = await ContractInit.webSoketInit(path, MiddlePaymentContract);

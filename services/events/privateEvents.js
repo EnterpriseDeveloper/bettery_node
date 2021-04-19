@@ -65,8 +65,7 @@ const createPrivateEvent = async (req, res) => {
 
     try {
         let { wallet } = await userData.getUserWallet(req.body.host, res)
-        // TODO add prodaction 
-        let pathContr = "test" // process.env.NODE_ENV
+        let pathContr = process.env.NODE_ENV
         let contract = await contractInit.init(pathContr, PrivateEvents)
 
         let gasEstimate = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).estimateGas();
@@ -108,8 +107,7 @@ const participate = async (req, res) => {
     } else {
         try {
             let { wallet } = await userData.getUserWallet(from, res)
-            // TODO add prodaction 
-            let pathContr = "test" // process.env.NODE_ENV
+            let pathContr = process.env.NODE_ENV
             let contract = await contractInit.init(pathContr, PrivateEvents)
             let gasEstimate = await contract.methods.setAnswer(eventId, answer, wallet).estimateGas();
             let transaction = await contract.methods.setAnswer(eventId, answer, wallet).send({
@@ -166,8 +164,7 @@ const validate = async (req, res) => {
     } else {
         try {
             let { wallet } = await userData.getUserWallet(from, res)
-            // TODO add prodaction 
-            let pathContr = "test" // process.env.NODE_ENV
+            let pathContr = process.env.NODE_ENV;
             let contract = await contractInit.init(pathContr, PrivateEvents)
             let gasEstimate = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).estimateGas();
             let transaction = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).send({

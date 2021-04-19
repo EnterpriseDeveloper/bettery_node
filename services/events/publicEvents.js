@@ -34,8 +34,7 @@ const createEvent = async (req, res) => {
         let calculateExperts = req.body.calculateExperts === "company" ? true : false
         let { wallet } = await userData.getUserWallet(req.body.host, res)
         let amountPremiumEvent = req.body.amount;
-        // TODO add prodaction 
-        let pathContr = "test" // process.env.NODE_ENV
+        let pathContr = process.env.NODE_ENV;
         let contract = await contractInit.init(pathContr, PublicEvents)
 
         let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).estimateGas();

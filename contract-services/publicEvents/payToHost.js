@@ -10,8 +10,7 @@ const payToHost = async (data) => {
     let mintCMF = data.mintCMF; // in wei
     let mintMF = data.mintMF; // in wei
 
-    // TODO add prodaction 
-    let path = "test" // process.env.NODE_ENV
+    let path = process.env.NODE_ENV;
     let contract = await ContractInit.init(path, MiddlePaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPaytoHost(id).estimateGas();

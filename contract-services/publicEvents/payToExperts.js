@@ -13,8 +13,7 @@ const payToExperts = async (data) => {
     let mintAdv = data.mintAdv;
     let payAdv = data.payAdv; 
 
-    // TODO add prodaction 
-    let path = "test" // process.env.NODE_ENV
+    let path = process.env.NODE_ENV
     let contract = await ContractInit.init(path, MiddlePaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPayToExperts(id).estimateGas();

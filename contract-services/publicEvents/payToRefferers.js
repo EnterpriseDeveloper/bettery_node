@@ -8,8 +8,7 @@ const Web3 = require("web3");
 const payToRefferers = async (data) => {
     console.log("from payToRefferers")
     console.log(data);
-    // TODO add prodaction 
-    let path = "test" // process.env.NODE_ENV
+    let path = process.env.NODE_ENV
     let contract = await ContractInit.init(path, PlayerPaymentContract);
 
     let id = data.id;

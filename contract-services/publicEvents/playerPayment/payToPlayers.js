@@ -92,8 +92,7 @@ const payToPlayers = async (data) => {
 
     await sendToDb(payToValidators.concat(forSendReputation))
 
-    // TODO add prodaction
-    let path = "test" // process.env.NODE_ENV
+    let path = process.env.NODE_ENV
     let contract = await ContractInit.init(path, PlayerPaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPayToPlayers(id).estimateGas();
