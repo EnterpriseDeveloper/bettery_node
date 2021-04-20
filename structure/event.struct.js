@@ -14,7 +14,11 @@ const publicEventStructure = (data) => {
                 id: z['publicEvents/host']["_id"],
                 nickName: z['publicEvents/host']['users/nickName'],
                 avatat: z['publicEvents/host']['users/avatar'],
-                wallet: z['publicEvents/host']['users/wallet']
+                wallet: z['publicEvents/host']['users/wallet'],
+                mintedHostAmount: z['publicEvents/mintedHostAmount'] === undefined ? 0 : z['publicEvents/mintedHostAmount'],
+                payHostAmount: z['publicEvents/payHostAmount'] === undefined ? 0 : z['publicEvents/payHostAmount'],
+                mintedAdvisorAmount: z['publicEvents/mintedAdvisorAmount'] === undefined ? 0 : z['publicEvents/mintedAdvisorAmount'],
+                payAdvisorAmount: z['publicEvents/payAdvisorAmount'] === undefined ? 0 : z['publicEvents/payAdvisorAmount']
             },
             validated: z['publicEvents/validated'],
             status: z['publicEvents/status'],
@@ -34,6 +38,9 @@ const publicEventStructure = (data) => {
                     userId: par['publicActivites/from']['_id'],
                     amount: par['publicActivites/amount'],
                     avatar: par['publicActivites/from']['users/avatar'],
+                    premiumToken: par["publicActivites/premiumToken"] == undefined ? 0 : par["publicActivites/premiumToken"],
+                    mintedToken: par["publicActivites/mintedToken"] == undefined ? 0 : par["publicActivites/mintedToken"],
+                    payToken: par["publicActivites/payToken"] == undefined ? 0 : par["publicActivites/payToken"]
                 }
             }),
             validatorsAnswers: z["publicEvents/validatorsAnswer"] === undefined ? undefined : z["publicEvents/validatorsAnswer"].map((val) => {
@@ -43,13 +50,17 @@ const publicEventStructure = (data) => {
                     answer: val['publicActivites/answer'],
                     userId: val['publicActivites/from']['_id'],
                     avatar: val['publicActivites/from']['users/avatar'],
+                    premiumToken: val["publicActivites/premiumToken"] == undefined ? 0 : val["publicActivites/premiumToken"],
+                    mintedToken: val["publicActivites/mintedToken"] == undefined ? 0 : val["publicActivites/mintedToken"],
+                    payToken: val["publicActivites/payToken"] == undefined ? 0 : val["publicActivites/payToken"]
                 }
             }),
             room: {
                 id: z['publicEvents/room'][0]['_id'],
                 name: z['publicEvents/room'][0]['room/name'],
                 color: z['publicEvents/room'][0]['room/color'],
-                owner: z['publicEvents/room'][0]['room/owner']['_id']
+                owner: z['publicEvents/room'][0]['room/owner']['_id'],
+                eventAmount: z['publicEvents/room'][0]['room/publicEventsId'].length
             }
         }
     })

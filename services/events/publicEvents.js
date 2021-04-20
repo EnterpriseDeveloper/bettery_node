@@ -32,12 +32,13 @@ const createEvent = async (req, res) => {
         let questionQuantity = req.body.answers.length;
         let amountExperts = req.body.calculateExperts === "company" ? 0 : req.body.validatorsAmount;
         let calculateExperts = req.body.calculateExperts === "company" ? true : false
-        let host = await userData.getUserWallet(req.body.host, res)
+        let { wallet } = await userData.getUserWallet(req.body.host, res)
         let amountPremiumEvent = req.body.amount;
-        let contract = await contractInit.init(process.env.NODE_ENV, PublicEvents)
+        let pathContr = process.env.NODE_ENV;
+        let contract = await contractInit.init(pathContr, PublicEvents)
 
-        let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, host, amountPremiumEvent).estimateGas();
-        let transaction = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, host, amountPremiumEvent).send({
+        let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).estimateGas();
+        let transaction = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).send({
             gas: gasEstimate,
             gasPrice: 0
         });
@@ -48,14 +49,12 @@ const createEvent = async (req, res) => {
             let roomId = allData.roomId;
             let whichRoom = req.body.whichRoom;
 
-            // TODO add to db premium and amount of premium event
-            delete allData.amount; // amount tokens on premium event
+            delete allData.amount;
             delete allData.calculateExperts;
-            ////////////////////////
 
-            //TODO add to the history of tokens in premium events
+            //TODO add to the history host tokens amount in premium events
 
-
+            allData.premiumTokens = amountPremiumEvent
             allData._id = id;
             allData.finalAnswer = "";
             allData.dateCreation = Math.floor(Date.now() / 1000)
@@ -221,7 +220,7 @@ const getAll = async (req, res) => {
     let dataEvetns = search.length >= 1 ? filterData.searchData(obj, search) : obj;
 
     if (!finished) {
-        dataEvetns = _.filter(dataEvetns, (e) => { return e.finalAnswer === null })
+        dataEvetns = _.filter(dataEvetns, (e) => { return e.finalAnswer === null && e.status.search("reverted") == -1 })
     }
 
     let soringData;
@@ -267,7 +266,8 @@ const getBetteryEvent = async (req, res) => {
             let id = getUserInfo.data[0]._id;
             let conf = {
                 "select": ["publicEvents/question", "_id", "publicEvents/startTime", "room"],
-                "where": `publicEvents/host = ${id}`
+                "where": `publicEvents/host = ${id}`,
+                "opts": {"orderBy": ["DESC", "publicEvents/startTime"]}
             }
             let data = await axios.post(path.path + "/query", conf).catch((err) => {
                 res.status(400);
@@ -275,8 +275,7 @@ const getBetteryEvent = async (req, res) => {
                 return
             })
             if (data) {
-                let sortByTime = _.sortBy(data.data, [function (o) { return o["publicEvents/startTime"]; }]);
-                let getLast = sortByTime.slice(Math.max(sortByTime.length - 5, 0))
+                let getLast = data.data.slice(Math.max(data.data.length - 5, 0))
                 res.status(200);
                 res.send(getLast);
             }

@@ -3,8 +3,9 @@ const path = require("../../config/path")
 const contractInit = require("../../contract-services/contractInit");
 const BET = require("../../contract-services/abi/BET.json");
 
-const mintTokens = async (address) => {    
-    let betteryContract = await contractInit.init(process.env.NODE_ENV, BET)
+const mintTokens = async (address) => {
+    let pathContr = process.env.NODE_ENV;  
+    let betteryContract = await contractInit.init(pathContr, BET)
     let gasEstimate = await betteryContract.methods.mint(address).estimateGas();
     return await betteryContract.methods.mint(address).send({
         gas: gasEstimate,

@@ -6,11 +6,17 @@ const path = require("../../config/path");
 const expertCalc = async (data) => {
     let id = data.id;
     let players = Number(data.activePlayers);
+    let experts = 0;
+    if (players < 11) {
+        experts = 3;
+    } else {
+        experts = players / (Math.pow(players, 0.5) + 2 - (Math.pow(2, 0.5)));
+    }
 
-    let experts = players / (players ** 0.5 + 2 - (2 ** 0.5));
-    let expertsAmount = experts.toFixed(0);
+    let expertsAmount = Math.round(experts);
     console.log("expertsAmount: " + expertsAmount);
-    let contract = await ContractInit.init(process.env.NODE_ENV, PublicEventContract);
+    let pathContr = process.env.NODE_ENV
+    let contract = await ContractInit.init(pathContr, PublicEventContract);
 
     try {
         let gasEstimate = await contract.methods.setActiveExpertsFromOracl(Number(expertsAmount), id).estimateGas();
@@ -20,7 +26,7 @@ const expertCalc = async (data) => {
         });
 
         let send = [{
-            "_id": id,
+            "_id": Number(id),
             "validatorsAmount": expertsAmount
         }]
         await axios.post(`${path.path}/transact`, send).catch((err) => {

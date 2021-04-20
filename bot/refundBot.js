@@ -2,6 +2,8 @@ const axios = require("axios");
 const url = require("../config/path");
 const _ = require("lodash")
 const epochWeek = require('../config/limits');
+const contractInit = require("../contract-services/contractInit");
+const MPContr = require("../contract-services/abi/MiddlePayment.json");
 
 const refundBot = async () => {
     let config = {
@@ -16,7 +18,7 @@ const refundBot = async () => {
     })
 
     if (data.data.length != 0) {
-        let events = _.filter(data.data, (x) => { return x['publicEvents/finalAnswerNumber'] == undefined && x['publicEvents/status'] != "reverted" })
+        let events = _.filter(data.data, (x) => { return x['publicEvents/finalAnswerNumber'] == undefined && !x['publicEvents/status'].includes("reverted")})
         if (events.length != 0) {
             for (let i = 0; i < events.length; i++) {
                 let eventId = events[i]["_id"]
@@ -35,7 +37,7 @@ const refundBot = async () => {
 const revertEvent = async (eventId, participant) => {
     let revert = [{
         "_id": eventId,
-        "status": "reverted",
+        "status": "reverted: not enough experts",
         "eventEnd": Math.floor(new Date().getTime() / 1000.0)
     }]
 
@@ -45,21 +47,18 @@ const revertEvent = async (eventId, participant) => {
     })
 
     if (participant !== undefined) {
-        // ADD providers for main network
-        // rebuild for new token sale technology
-        // let contr = new Contract.Contract();
-        // let getContract = await contr.loadContract();
-        // let from = contr.getAccount();
-        // try {
-        //     const gasEstimate = await getContract.methods.revertedPayment(eventId, "do not have enough validators").estimateGas({ from: from });
-        //     await getContract.methods.revertedPayment(eventId, "do not have enough validators").send({
-        //         gas: gasEstimate,
-        //         gasPrice: 0
-        //     });
-        // } catch (err) {
-        //     console.log("error from refund Bot")
-        //     console.log(err)
-        // }
+        let path = process.env.NODE_ENV
+        let betteryContract = await contractInit.init(path, MPContr)
+        try {
+            const gasEstimate = await betteryContract.methods.revertedPayment(eventId, "do not have enough validators").estimateGas();
+            await betteryContract.methods.revertedPayment(eventId, "do not have enough validators").send({
+                gas: gasEstimate,
+                gasPrice: 0
+            });
+        } catch (err) {
+            console.log("error from refund Bot")
+            console.log(err)
+        }
     }
 }
 

@@ -31,8 +31,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -45,8 +44,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -59,8 +57,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -73,8 +70,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -110,8 +106,7 @@
       "name": "buyTokens",
       "outputs": [],
       "stateMutability": "payable",
-      "type": "function",
-      "payable": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -148,13 +143,13 @@
     "absolutePath": "/Users/macbook/Documents/freelance/tokenominc/contracts/ether/tokenSale/QuizeTokenSale.sol",
     "exportedSymbols": {
       "AddressUpgradeable": [
-        9377
+        9678
       ],
       "BTYmain": [
         2731
       ],
       "Initializable": [
-        8525
+        8826
       ],
       "QuizeTokenSale": [
         239
@@ -206,7 +201,7 @@
         "id": 37,
         "nodeType": "ImportDirective",
         "scope": 240,
-        "sourceUnit": 8526,
+        "sourceUnit": 8827,
         "src": "113:69:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -219,10 +214,10 @@
               "id": 38,
               "name": "Initializable",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 8525,
+              "referencedDeclaration": 8826,
               "src": "211:13:1",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_Initializable_$8525",
+                "typeIdentifier": "t_contract$_Initializable_$8826",
                 "typeString": "contract Initializable"
               }
             },
@@ -232,14 +227,14 @@
           }
         ],
         "contractDependencies": [
-          8525
+          8826
         ],
         "contractKind": "contract",
         "fullyImplemented": true,
         "id": 239,
         "linearizedBaseContracts": [
           239,
-          8525
+          8826
         ],
         "name": "QuizeTokenSale",
         "nodeType": "ContractDefinition",
@@ -656,7 +651,7 @@
                   "name": "initializer",
                   "nodeType": "Identifier",
                   "overloadedDeclarations": [],
-                  "referencedDeclaration": 8508,
+                  "referencedDeclaration": 8809,
                   "src": "537:11:1",
                   "typeDescriptions": {
                     "typeIdentifier": "t_modifier$__$",
@@ -2952,13 +2947,13 @@
       "absolutePath": "/Users/macbook/Documents/freelance/tokenominc/contracts/ether/tokenSale/QuizeTokenSale.sol",
       "exportedSymbols": {
         "AddressUpgradeable": [
-          9377
+          9678
         ],
         "BTYmain": [
           2731
         ],
         "Initializable": [
-          8525
+          8826
         ],
         "QuizeTokenSale": [
           239
@@ -3012,7 +3007,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 8526,
+          "SourceUnit": 8827,
           "absolutePath": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol",
           "file": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol",
           "scope": 240,
@@ -3029,13 +3024,13 @@
         "attributes": {
           "abstract": false,
           "contractDependencies": [
-            8525
+            8826
           ],
           "contractKind": "contract",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             239,
-            8525
+            8826
           ],
           "name": "QuizeTokenSale",
           "scope": 240
@@ -3047,7 +3042,7 @@
               {
                 "attributes": {
                   "name": "Initializable",
-                  "referencedDeclaration": 8525,
+                  "referencedDeclaration": 8826,
                   "type": "contract Initializable"
                 },
                 "id": 38,
@@ -3388,7 +3383,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 8508,
+                      "referencedDeclaration": 8809,
                       "type": "modifier ()",
                       "value": "initializer"
                     },
@@ -5982,7 +5977,7 @@
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-03-25T15:24:49.595Z",
+  "updatedAt": "2021-04-20T07:24:33.610Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

@@ -6,14 +6,16 @@ const ContractInit = require("./contractInit.js");
 const ExpertsCalcOracle = require('./oracels/exprestCalc');
 const setAnswer = require("../services/events/event_is_finish");
 const publicEvents = require("./publicEvents/index");
+const playPaymentSentToDB = require("./publicEvents/playerPayment/setPaymentToDB");
 
 
 const loadHandler = async () => {
-    let publicEvent = await ContractInit.webSoketInit(process.env.NODE_ENV, PublicEventContract);
+    let path = process.env.NODE_ENV
+    let publicEvent = await ContractInit.webSoketInit(path, PublicEventContract);
     publicEventsHandler(publicEvent);
-    let mpEvent = await ContractInit.webSoketInit(process.env.NODE_ENV, MiddlePaymentContract);
-    MiddlePayment(mpEvent); 
-    let ppEvent = await ContractInit.webSoketInit(process.env.NODE_ENV, PlayerPaymentContract);
+    let mpEvent = await ContractInit.webSoketInit(path, MiddlePaymentContract);
+    MiddlePayment(mpEvent);
+    let ppEvent = await ContractInit.webSoketInit(path, PlayerPaymentContract);
     PlayerPayment(ppEvent);
 
 }
@@ -38,10 +40,10 @@ const publicEventsHandler = (publicEvent) => {
         }
     })
 
-   
+
 }
 
-const MiddlePayment = async (middlePayment) =>{
+const MiddlePayment = async (middlePayment) => {
     middlePayment.events.payToCompanies(async (err, event) => {
         if (err) {
             console.error('Error from find pay to companies events', err)
@@ -84,12 +86,12 @@ const MiddlePayment = async (middlePayment) =>{
             restartHandler();
         } else {
             console.log("event revertedEvent work")
-            // TODO 
+            publicEvents.reverted.reverted(event.returnValues)
         }
     })
 }
 
-const PlayerPayment = async (playerPayment) =>{
+const PlayerPayment = async (playerPayment) => {
     playerPayment.events.payToLosers(async (err, event) => {
         if (err) {
             console.error('Error from find pay to losers events', err)
@@ -107,15 +109,25 @@ const PlayerPayment = async (playerPayment) =>{
             publicEvents.payToRefferers.payToRefferers(event.returnValues);
         }
     })
-    
+
     playerPayment.events.eventFinish(async (err, event) => {
         if (err) {
             console.error('Error from event finish event', err)
             restartHandler();
         } else {
             console.log("event finish work")
-            setAnswer.setCorrectAnswer(event.returnValues);
-            // TODO add calcalation of tokens
+            await playPaymentSentToDB.setToDB(event.returnValues);
+            setAnswer.eventEnd(event.returnValues);
+        }
+    })
+
+    playerPayment.events.eventMintedFinish(async (err, event) => {
+        if (err) {
+            console.error('Error from event finish event', err)
+            restartHandler();
+        } else {
+            console.log("event minted finish work")
+            setAnswer.eventEnd(event.returnValues);
         }
     })
 }

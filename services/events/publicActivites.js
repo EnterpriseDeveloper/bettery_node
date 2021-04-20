@@ -24,21 +24,22 @@ const participate = async (req, res) => {
     }
 
     try {
-        let playerWallet = await userData.getUserWallet(userId, res)
-        let contract = await contractInit.init(process.env.NODE_ENV, PublicEvents)
+        let { wallet } = await userData.getUserWallet(userId, res)
+        let pathContr = process.env.NODE_ENV;
+        let contract = await contractInit.init(pathContr, PublicEvents)
         let tokens = web3.utils.toWei(String(amount), "ether");
 
         let gasEstimate = await contract.methods.setAnswer(
             eventId,
             answerIndex,
             tokens,
-            playerWallet
+            wallet
         ).estimateGas();
         let transaction = await contract.methods.setAnswer(
             eventId,
             answerIndex,
             tokens,
-            playerWallet
+            wallet
         ).send({
             gas: gasEstimate,
             gasPrice: 0
@@ -110,20 +111,21 @@ const validate = async (req, res) => {
     }
 
     try {
-        let expertWallet = await userData.getUserWallet(userId, res)
-        let contract = await contractInit.init(process.env.NODE_ENV, PublicEvents)
+        let { wallet, reputation } = await userData.getUserWallet(from, res)
+        let pathContr = process.env.NODE_ENV;
+        let contract = await contractInit.init(pathContr, PublicEvents)
 
         let gasEstimate = await contract.methods.setValidator(
             eventId,
-            answerIndex,
-            expertWallet,
-            0 // TODO add reputation
+            answer,
+            wallet,
+            reputation
         ).estimateGas();
         let transaction = await contract.methods.setValidator(
             eventId,
-            answerIndex,
-            expertWallet,
-            0 // TODO add reputation
+            answer,
+            wallet,
+            reputation
         ).send({
             gas: gasEstimate,
             gasPrice: 0

@@ -14,9 +14,7 @@ const getEventByRoomId = async (req, res) => {
 
     if (eventData !== undefined) {
 
-        let obj = structure.publicEventStructure(eventData.data);
-        obj = _.sortBy(obj, (o) => { return o.startTime; });
-        let roomEvent = obj.reverse()
+        let roomEvent = structure.publicEventStructure(eventData.data);
         let dataEvetns = search.length >= 1 ? helpers.searchData(roomEvent, search) : roomEvent;
 
         let events = {
@@ -32,8 +30,9 @@ const getEventByRoomId = async (req, res) => {
 const getCommentsAmount = async (events, res) => {
     for (let i = 0; i < events.length; i++) {
         let conf = {
-            "select": ["*"],
-            "where": `comments/publicEventsId = ${Number(events[i].id)}`
+            "select": ["comments/comment", "comments/date"],
+            "where": `comments/publicEventsId = ${Number(events[i].id)}`,
+            "opts": {"orderBy": ["DESC", "comments/date"], "limit": 1 }
         }
         let comments = await axios.post(path.path + "/query", conf)
             .catch((err) => {
@@ -45,10 +44,7 @@ const getCommentsAmount = async (events, res) => {
 
         events[i].commentsAmount = comments.data.length
         if (comments.data.length != 0) {
-            let lastComments = _.maxBy(comments.data, function (o) {
-                return o['comments/date'];
-            })
-            events[i].lastComment = lastComments['comments/comment'];
+            events[i].lastComment = comments.data[0]['comments/comment'];
         } else {
             events[i].lastComment = "null";
         }
@@ -124,7 +120,8 @@ const getData = async (id, res) => {
             { 'publicEvents/host': ["*"] },
             { 'publicEvents/room': ["*"] }
         ],
-        "where": `publicEvents/room = ${Number(id)}`
+        "where": `publicEvents/room = ${Number(id)}`,
+        "opts": {"orderBy": ["DESC", "publicEvents/startTime"]}
     }
 
     const eventData = await axios.post(`${path.path}/query`, event).catch((err) => {

@@ -64,11 +64,12 @@ const createPrivateEvent = async (req, res) => {
     let questionQuantity = req.body.answers.length;
 
     try {
-        let hostWallet = await userData.getUserWallet(req.body.host, res)
-        let contract = await contractInit.init(process.env.NODE_ENV, PrivateEvents)
+        let { wallet } = await userData.getUserWallet(req.body.host, res)
+        let pathContr = process.env.NODE_ENV
+        let contract = await contractInit.init(pathContr, PrivateEvents)
 
-        let gasEstimate = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, hostWallet).estimateGas();
-        let transaction = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, hostWallet).send({
+        let gasEstimate = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).estimateGas();
+        let transaction = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).send({
             gas: gasEstimate,
             gasPrice: 0
         });
@@ -105,10 +106,11 @@ const participate = async (req, res) => {
         res.send({ "error": "structure is incorrect" });
     } else {
         try {
-            let playerWallet = await userData.getUserWallet(from, res)
-            let contract = await contractInit.init(process.env.NODE_ENV, PrivateEvents)
-            let gasEstimate = await contract.methods.setAnswer(eventId, answer, playerWallet).estimateGas();
-            let transaction = await contract.methods.setAnswer(eventId, answer, playerWallet).send({
+            let { wallet } = await userData.getUserWallet(from, res)
+            let pathContr = process.env.NODE_ENV
+            let contract = await contractInit.init(pathContr, PrivateEvents)
+            let gasEstimate = await contract.methods.setAnswer(eventId, answer, wallet).estimateGas();
+            let transaction = await contract.methods.setAnswer(eventId, answer, wallet).send({
                 gas: gasEstimate,
                 gasPrice: 0
             });
@@ -161,10 +163,11 @@ const validate = async (req, res) => {
         res.send({ "error": "structure is incorrect" });
     } else {
         try {
-            let expertWallet = await userData.getUserWallet(from, res)
-            let contract = await contractInit.init(process.env.NODE_ENV, PrivateEvents)
-            let gasEstimate = await contract.methods.setCorrectAnswer(eventId, answerNumber, expertWallet).estimateGas();
-            let transaction = await contract.methods.setCorrectAnswer(eventId, answerNumber, expertWallet).send({
+            let { wallet } = await userData.getUserWallet(from, res)
+            let pathContr = process.env.NODE_ENV;
+            let contract = await contractInit.init(pathContr, PrivateEvents)
+            let gasEstimate = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).estimateGas();
+            let transaction = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).send({
                 gas: gasEstimate,
                 gasPrice: 0
             });

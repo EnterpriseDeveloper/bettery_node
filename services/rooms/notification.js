@@ -1,7 +1,6 @@
 const axios = require('axios');
 const path = require("../../config/path");
 const struct = require('../../structure/notification.struct');
-const _ = require('lodash');
 
 const subscribeToNotification = async (req, res) => {
     let joinedId = req.body.joinedId;
@@ -79,6 +78,7 @@ const getNotificationByUserId = async (req, res) => {
             }
         ],
         "from": Number(userId),
+        "opts": {"orderBy": ["DESC", "notificationFromRoom/date"]}
     }
 
     let getData = await axios.post(`${path.path}/query`, config).catch((err) => {
@@ -92,9 +92,8 @@ const getNotificationByUserId = async (req, res) => {
 
     if (data != undefined) {
         let notif = struct.notificationStruct(data);
-        let sort = _.sortBy(notif, (o) => { return o.date; });
         res.status(200);
-        res.send(sort.reverse());
+        res.send(notif);
 
     } else {
         res.status(200);
