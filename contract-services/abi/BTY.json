@@ -8181,6 +8181,12 @@
     "version": "0.7.6+commit.7338295f.Linux.g++"
   },
   "networks": {
+    "137": {
+      "events": {},
+      "links": {},
+      "address": "0x660C707e184a516EdC287602951Cd11aeBdb9b32",
+      "transactionHash": "0xa7f5cadccd89b26dd9324a1df3e922547f148835a11f30fbd04c7eea19ed946b"
+    },
     "80001": {
       "events": {
         "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
@@ -8340,7 +8346,7 @@
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-04-14T14:50:41.368Z",
+  "updatedAt": "2021-04-20T07:24:21.723Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

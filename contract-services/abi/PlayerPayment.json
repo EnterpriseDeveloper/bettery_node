@@ -188,7 +188,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -201,7 +202,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -214,7 +216,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -238,7 +241,8 @@
         }
       ],
       "stateMutability": "pure",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -251,7 +255,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -264,7 +269,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -277,7 +283,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -290,7 +297,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -362,7 +370,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -20228,6 +20237,12 @@
     "version": "0.7.6+commit.7338295f.Linux.g++"
   },
   "networks": {
+    "137": {
+      "events": {},
+      "links": {},
+      "address": "0x599239D4d9591272c45FcA9a95413b7bd6AF99b8",
+      "transactionHash": "0x66b7b97bf514cadc7650dedabd474e39a501f32d5dbc951923866c04779a829c"
+    },
     "80001": {
       "events": {
         "0x25da44ba4726d9f695af444bfab7e7216cbb2a722298eb04083ad9f507a7c996": {
@@ -20442,7 +20457,7 @@
     }
   },
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-04-15T10:16:19.867Z",
+  "updatedAt": "2021-04-20T07:24:21.766Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
