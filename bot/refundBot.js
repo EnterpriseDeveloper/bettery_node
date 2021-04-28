@@ -2,8 +2,8 @@ const axios = require("axios");
 const url = require("../config/path");
 const _ = require("lodash")
 const epochWeek = require('../config/limits');
-const contractInit = require("../contract-services/contractInit");
-const MPContr = require("../contract-services/abi/MiddlePayment.json");
+const revertEvent = require("../services/events/revert");
+
 
 const refundBot = async () => {
     let config = {
@@ -27,42 +27,13 @@ const refundBot = async () => {
                 let week = epochWeek.epochWeek;
                 if (timeNow - endTime > week) {
                     let participant = events[i]["publicEvents/parcipiantsAnswer"];
-                    await revertEvent(eventId, participant)
+                    await revertEvent.revertEvent(eventId, participant, "not enough experts")
                 };
             }
         }
     }
 }
 
-const revertEvent = async (eventId, participant) => {
-    let revert = [{
-        "_id": eventId,
-        "status": "reverted: not enough experts",
-        "eventEnd": Math.floor(new Date().getTime() / 1000.0)
-    }]
-
-    await axios.post(`${url.path}/transact`, revert).catch((err) => {
-        console.log(err);
-        return;
-    })
-
-    if (participant !== undefined) {
-        let path = process.env.NODE_ENV
-        let betteryContract = await contractInit.init(path, MPContr)
-        try {
-            const gasEstimate = await betteryContract.methods.revertedPayment(eventId, "do not have enough validators").estimateGas();
-            await betteryContract.methods.revertedPayment(eventId, "do not have enough validators").send({
-                gas: gasEstimate,
-                gasPrice: 0
-            });
-        } catch (err) {
-            console.log("error from refund Bot")
-            console.log(err)
-        }
-    }
-}
-
 module.exports = {
-    refundBot,
-    revertEvent
+    refundBot
 }
