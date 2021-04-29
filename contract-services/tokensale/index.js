@@ -1,8 +1,6 @@
 const Web3 = require("web3");
 const TokenSaleContract = require('../abi/QuizeTokenSale.json')
 const BetteryTokenContract = require('../abi/BTYmain.json'); // TODO rename
-const { readFileSync } = require('fs');
-const path = require('path');
 const config = require('../../config/networks');
 
 module.exports = app => {
@@ -53,8 +51,7 @@ async function tokenSale(provider, networkId, keys) {
 
 async function connectToContract(provider, keys) {
     let web3 = new Web3(provider);
-    let privateKey = readFileSync(path.join(__dirname, keys), 'utf-8')
-    const prKey = web3.eth.accounts.privateKeyToAccount('0x' + privateKey);
+    const prKey = web3.eth.accounts.privateKeyToAccount('0x' + keys.key);
     await web3.eth.accounts.wallet.add(prKey);
     let accounts = await web3.eth.accounts.wallet;
     let account = accounts[0].address;
