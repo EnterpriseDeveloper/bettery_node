@@ -1,13 +1,10 @@
 const Web3 = require('web3');
-const { readFileSync } = require('fs');
-const path = require('path');
 const networkConfig = require("../config/networks");
 
 
 async function getAccount(provider, keys) {
     let web3 = new Web3(provider);
-    let privateKey = readFileSync(path.join(__dirname, keys), 'utf-8')
-    const prKey = web3.eth.accounts.privateKeyToAccount('0x' + privateKey);
+    const prKey = web3.eth.accounts.privateKeyToAccount('0x' + keys.key);
     await web3.eth.accounts.wallet.add(prKey);
     let accounts = await web3.eth.accounts.wallet;
     let account = accounts[0].address;
@@ -17,14 +14,14 @@ async function getAccount(provider, keys) {
 async function init(networkWay, contract) {
     let network = networkWay == "production" ? networkConfig.maticMain : networkConfig.maticMumbaiHttps,
         networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId,
-        keys = networkWay == "production" ? "./keys/prod/privateKey" : "./keys/test/privateKey";
+        keys = networkWay == "production" ? require("./keys/prod/privKey") : require("./keys/test/privKey");
     return await connectToNetwork(network, networkId, contract, keys);
 }
 
 async function webSoketInit(networkWay, contract) {
     let network = networkWay == "production" ? networkConfig.matciMainWSS : networkConfig.maticMumbaiWSS,
         networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId,
-        keys = networkWay == "production" ? "./keys/prod/privateKey" : "./keys/test/privateKey"
+        keys = networkWay == "production" ? require("./keys/prod/privKey") : require("./keys/test/privKey");
     return await connectToNetwork(network, networkId, contract, keys);
 }
 
@@ -39,3 +36,4 @@ module.exports = {
     init,
     webSoketInit
 }
+

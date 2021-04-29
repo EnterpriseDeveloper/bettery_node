@@ -2,4 +2,5 @@
 /node_modules
 /keys
 /config/keys.js
-/contract-services/keys/prod/privateKey
+/server_prod.js
+/server.js

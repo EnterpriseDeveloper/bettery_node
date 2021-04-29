@@ -15,11 +15,11 @@ module.exports = app => {
         if (from == "prod") {
             provider = config.mainnet;
             networkId = config.mainnetID;
-            keys = "./keys/prod/privateKey";
+            keys = require("../keys/prod/privKey"); 
         } else if (from == "dev") {
             provider = config.goerli;
             networkId = config.mainId;
-            keys = "./keys/test/privateKey";
+            keys = require("../keys/test/privKey");
         }
         let tokenMarket = await tokenSale(provider, networkId, keys);
         let tokenSold = await tokenMarket.methods.tokensSold().call();
