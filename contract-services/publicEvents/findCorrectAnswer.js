@@ -1,5 +1,6 @@
 const MiddlePaymentContract = require("../abi/MiddlePayment.json");
 const ContractInit = require("../contractInit");
+const getNonce = require("../nonce/nonce");
 
 const findCorrectAnswer = async (data) => {
     console.log("from findCorrectAnswer")
@@ -10,9 +11,11 @@ const findCorrectAnswer = async (data) => {
     let contract = await ContractInit.init(path, MiddlePaymentContract);
     try {
         let gasEstimate = await contract.methods.letsFindCorrectAnswer(id).estimateGas();
+        let nonce = await getNonce.getNonce();
         await contract.methods.letsFindCorrectAnswer(id).send({
             gas: gasEstimate,
-            gasPrice: 0
+            gasPrice: 0,
+            nonce: nonce
         });
     } catch (err) {
         console.log("err from find correct answer", err)

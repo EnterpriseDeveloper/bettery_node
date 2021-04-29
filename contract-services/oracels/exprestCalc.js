@@ -2,6 +2,7 @@ const ContractInit = require("../contractInit.js");
 const PublicEventContract = require("../abi/PublicEvents.json");
 const axios = require("axios");
 const path = require("../../config/path");
+const getNonce = require("../nonce/nonce");
 
 const expertCalc = async (data) => {
     let id = data.id;
@@ -20,9 +21,11 @@ const expertCalc = async (data) => {
 
     try {
         let gasEstimate = await contract.methods.setActiveExpertsFromOracl(Number(expertsAmount), id).estimateGas();
+        let nonce = await getNonce.getNonce();
         await contract.methods.setActiveExpertsFromOracl(Number(expertsAmount), id).send({
             gas: gasEstimate,
-            gasPrice: 0
+            gasPrice: 0,
+            nonce: nonce
         });
 
         let send = [{

@@ -2,6 +2,7 @@ const MiddlePaymentContract = require("../abi/MiddlePayment.json");
 const Web3 = require("web3");
 const setAnswer = require("../../services/events/event_is_finish");
 const ContractInit = require("../contractInit");
+const getNonce = require("../nonce/nonce");
 
 const payToCompanies = async (x) => {
     console.log("from payToCompanies")
@@ -23,9 +24,11 @@ const payToCompanies = async (x) => {
     let contract = await ContractInit.init(path, MiddlePaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPayToCompanies(id).estimateGas();
+        let nonce = await getNonce.getNonce();
         await contract.methods.letsPayToCompanies(id).send({
             gas: gasEstimate,
-            gasPrice: 0
+            gasPrice: 0,
+            nonce: nonce
         });
 
     } catch (err) {

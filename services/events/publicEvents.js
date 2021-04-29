@@ -10,6 +10,7 @@ const notification = require('../rooms/notification');
 const contractInit = require("../../contract-services/contractInit");
 const PublicEvents = require("../../contract-services/abi/PublicEvents.json");
 const userData = require("../../helpers/userData");
+const getNonce = require("../../contract-services/nonce/nonce");
 
 const createEvent = async (req, res) => {
     // create event id
@@ -37,10 +38,12 @@ const createEvent = async (req, res) => {
         let pathContr = process.env.NODE_ENV;
         let contract = await contractInit.init(pathContr, PublicEvents)
 
+        let nonce = await getNonce.getNonce();
         let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).estimateGas();
         let transaction = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).send({
             gas: gasEstimate,
-            gasPrice: 0
+            gasPrice: 0,
+            nonce: nonce
         });
         if (transaction) {
             let allData = req.body

@@ -4,13 +4,11 @@ var app = express();
 const fs = require('fs');
 const refundBot = require('./bot/refundBot');
 const loadContractHandler = require("./contract-services/eventHandler");
-
-const multer = require('multer');
-const upload = multer();
+const nonce = require("./contract-services/nonce/nonce");
 
 var http = require('http');
 
-if(process.env.NODE_TEST == 'false'){
+if (process.env.NODE_TEST == 'false') {
     var https = require('https');
 
     let key = process.env.NODE_ENV == "production" ? "./keys/key.pem" : "/home/ubuntu/node/keys/server.key",
@@ -50,6 +48,11 @@ app.use(bodyParser.urlencoded({
 }));
 var httpServer = http.createServer(app);
 
+if (process.env.NODE_TEST != 'false') {
+    var io = require('socket.io')(httpServer);
+    require('./services/comments')(io);
+}
+
 
 require('./services/events')(app);
 require('./services/funds')(app);
@@ -60,6 +63,7 @@ require('./services/subscribe')(app);
 require('./contract-services/tokensale')(app);
 
 httpServer.listen(80, async () => {
+    await nonce.nonceInit();
     await loadContractHandler.loadHandler();
     setInterval(() => {
         refundBot.refundBot();
