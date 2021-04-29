@@ -7,8 +7,8 @@
     "dev": "NODE_TEST=true NODE_ENV=test nodemon",
     "start": "NODE_TEST=false NODE_ENV=test node index.js",
     "start_prod": "NODE_TEST=false NODE_ENV=production node index.js",
-    "forever": "nohup node server.js > output.log &",
-    "forever_prod": "nohup node server_prod.js > output.log &",
+    "forever": "NODE_TEST=false NODE_ENV=test nohup node server.js > output.log &",
+    "forever_prod": "NODE_TEST=false NODE_ENV=production nohup node server_prod.js > output.log &",
     "build": "webpack --mode=development --config webpack.config.js",
     "build_prod": "webpack --mode=production --config webpack.production.config.js"
   },
