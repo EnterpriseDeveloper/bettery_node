@@ -6,6 +6,7 @@ const structure = require('../../structure/event.struct');
 const contractInit = require("../../contract-services/contractInit");
 const PrivateEvents = require("../../contract-services/abi/PrivateEvents.json");
 const userData = require("../../helpers/userData");
+const getNonce = require("../../contract-services/nonce/nonce");
 
 const createPrivateEvent = async (req, res) => {
     let allData = req.body;
@@ -69,9 +70,11 @@ const createPrivateEvent = async (req, res) => {
         let contract = await contractInit.init(pathContr, PrivateEvents)
 
         let gasEstimate = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).estimateGas();
+        let nonce = await getNonce.getNonce();
         let transaction = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).send({
             gas: gasEstimate,
-            gasPrice: 0
+            gasPrice: 0,
+            nonce: nonce
         });
         if (transaction) {
             let transactionHash = transaction.transactionHash;
@@ -110,9 +113,11 @@ const participate = async (req, res) => {
             let pathContr = process.env.NODE_ENV
             let contract = await contractInit.init(pathContr, PrivateEvents)
             let gasEstimate = await contract.methods.setAnswer(eventId, answer, wallet).estimateGas();
+            let nonce = await getNonce.getNonce();
             let transaction = await contract.methods.setAnswer(eventId, answer, wallet).send({
                 gas: gasEstimate,
-                gasPrice: 0
+                gasPrice: 0,
+                nonce: nonce
             });
 
             if (transaction) {
@@ -167,9 +172,11 @@ const validate = async (req, res) => {
             let pathContr = process.env.NODE_ENV;
             let contract = await contractInit.init(pathContr, PrivateEvents)
             let gasEstimate = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).estimateGas();
+            let nonce = await getNonce.getNonce();
             let transaction = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).send({
                 gas: gasEstimate,
-                gasPrice: 0
+                gasPrice: 0,
+                nonce: nonce
             });
 
             if (transaction) {

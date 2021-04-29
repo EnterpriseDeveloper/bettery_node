@@ -2,6 +2,7 @@ const contractInit = require("../../contract-services/contractInit");
 const MPContr = require("../../contract-services/abi/MiddlePayment.json");
 const axios = require("axios");
 const url = require("../../config/path");
+const getNonce = require("../../contract-services/nonce/nonce");
 
 const getEventData = async (req, res) =>{
     let id = Number(req.body.id);
@@ -57,9 +58,11 @@ const revertEvent = async (eventId, participant, purpose) => {
         let betteryContract = await contractInit.init(path, MPContr)
         try {
             const gasEstimate = await betteryContract.methods.revertedPayment(eventId, purpose).estimateGas();
+            let nonce = await getNonce.getNonce();
             await betteryContract.methods.revertedPayment(eventId, purpose).send({
                 gas: gasEstimate,
-                gasPrice: 0
+                gasPrice: 0,
+                nonce: nonce
             });
         } catch (err) {
             console.log("error from refund Bot")

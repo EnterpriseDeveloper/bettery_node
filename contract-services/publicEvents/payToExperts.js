@@ -3,6 +3,7 @@ const ContractInit = require("../contractInit");
 const Web3 = require("web3");
 const url = require("../../config/path");
 const axios = require("axios");
+const getNonce = require("../nonce/nonce");
 
 const payToExperts = async (data) => {
     console.log("from payToExperts")
@@ -17,9 +18,11 @@ const payToExperts = async (data) => {
     let contract = await ContractInit.init(path, MiddlePaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPayToExperts(id).estimateGas();
+        let nonce = await getNonce.getNonce();
         await contract.methods.letsPayToExperts(id).send({
             gas: gasEstimate,
-            gasPrice: 0
+            gasPrice: 0,
+            nonce: nonce
         });
 
         await setToDb(id, mintHost, payHost, mintAdv, payAdv);

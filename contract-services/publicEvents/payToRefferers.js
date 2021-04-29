@@ -4,6 +4,7 @@ const axios = require("axios");
 const url = require("../../config/path");
 const _ = require("lodash");
 const Web3 = require("web3");
+const getNonce = require("../nonce/nonce");
 
 const payToRefferers = async (data) => {
     console.log("from payToRefferers")
@@ -34,6 +35,7 @@ const payToRefferers = async (data) => {
             payRefAmount[2],
             payComp
         ).estimateGas();
+        let nonce = await getNonce.getNonce();
         await contract.methods.payToReff(
             id,
             payRefAddr[0],
@@ -45,7 +47,8 @@ const payToRefferers = async (data) => {
             payComp
         ).send({
             gas: gasEstimate,
-            gasPrice: 0
+            gasPrice: 0,
+            nonce: nonce
         });
 
         // TODO add to db ref payments

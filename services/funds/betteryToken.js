@@ -2,14 +2,17 @@ const axios = require('axios');
 const path = require("../../config/path")
 const contractInit = require("../../contract-services/contractInit");
 const BET = require("../../contract-services/abi/BET.json");
+const getNonce = require("../../contract-services/nonce/nonce");
 
 const mintTokens = async (address) => {
     let pathContr = process.env.NODE_ENV;  
     let betteryContract = await contractInit.init(pathContr, BET)
+    let nonce = await getNonce.getNonce();
     let gasEstimate = await betteryContract.methods.mint(address).estimateGas();
     return await betteryContract.methods.mint(address).send({
         gas: gasEstimate,
-        gasPrice: 0
+        gasPrice: 0,
+        nonce: nonce
     });
 }
 

@@ -5,6 +5,7 @@ const reputationConvert = require("../../../helpers/reputationConvert")
 const url = require("../../../config/path");
 const axios = require('axios');
 const _ = require('lodash');
+const getNonce = require("../../nonce/nonce");
 
 const payToPlayers = async (data) => {
     console.log("from payToPlayers", data)
@@ -96,9 +97,11 @@ const payToPlayers = async (data) => {
     let contract = await ContractInit.init(path, PlayerPaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPayToPlayers(id).estimateGas();
+        let nonce = await getNonce.getNonce();
         await contract.methods.letsPayToPlayers(id).send({
             gas: gasEstimate,
-            gasPrice: 0
+            gasPrice: 0,
+            nonce: nonce
         });
 
     } catch (err) {
