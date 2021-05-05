@@ -13,6 +13,14 @@ const userData = require("../../helpers/userData");
 const getNonce = require("../../contract-services/nonce/nonce");
 
 const createEvent = async (req, res) => {
+    let dateNow = Number((new Date().getTime() / 1000).toFixed(0))
+
+    if (dateNow > req.body.endTime) {
+        res.status(400);
+        res.send("Please check your event end time. This time already passed.");
+        return;
+    }
+
     // create event id
     let createEventID = [{
         _id: "publicEvents$newEvents",

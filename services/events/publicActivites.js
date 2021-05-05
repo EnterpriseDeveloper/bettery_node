@@ -21,13 +21,13 @@ const participate = async (req, res) => {
         answerIndex == undefined ||
         amount == undefined) {
         res.status(400);
-        res.send({ message: "Structure is incorrect" });
+        res.send("Structure is incorrect");
         return;
     }
 
-    if(Number(amount) < limit.minBetAmount){
+    if (Number(amount) < limit.minBetAmount) {
         res.status(400);
-        res.send({ message: "The minimum amount for betting is 0.01 BET" });
+        res.send("The minimum amount for betting is 0.01 BET");
         return;
     }
 
@@ -116,7 +116,7 @@ const validate = async (req, res) => {
         answer == undefined ||
         from == undefined) {
         res.status(400);
-        res.send({ message: "Structure is incorrect" });
+        res.send("Structure is incorrect");
         return;
     }
 
