@@ -26,7 +26,7 @@ module.exports = io => {
         socket.on("typing in", async (msg) =>{
             let eventId = msg.eventId
             socket.join(eventId);
-            io.to(eventId).emit('typing out', msg.text);
+            socket.broadcast.to(eventId).emit('typing out', msg.text);
         })
 
         socket.on("reply", async (msg) =>{
