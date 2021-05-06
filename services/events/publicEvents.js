@@ -46,8 +46,8 @@ const createEvent = async (req, res) => {
         let pathContr = process.env.NODE_ENV;
         let contract = await contractInit.init(pathContr, PublicEvents)
 
-        let nonce = await getNonce.getNonce();
         let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).estimateGas();
+        let nonce = await getNonce.getNonce();
         let transaction = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).send({
             gas: gasEstimate,
             gasPrice: 0,
