@@ -30,7 +30,7 @@ module.exports = io => {
         })
 
         socket.on("reply", async (msg) =>{
-            let eventId = msg.eventId
+            let eventId = msg.eventId  
             socket.join(eventId);
             await createComments.replyToComment(msg);
             io.to(eventId).emit('receive comments', await getComments.getAllCommentsById(eventId));
