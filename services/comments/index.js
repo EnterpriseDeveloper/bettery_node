@@ -34,7 +34,7 @@ module.exports = io => {
             socket.join(eventId);
             await createComments.replyToComment(msg);
             io.to(eventId).emit('receive comments', await getComments.getAllCommentsById(eventId));
-        })
+        })    
     });
 
 }
