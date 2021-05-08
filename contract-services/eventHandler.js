@@ -40,6 +40,16 @@ const publicEventsHandler = (publicEvent) => {
         }
     })
 
+    publicEvent.events.revertedEvent(async (err, event) => {
+        if (err) {
+            console.error('Error from reverted event', err)
+            restartHandler();
+        } else {
+            console.log("event revertedEvent work")
+            publicEvents.reverted.reverted(event.returnValues)
+        }
+    })
+
 
 }
 
