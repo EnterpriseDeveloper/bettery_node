@@ -12,9 +12,9 @@ const getAdditionalData = async (events, res) => {
         }
         let comments = await axios.post(path.path + "/query", confComment)
             .catch((err) => {
+                console.log("DB error: " + err.response)
                 res.status(400);
-                res.send(err.response.data.message);
-                console.log("DB error: " + err.response.data.message)
+                res.send(err.response);
                 return;
             })
 
