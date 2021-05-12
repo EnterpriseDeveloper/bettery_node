@@ -10,6 +10,7 @@ const publicEventStructure = (data) => {
             startTime: z['publicEvents/startTime'],
             id: z._id,
             hashtags: z['publicEvents/hashtags'],
+            resolutionDetalis: z["publicEvents/resolutionDetalis"] === undefined ? "undefined" : z["publicEvents/resolutionDetalis"],
             host: {
                 id: z['publicEvents/host']["_id"],
                 nickName: z['publicEvents/host']['users/nickName'],
@@ -78,6 +79,7 @@ const privateEventStructure = (data) => {
             status: z['privateEvents/status'],
             question: z['privateEvents/question'],
             answers: z["privateEvents/answers"],
+            resolutionDetalis: z["privateEvents/resolutionDetalis"] === undefined ? "undefined" : z["privateEvents/resolutionDetalis"],
             host: {
                 id: z['privateEvents/host']["_id"],
                 nickName: z['privateEvents/host']['users/nickName'],
