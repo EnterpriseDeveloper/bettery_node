@@ -34,7 +34,7 @@ const publicEventsHandler = (publicEvent) => {
     publicEvent.events.findCorrectAnswer(async (err, event) => {
         if (err) {
             console.error('Error from find сorrect answer events', err)
-            restartHandler();
+        //    restartHandler();
         } else {
             publicEvents.findCorrectAnswer.findCorrectAnswer(event.returnValues);
         }
@@ -43,7 +43,7 @@ const publicEventsHandler = (publicEvent) => {
     publicEvent.events.revertedEvent(async (err, event) => {
         if (err) {
             console.error('Error from reverted event', err)
-            restartHandler();
+        //    restartHandler();
         } else {
             console.log("event revertedEvent work")
             publicEvents.reverted.reverted(event.returnValues)
@@ -57,7 +57,7 @@ const MiddlePayment = async (middlePayment) => {
     middlePayment.events.payToCompanies(async (err, event) => {
         if (err) {
             console.error('Error from find pay to companies events', err)
-            restartHandler();
+        //    restartHandler();
         } else {
             publicEvents.payToCompanies.payToCompanies(event.returnValues);
         }
@@ -66,7 +66,7 @@ const MiddlePayment = async (middlePayment) => {
     middlePayment.events.payToHost(async (err, event) => {
         if (err) {
             console.error('Error from find pay to host events', err)
-            restartHandler();
+        //    restartHandler();
         } else {
             publicEvents.payToHost.payToHost(event.returnValues);
         }
@@ -75,7 +75,7 @@ const MiddlePayment = async (middlePayment) => {
     middlePayment.events.payToExperts(async (err, event) => {
         if (err) {
             console.error('Error from find pay to expert events', err)
-            restartHandler();
+        //    restartHandler();
         } else {
             publicEvents.payToExperts.payToExperts(event.returnValues);
         }
@@ -84,7 +84,7 @@ const MiddlePayment = async (middlePayment) => {
     middlePayment.events.payToPlayers(async (err, event) => {
         if (err) {
             console.error('Error from find pay to players events', err)
-            restartHandler();
+        //    restartHandler();
         } else {
             publicEvents.payToPlayers.payToPlayers(event.returnValues);
         }
@@ -93,7 +93,7 @@ const MiddlePayment = async (middlePayment) => {
     middlePayment.events.revertedEvent(async (err, event) => {
         if (err) {
             console.error('Error from reverted event', err)
-            restartHandler();
+        //    restartHandler();
         } else {
             console.log("event revertedEvent work")
             publicEvents.reverted.reverted(event.returnValues)
@@ -105,7 +105,7 @@ const PlayerPayment = async (playerPayment) => {
     playerPayment.events.payToLosers(async (err, event) => {
         if (err) {
             console.error('Error from find pay to losers events', err)
-            restartHandler();
+        //    restartHandler();
         } else {
             publicEvents.payToLosers.payToLosers(event.returnValues);
         }
@@ -114,7 +114,7 @@ const PlayerPayment = async (playerPayment) => {
     playerPayment.events.payToRefferers(async (err, event) => {
         if (err) {
             console.error('Error from find pay to refferers events', err)
-            restartHandler();
+        //    restartHandler();
         } else {
             publicEvents.payToRefferers.payToRefferers(event.returnValues);
         }
@@ -123,7 +123,7 @@ const PlayerPayment = async (playerPayment) => {
     playerPayment.events.eventFinish(async (err, event) => {
         if (err) {
             console.error('Error from event finish event', err)
-            restartHandler();
+        //    restartHandler();
         } else {
             console.log("event finish work")
             await playPaymentSentToDB.setToDB(event.returnValues);
@@ -134,7 +134,7 @@ const PlayerPayment = async (playerPayment) => {
     playerPayment.events.eventMintedFinish(async (err, event) => {
         if (err) {
             console.error('Error from event finish event', err)
-            restartHandler();
+        //    restartHandler();
         } else {
             console.log("event minted finish work")
             setAnswer.eventEnd(event.returnValues);
@@ -146,7 +146,7 @@ const PlayerPayment = async (playerPayment) => {
 const restartHandler = () => {
     setTimeout(async () => {
         console.log("RESTART EVENT HANDEL")
-        await this.loadHandler()
+        await loadHandler()
     }, 3000)
 }
 
