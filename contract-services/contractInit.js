@@ -32,8 +32,14 @@ async function connectToNetwork(network, networkId, contract, keys) {
     return new web3.eth.Contract(abi, address, { from: account });
 }
 
+async function webSocketCheck(networkWay){
+    let network = networkWay == "production" ? networkConfig.matciMainWSS : networkConfig.maticMumbaiWSS;
+    return new Web3.providers.WebsocketProvider(network)
+}
+
 module.exports = {
     init,
-    webSoketInit
+    webSoketInit,
+    webSocketCheck
 }
 
