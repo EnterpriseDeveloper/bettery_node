@@ -37,8 +37,8 @@ const getCommentsAmount = async (events, res) => {
         let comments = await axios.post(path.path + "/query", conf)
             .catch((err) => {
                 res.status(400);
-                res.send(err.response.data.message);
-                console.log("DB error: " + err.response.data.message)
+                res.send(err.response);
+                console.log("DB error: " + err.response)
                 return;
             })
 
@@ -86,7 +86,7 @@ const findJoined = (userId, data) => {
 
 const getActiveEvents = (data) => {
     let events = _.filter(data, (x) => {
-        return x['publicEvents/finalAnswerNumber'] == undefined && x['publicEvents/status'] != "reverted"
+        return x['publicEvents/finalAnswerNumber'] == undefined && x['publicEvents/status'].search("reverted") == -1
     })
     return events.length;
 }

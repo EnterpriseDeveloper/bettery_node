@@ -4,30 +4,39 @@ const Web3 = require("web3");
 const url = require("../../config/path");
 const axios = require("axios");
 const getNonce = require("../nonce/nonce");
+const statuses = require("./status");
 
 const payToExperts = async (data) => {
     console.log("from payToExperts")
     console.log(data);
     let id = data.id;
-    let mintHost = data.mintHost;
-    let payHost = data.payHost;
-    let mintAdv = data.mintAdv;
-    let payAdv = data.payAdv; 
 
-    let path = process.env.NODE_ENV
-    let contract = await ContractInit.init(path, MiddlePaymentContract);
-    try {
-        let gasEstimate = await contract.methods.letsPayToExperts(id).estimateGas();
-        let nonce = await getNonce.getNonce();
-        await contract.methods.letsPayToExperts(id).send({
-            gas: gasEstimate,
-            gasPrice: 0,
-            nonce: nonce
-        });
-
-        await setToDb(id, mintHost, payHost, mintAdv, payAdv);
-    } catch (err) {
-        console.log("err from pay to experts", err)
+    let status = await statuses.getStatus(id);
+    console.log(status)
+    if(status == "payToHost"){
+        await statuses.setStatus(id, "payToExperts")
+        let mintHost = data.mintHost;
+        let payHost = data.payHost;
+        let mintAdv = data.mintAdv;
+        let payAdv = data.payAdv; 
+    
+        let path = process.env.NODE_ENV
+        let contract = await ContractInit.init(path, MiddlePaymentContract);
+        try {
+            let gasEstimate = await contract.methods.letsPayToExperts(id).estimateGas();
+            let nonce = await getNonce.getNonce();
+            await contract.methods.letsPayToExperts(id).send({
+                gas: gasEstimate,
+                gasPrice: 0,
+                nonce: nonce
+            });
+    
+            await setToDb(id, mintHost, payHost, mintAdv, payAdv);
+        } catch (err) {
+            console.log("err from pay to experts", err)
+        }
+    }else{
+        console.log("DUPLICATE FROM payToExperts")
     }
 }
 

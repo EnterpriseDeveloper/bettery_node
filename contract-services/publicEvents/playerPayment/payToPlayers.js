@@ -6,106 +6,114 @@ const url = require("../../../config/path");
 const axios = require('axios');
 const _ = require('lodash');
 const getNonce = require("../../nonce/nonce");
+const statuses = require("../status");
 
 const payToPlayers = async (data) => {
     console.log("from payToPlayers", data)
     let id = data.id;
+    let status = await statuses.getStatus(id);
+    console.log(status)
+    if (status == "payToExperts") {
+        await statuses.setStatus(id, "payToPlayers");
+        // calculate expert win and send to DB
+        let expertPercMint = data.expertPercMint
+        let percent = data.percent
+        let expertPremiumPerc = data.expertPremiumPerc
 
-    // calculate expert win and send to DB
-    let expertPercMint = data.expertPercMint
-    let percent = data.percent
-    let expertPremiumPerc = data.expertPremiumPerc
-
-    let params = {
-        "select": [
-            "publicEvents/mintedTokens",
-            "publicEvents/premiumTokens",
-            "publicEvents/finalAnswerNumber",
-            "publicEvents/premium",
-            {
-                "publicEvents/validatorsAnswer": [
-                    "publicActivites/answer",
-                    {
-                        "publicActivites/from": [
-                            "users/_id",
-                            "users/expertReputPoins"
-                        ]
-                    }
-                ]
-            },
-            {
-                "publicEvents/parcipiantsAnswer": [
-                    "publicActivites/answer",
-                    "publicActivites/amount"
-                ]
-            }
-        ],
-        "from": Number(id)
-    }
-    let allData = await axios.post(`${url.path}/query`, params).catch(err => {
-        console.log("DB error in 'payToPlayers': " + err.response.data.message)
-        return
-    })
-
-    let mintedTokens = allData.data[0]['publicEvents/mintedTokens'];
-    let premiumTokens = allData.data[0]['publicEvents/premiumTokens'];
-    let correctAnswer = allData.data[0]['publicEvents/finalAnswerNumber'];
-
-    let { rightValidators, forSendReputation } = calculateReput(allData, correctAnswer)
-
-
-    let amountLoserToken = calculateLoserPool(allData, correctAnswer)
-
-    let allReputation = calculateAllReput(rightValidators)
-
-
-    let payToValidators = [];
-
-    if (allReputation > 0) {
-        for (let i = 0; i < rightValidators.length; i++) {
-            let reputation = reputationConvert(rightValidators[i]['publicActivites/from']['users/expertReputPoins'])
-            let amountMint = 0;
-            if (mintedTokens > 0) {
-                amountMint = expertPercMint * mintedTokens * (reputation + 1) / allReputation / 100
-            }
-
-            let payToken = amountLoserToken * percent * (reputation + 1) / allReputation / 100
-
-            let premiumAmount = 0;
-
-            if (allData.data[0]['publicEvents/premium']) {
-                premiumAmount = premiumTokens * expertPremiumPerc * (reputation + 1) / allReputation / 100
-            }
-            let obj = {
-                "_id": Number(rightValidators[i]._id),
-                "mintedToken": amountMint,
-                "payToken": payToken,
-                "premiumToken": premiumAmount === undefined ? 0 : premiumAmount
-            }
-            payToValidators.push(obj)
-
+        let params = {
+            "select": [
+                "publicEvents/mintedTokens",
+                "publicEvents/premiumTokens",
+                "publicEvents/finalAnswerNumber",
+                "publicEvents/premium",
+                {
+                    "publicEvents/validatorsAnswer": [
+                        "publicActivites/answer",
+                        {
+                            "publicActivites/from": [
+                                "users/_id",
+                                "users/expertReputPoins"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "publicEvents/parcipiantsAnswer": [
+                        "publicActivites/answer",
+                        "publicActivites/amount"
+                    ]
+                }
+            ],
+            "from": Number(id)
         }
-    }else{
-        // TODO add to db percent of expert to the Marketing Fund 
-        console.log("ALL validators have minus reputation");
-    }
+        let allData = await axios.post(`${url.path}/query`, params).catch(err => {
+            console.log("DB error in 'payToPlayers': " + err.response.data.message)
+            return
+        })
+
+        let mintedTokens = allData.data[0]['publicEvents/mintedTokens'];
+        let premiumTokens = allData.data[0]['publicEvents/premiumTokens'];
+        let correctAnswer = allData.data[0]['publicEvents/finalAnswerNumber'];
+
+        let { rightValidators, forSendReputation } = calculateReput(allData, correctAnswer)
 
 
-    await sendToDb(payToValidators.concat(forSendReputation))
+        let amountLoserToken = calculateLoserPool(allData, correctAnswer)
 
-    let path = process.env.NODE_ENV
-    let contract = await ContractInit.init(path, PlayerPaymentContract);
-    try {
-        let gasEstimate = await contract.methods.letsPayToPlayers(id).estimateGas();
-        let nonce = await getNonce.getNonce();
-        await contract.methods.letsPayToPlayers(id).send({
-            gas: gasEstimate,
-            gasPrice: 0,
-            nonce: nonce
-        });
+        let allReputation = calculateAllReput(rightValidators)
 
-    } catch (err) {
-        console.log("err from pay to players", err)
+
+        let payToValidators = [];
+
+        if (allReputation > 0) {
+            for (let i = 0; i < rightValidators.length; i++) {
+                let reputation = reputationConvert(rightValidators[i]['publicActivites/from']['users/expertReputPoins'])
+                let amountMint = 0;
+                if (mintedTokens > 0) {
+                    amountMint = expertPercMint * mintedTokens * (reputation + 1) / allReputation / 100
+                }
+
+                let payToken = amountLoserToken * percent * (reputation + 1) / allReputation / 100
+
+                let premiumAmount = 0;
+
+                if (allData.data[0]['publicEvents/premium']) {
+                    premiumAmount = premiumTokens * expertPremiumPerc * (reputation + 1) / allReputation / 100
+                }
+                let obj = {
+                    "_id": Number(rightValidators[i]._id),
+                    "mintedToken": amountMint,
+                    "payToken": payToken,
+                    "premiumToken": premiumAmount === undefined ? 0 : premiumAmount
+                }
+                payToValidators.push(obj)
+
+            }
+        } else {
+            // TODO add to db percent of expert to the Marketing Fund 
+            console.log("ALL validators have minus reputation");
+        }
+
+
+        await sendToDb(payToValidators.concat(forSendReputation))
+
+        let path = process.env.NODE_ENV
+        let contract = await ContractInit.init(path, PlayerPaymentContract);
+        try {
+            let gasEstimate = await contract.methods.letsPayToPlayers(id).estimateGas();
+            let nonce = await getNonce.getNonce();
+            await contract.methods.letsPayToPlayers(id).send({
+                gas: gasEstimate,
+                gasPrice: 0,
+                nonce: nonce
+            });
+
+        } catch (err) {
+            console.log("err from pay to players", err)
+        }
+
+    } else {
+        console.log("Duplicate from payToPlayers")
     }
 }
 

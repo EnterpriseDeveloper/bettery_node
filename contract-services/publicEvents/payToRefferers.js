@@ -5,56 +5,65 @@ const url = require("../../config/path");
 const _ = require("lodash");
 const Web3 = require("web3");
 const getNonce = require("../nonce/nonce");
+const statuses = require("./status");
 
 const payToRefferers = async (data) => {
     console.log("from payToRefferers")
     console.log(data);
-    let path = process.env.NODE_ENV
-    let contract = await ContractInit.init(path, PlayerPaymentContract);
 
     let id = data.id;
-    let getPlayers = await fetchDataFromDb(id);
-
-    let mintedTokens = Number(getPlayers.data[0]["publicEvents/mintedTokens"]);
-    let players = getPlayers.data[0]["publicEvents/parcipiantsAnswer"];
-    const ref = letFindAllRef(players);
-    let refAmount = getRefAmount(ref);
-    let contrPercet = await getPercentFromContract(contract)
-    let allData = calcTokens(ref, refAmount, mintedTokens, contrPercet);
-    let fakeAddr = await contract.methods.fakeAddr().call();
-    let { payRefAddr, payRefAmount, payComp } = getRefStruct(allData, fakeAddr, refAmount, mintedTokens, contrPercet);
-
-    try {
-        let gasEstimate = await contract.methods.payToReff(
-            id,
-            payRefAddr[0],
-            payRefAmount[0],
-            payRefAddr[1],
-            payRefAmount[1],
-            payRefAddr[2],
-            payRefAmount[2],
-            payComp
-        ).estimateGas();
-        let nonce = await getNonce.getNonce();
-        await contract.methods.payToReff(
-            id,
-            payRefAddr[0],
-            payRefAmount[0],
-            payRefAddr[1],
-            payRefAmount[1],
-            payRefAddr[2],
-            payRefAmount[2],
-            payComp
-        ).send({
-            gas: gasEstimate,
-            gasPrice: 0,
-            nonce: nonce
-        });
-
-        // TODO add to db ref payments
-    } catch (err) {
-        console.log("err from pay to pay to refferers", err)
+    let status = await statuses.getStatus(id);
+    console.log(status)
+    if(status == "payToLosers"){
+        await statuses.setStatus(id, "payToRefferers");
+        let path = process.env.NODE_ENV
+        let contract = await ContractInit.init(path, PlayerPaymentContract);
+        let getPlayers = await fetchDataFromDb(id);
+    
+        let mintedTokens = Number(getPlayers.data[0]["publicEvents/mintedTokens"]);
+        let players = getPlayers.data[0]["publicEvents/parcipiantsAnswer"];
+        const ref = letFindAllRef(players);
+        let refAmount = getRefAmount(ref);
+        let contrPercet = await getPercentFromContract(contract)
+        let allData = calcTokens(ref, refAmount, mintedTokens, contrPercet);
+        let fakeAddr = await contract.methods.fakeAddr().call();
+        let { payRefAddr, payRefAmount, payComp } = getRefStruct(allData, fakeAddr, refAmount, mintedTokens, contrPercet);
+    
+        try {
+            let gasEstimate = await contract.methods.payToReff(
+                id,
+                payRefAddr[0],
+                payRefAmount[0],
+                payRefAddr[1],
+                payRefAmount[1],
+                payRefAddr[2],
+                payRefAmount[2],
+                payComp
+            ).estimateGas();
+            let nonce = await getNonce.getNonce();
+            await contract.methods.payToReff(
+                id,
+                payRefAddr[0],
+                payRefAmount[0],
+                payRefAddr[1],
+                payRefAmount[1],
+                payRefAddr[2],
+                payRefAmount[2],
+                payComp
+            ).send({
+                gas: gasEstimate,
+                gasPrice: 0,
+                nonce: nonce
+            });
+    
+            // TODO add to db ref payments
+        } catch (err) {
+            console.log("err from pay to pay to refferers", err)
+        }
+    }else{
+        console.log("Duplicate from payToRefferers")
     }
+   
 }
 
 const fetchDataFromDb = async (id) => {
