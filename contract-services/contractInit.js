@@ -22,7 +22,16 @@ async function webSoketInit(networkWay, contract) {
     let network = networkWay == "production" ? networkConfig.matciMainWSS : networkConfig.maticMumbaiWSS,
         networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId,
         keys = networkWay == "production" ? require("./keys/prod/privKey") : require("./keys/test/privKey");
-    return await connectToNetwork(network, networkId, contract, keys);
+        const options = {
+            // Enable auto reconnection
+            reconnect: {
+                auto: true,
+                delay: 5000, // ms
+                maxAttempts: 5,
+                onTimeout: false
+            }
+          };
+    return await connectToNetwork(new Web3.providers.WebsocketProvider(network, options), networkId, contract, keys);
 }
 
 async function connectToNetwork(network, networkId, contract, keys) {
@@ -32,14 +41,8 @@ async function connectToNetwork(network, networkId, contract, keys) {
     return new web3.eth.Contract(abi, address, { from: account });
 }
 
-async function webSocketCheck(networkWay){
-    let network = networkWay == "production" ? networkConfig.matciMainWSS : networkConfig.maticMumbaiWSS;
-    return new Web3.providers.WebsocketProvider(network)
-}
-
 module.exports = {
     init,
-    webSoketInit,
-    webSocketCheck
+    webSoketInit
 }
 
