@@ -10,7 +10,7 @@ const mintTokens = async (address) => {
     let nonce = await getNonce.getNonce();
     let gasEstimate = await betteryContract.methods.mint(address).estimateGas();
     return await betteryContract.methods.mint(address).send({
-        gas: gasEstimate,
+        gas: Number((((gasEstimate * 5) / 100) + gasEstimate).toFixed(0)),
         gasPrice: 0,
         nonce: nonce
     });

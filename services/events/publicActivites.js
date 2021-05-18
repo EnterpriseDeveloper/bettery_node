@@ -50,7 +50,7 @@ const participate = async (req, res) => {
             tokens,
             wallet
         ).send({
-            gas: gasEstimate,
+            gas: Number((((gasEstimate * 5) / 100) + gasEstimate).toFixed(0)),
             gasPrice: 0,
             nonce: nonce
         });
@@ -138,7 +138,7 @@ const validate = async (req, res) => {
             wallet,
             reputation
         ).send({
-            gas: gasEstimate,
+            gas: Number((((gasEstimate * 5) / 100) + gasEstimate).toFixed(0)),
             gasPrice: 0,
             nonce: nonce
         });

@@ -21,7 +21,7 @@ const payToLosers = async (data) => {
             let gasEstimate = await contract.methods.letsPayToLoosers(id, avarageBet, calcMintedToken).estimateGas();
             let nonce = await getNonce.getNonce();
             await contract.methods.letsPayToLoosers(id, avarageBet, calcMintedToken).send({
-                gas: gasEstimate,
+                gas: Number((((gasEstimate * 5) / 100) + gasEstimate).toFixed(0)),
                 gasPrice: 0,
                 nonce: nonce
             });
