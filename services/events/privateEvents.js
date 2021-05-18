@@ -7,6 +7,8 @@ const contractInit = require("../../contract-services/contractInit");
 const PrivateEvents = require("../../contract-services/abi/PrivateEvents.json");
 const userData = require("../../helpers/userData");
 const getNonce = require("../../contract-services/nonce/nonce");
+const helpers = require("../../helpers/helpers");
+const getRoom = require("../rooms/getRoom");
 
 const createPrivateEvent = async (req, res) => {
     let allData = req.body;
@@ -15,6 +17,22 @@ const createPrivateEvent = async (req, res) => {
     allData._id = id;
     allData.finalAnswer = '';
     allData.dateCreation = Math.floor(Date.now() / 1000)
+
+    if (req.body.thumImage !== "undefined") {
+        let type = await helpers.uploadImage(req.body.thumImage, id);
+        allData.thumImage = `https://api.bettery.io/image/${id}.${type}`;
+        delete allData.thumColor;
+    } else if (req.body.thumColor !== "undefined") {
+        delete allData.thumImage;
+    } else if (req.body.thumColor === "undefined" && req.body.thumImage === "undefined") {
+        delete allData.thumImage;
+        if (whichRoom == "new") {
+            allData.thumColor = req.body.roomColor;
+        } else {
+            allData.thumColor = await getRoom.getRoomColor(allData.roomId);
+        }
+    }
+
 
     delete allData.prodDev;
     let data;

@@ -2,6 +2,7 @@ const axios = require("axios");
 const path = require("../../config/path");
 const _ = require("lodash");
 const createRoom = require('../rooms/createRoom');
+const getRoom = require("../rooms/getRoom");
 const structire = require('../../structure/event.struct');
 const filterData = require('../../helpers/filter');
 const sortData = require('../../helpers/sorting');
@@ -11,6 +12,7 @@ const contractInit = require("../../contract-services/contractInit");
 const PublicEvents = require("../../contract-services/abi/PublicEvents.json");
 const userData = require("../../helpers/userData");
 const getNonce = require("../../contract-services/nonce/nonce");
+const helpers = require("../../helpers/helpers");
 
 const createEvent = async (req, res) => {
     let dateNow = Number((new Date().getTime() / 1000).toFixed(0))
@@ -55,6 +57,23 @@ const createEvent = async (req, res) => {
         });
         if (transaction) {
             let allData = req.body
+
+            // upload image
+            if (req.body.thumImage !== "undefined") {
+                let type = await helpers.uploadImage(req.body.thumImage ,id);
+                allData.thumImage = `https://api.bettery.io/image/${id}.${type}`;
+                delete allData.thumColor;
+            } else if (req.body.thumColor !== "undefined") {
+                delete allData.thumImage;
+            } else if (req.body.thumColor === "undefined" && req.body.thumImage === "undefined") {
+                delete allData.thumImage;
+                if (whichRoom == "new") {
+                    allData.thumColor = req.body.roomColor;
+                } else {
+                    allData.thumColor = await getRoom.getRoomColor(roomId);
+                }
+            }
+
             let hashtagsId = req.body.hashtagsId;
             let hostId = allData.host;
             let roomId = allData.roomId;
@@ -278,7 +297,7 @@ const getBetteryEvent = async (req, res) => {
             let conf = {
                 "select": ["publicEvents/question", "_id", "publicEvents/startTime", "room"],
                 "where": `publicEvents/host = ${id}`,
-                "opts": {"orderBy": ["DESC", "publicEvents/startTime"]}
+                "opts": { "orderBy": ["DESC", "publicEvents/startTime"] }
             }
             let data = await axios.post(path.path + "/query", conf).catch((err) => {
                 res.status(400);

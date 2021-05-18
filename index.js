@@ -41,9 +41,10 @@ var cors = require('cors');
 app.use(cors({
     origin: "*"
 }))
-app.use(bodyParser.json());
-app.use(bodyParser.text());
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.text({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({
+    limit: '50mb',
     extended: true
 }));
 var httpServer = http.createServer(app);
@@ -60,6 +61,7 @@ require('./services/history')(app);
 require('./services/users')(app);
 require('./services/rooms')(app);
 require('./services/subscribe')(app);
+require('./services/image')(app);
 require('./contract-services/tokensale')(app);
 
 httpServer.listen(80, async () => {
