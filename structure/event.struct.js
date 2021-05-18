@@ -21,6 +21,8 @@ const publicEventStructure = (data) => {
                 mintedAdvisorAmount: z['publicEvents/mintedAdvisorAmount'] === undefined ? 0 : z['publicEvents/mintedAdvisorAmount'],
                 payAdvisorAmount: z['publicEvents/payAdvisorAmount'] === undefined ? 0 : z['publicEvents/payAdvisorAmount']
             },
+            thumImage: z['publicEvents/thumImage'] === undefined ? "undefined" : z['publicEvents/thumImage'],
+            thumColor: z['publicEvents/thumColor'] === undefined ? "undefined" : z['publicEvents/thumColor'],
             validated: z['publicEvents/validated'],
             status: z['publicEvents/status'],
             answers: z['publicEvents/answers'],
@@ -86,6 +88,8 @@ const privateEventStructure = (data) => {
                 avatat: z['privateEvents/host']['users/avatar'],
                 wallet: z['privateEvents/host']['users/wallet']
             },
+            thumImage: z['privateEvents/thumImage'] === undefined ? "undefined" : z['privateEvents/thumImage'],
+            thumColor: z['privateEvents/thumColor'] === undefined ? "undefined" : z['privateEvents/thumColor'],
             finalAnswer: z["privateEvents/finalAnswer"],
             finalAnswerNumber: z["privateEvents/finalAnswerNumber"],
             parcipiantAnswers: z["privateEvents/parcipiantsAnswer"] === undefined ? undefined : z["privateEvents/parcipiantsAnswer"].map((par) => {
