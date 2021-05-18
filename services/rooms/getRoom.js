@@ -40,7 +40,7 @@ const getAllRooms = async (req, res) => {
     // filter rooms with private events
     let data = _.filter(obj, (x) => { return x.publicEventsId.length != 0 })
 
-    for(let i = 0; i < data.length; i++){
+    for (let i = 0; i < data.length; i++) {
         data[i].publicEventsId = data[i].publicEventsId.reverse();
     }
     res.status(200)
@@ -107,11 +107,26 @@ const getJoinedRoom = async (req, res) => {
     }
 }
 
+const getRoomColor = async (id) => {
+    const config = {
+        "select": ["room/roomColor"],
+        "from": Number(id)
+    }
+
+    let data = await axios.post(`${path.path}/query`, config).catch(err => {
+        console.log("err from get room color: " + err.response)
+        return;
+    })
+
+    return data.data[0]["room/roomColor"]
+}
+
 
 
 module.exports = {
     getByUserId,
     roomValidation,
     getAllRooms,
-    getJoinedRoom
+    getJoinedRoom,
+    getRoomColor
 }
