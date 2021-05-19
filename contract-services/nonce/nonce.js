@@ -6,6 +6,19 @@ const url = require("../../config/path");
 
 const nonceInit = async () => {
     let { account, web3 } = await getAccount();
+
+    // get Pending transaction
+    //   const getPendingTransaction = () => {
+    //     web3.eth.getPendingTransactions((err, pendingTxs) => {
+    //         console.log(err)
+    //       console.log('Pending transactions are: ', pendingTxs);
+    //       // In case if you want to return pendingTxs
+    //       return pendingTxs;
+    //     });
+    //   }
+
+    //   getPendingTransaction();
+
     let nonce = await web3.eth.getTransactionCount(account);
     let getNonceConfig = {
         "select": ["*"],

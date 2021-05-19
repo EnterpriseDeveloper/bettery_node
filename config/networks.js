@@ -5,8 +5,8 @@ const maticMain = `https://wispy-spring-star.matic.quiknode.pro/${keys.quiknode}
 const matciMainWSS = `wss://wispy-spring-star.matic.quiknode.pro/${keys.quiknode}/`;
 const maticMainId = 137;
 // Mumbai
-const maticMumbaiHttps = 'https://matic-testnet-archive-rpc.bwarelabs.com';
-const maticMumbaiWSS = 'wss://ws-mumbai.matic.today';
+const maticMumbaiHttps = 'https://matic-mumbai.chainstacklabs.com';
+const maticMumbaiWSS = 'wss://ws-matic-mumbai.chainstacklabs.com';
 const maticMumbaiId = 80001;
 // Goerli
 const goerli = `https://goerli.infura.io/v3/${keys.infura}`;

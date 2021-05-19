@@ -20,7 +20,8 @@ const createPrivateEvent = async (req, res) => {
 
     if (req.body.thumImage !== "undefined") {
         let type = await helpers.uploadImage(req.body.thumImage, id);
-        allData.thumImage = `https://api.bettery.io/image/${id}.${type}`;
+        let url = process.env.NODE_ENV == "production" ? "http://api.bettery.io" : `http://13.229.200.135`
+        allData.thumImage = `${url}/image/${id}.${type}`;
         delete allData.thumColor;
     } else if (req.body.thumColor !== "undefined") {
         delete allData.thumImage;

@@ -59,14 +59,15 @@ const createEvent = async (req, res) => {
             let allData = req.body
 
             // upload image
-            if (req.body.thumImage !== "undefined") {
+            if (req.body.thumImage != "undefined") {
                 let type = await helpers.uploadImage(req.body.thumImage ,id);
-                allData.thumImage = `https://api.bettery.io/image/${id}.${type}`;
-                delete allData.thumColor;
-            } else if (req.body.thumColor !== "undefined") {
-                delete allData.thumImage;
+                let url = process.env.NODE_ENV == "production" ? "http://api.bettery.io" : `http://13.229.200.135`
+                allData.thumImage = `${url}/image/${id}.${type}`;
+                allData.thumColor = undefined;
+            } else if (req.body.thumColor != "undefined") {
+                allData.thumImage = undefined;
             } else if (req.body.thumColor === "undefined" && req.body.thumImage === "undefined") {
-                delete allData.thumImage;
+                allData.thumImage = undefined;
                 if (whichRoom == "new") {
                     allData.thumColor = req.body.roomColor;
                 } else {
@@ -158,10 +159,10 @@ const createEvent = async (req, res) => {
     } catch (err) {
         console.log(err);
         // remove event id
-        let removeEvent = {
+        let removeEvent = [{
             _id: id,
             _action: 'delete',
-        }
+        }]
         axios.post(`${path.path}/transact`, removeEvent)
             .catch((err) => {
                 console.log("DB error: " + err.response.data.message)
