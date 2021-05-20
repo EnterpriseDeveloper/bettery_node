@@ -8,12 +8,12 @@
     "start": "NODE_TEST=false NODE_ENV=test node index.js",
     "start_prod": "NODE_TEST=false NODE_ENV=production node index.js",
     "forever": "NODE_TEST=false NODE_ENV=test nohup node server.js > output.log &",
-    "forever_prod": "NODE_TEST=false NODE_ENV=production nohup node server_prod.js > output.log &",
+    "forever_prod": "NODE_TEST=false NODE_ENV=production nohup node server_prod.js > outputData.log &",
     "build": "webpack --mode=development --config webpack.config.js",
     "build_prod": "webpack --mode=production --config webpack.production.config.js"
   },
   "engines": {
-    "node": "v8.12.0"
+    "node": "v12.20.1"
   },
   "author": "",
   "license": "ISC",

@@ -22,7 +22,7 @@ const publicEventStructure = (data) => {
                 payAdvisorAmount: z['publicEvents/payAdvisorAmount'] === undefined ? 0 : z['publicEvents/payAdvisorAmount']
             },
             thumImage: z['publicEvents/thumImage'] === undefined ? "undefined" : z['publicEvents/thumImage'],
-            thumColor: z['publicEvents/thumColor'] === undefined ? z['publicEvents/room'][0]['room/color'] : z['publicEvents/thumColor'],
+            thumColor: getPublicColor(z),
             validated: z['publicEvents/validated'],
             status: z['publicEvents/status'],
             answers: z['publicEvents/answers'],
@@ -88,8 +88,8 @@ const privateEventStructure = (data) => {
                 avatat: z['privateEvents/host']['users/avatar'],
                 wallet: z['privateEvents/host']['users/wallet']
             },
-            thumImage: z['privateEvents/thumImage'] === undefined ? "undefined": z['privateEvents/thumImage'],
-            thumColor: z['privateEvents/thumColor'] === undefined ? z['privateEvents/room'][0]['room/name'] : z['privateEvents/thumColor'],
+            thumImage: z['privateEvents/thumImage'] === undefined ? "undefined" : z['privateEvents/thumImage'],
+            thumColor: getPrivateColor(z),
             finalAnswer: z["privateEvents/finalAnswer"],
             finalAnswerNumber: z["privateEvents/finalAnswerNumber"],
             parcipiantAnswers: z["privateEvents/parcipiantsAnswer"] === undefined ? undefined : z["privateEvents/parcipiantsAnswer"].map((par) => {
@@ -118,6 +118,23 @@ const privateEventStructure = (data) => {
             }
         }
     })
+}
+
+const getPublicColor = (z) => {
+    if (z['publicEvents/thumImage'] === undefined) {
+        return z['publicEvents/thumColor'] === undefined ? z['publicEvents/room'][0]['room/color'] : z['publicEvents/thumColor']
+    } else {
+        return "undefined"
+    }
+}
+
+const getPrivateColor = (z) => {
+    if (z['privateEvents/thumImage'] === undefined) {
+        return z['privateEvents/thumColor'] === undefined ? z['privateEvents/room'][0]['room/color'] : z['privateEvents/thumColor'];
+    } else {
+        return "undefined"
+    }
+
 }
 
 module.exports = {

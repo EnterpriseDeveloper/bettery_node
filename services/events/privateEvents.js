@@ -22,11 +22,11 @@ const createPrivateEvent = async (req, res) => {
         let type = await helpers.uploadImage(req.body.thumImage, id);
         let url = process.env.NODE_ENV == "production" ? "http://api.bettery.io" : `http://13.229.200.135`
         allData.thumImage = `${url}/image/${id}.${type}`;
-        delete allData.thumColor;
+        allData.thumColor = undefined;
     } else if (req.body.thumColor !== "undefined") {
-        delete allData.thumImage;
+        allData.thumImage = undefined;
     } else if (req.body.thumColor === "undefined" && req.body.thumImage === "undefined") {
-        delete allData.thumImage;
+        allData.thumImage = undefined;
         if (whichRoom == "new") {
             allData.thumColor = req.body.roomColor;
         } else {
