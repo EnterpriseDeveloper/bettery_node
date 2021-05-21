@@ -29,7 +29,7 @@ const torusRegist = async (req, res) => {
             "nickName": req.body.nickName,
             "email": req.body.email,
             "wallet": wallet,
-            "avatar": req.body.avatar,
+            "avatar": req.body.avatar == "" ? 'https://api.bettery.io/image/avatar.png' : req.body.avatar,
             "verifier": req.body.verifier,
             "verifierId": req.body.verifierId
         }]
