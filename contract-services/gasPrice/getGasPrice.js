@@ -7,9 +7,8 @@ const getGasPrice = async () =>{
     let data = await axios.get(path).catch((err)=>{
        console.log("get gas price err: " + err)
     })
-
-//    console.log(data.data)
-    return data.data.fast
+    console.log(data.data.fast)
+    return Number(data.data.fast)
 }
 
 module.exports = {

@@ -60,7 +60,7 @@ const revertEvent = async (eventId, participant, purpose) => {
             const gasEstimate = await betteryContract.methods.revertedPayment(eventId, purpose).estimateGas();
             let nonce = await getNonce.getNonce();
             await betteryContract.methods.revertedPayment(eventId, purpose).send({
-                gas: Number((((gasEstimate * 5) / 100) + gasEstimate).toFixed(0)),
+                gas: gasEstimate * 2,
                 gasPrice: 0,
                 nonce: nonce
             });

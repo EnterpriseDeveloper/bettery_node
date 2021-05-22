@@ -51,7 +51,7 @@ const createEvent = async (req, res) => {
         let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).estimateGas();
         let nonce = await getNonce.getNonce();
         let transaction = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).send({
-            gas: Number((((gasEstimate * 5) / 100) + gasEstimate).toFixed(0)),
+            gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
             gasPrice: 0,
             nonce: nonce
         });
@@ -60,7 +60,7 @@ const createEvent = async (req, res) => {
 
             // upload image
             if (req.body.thumImage != "undefined") {
-                let type = await helpers.uploadImage(req.body.thumImage ,id);
+                let type = await helpers.uploadImage(req.body.thumImage, id);
                 let url = process.env.NODE_ENV == "production" ? "http://api.bettery.io" : `http://13.229.200.135`
                 allData.thumImage = `${url}/image/${id}.${type}`;
                 allData.thumColor = undefined;
