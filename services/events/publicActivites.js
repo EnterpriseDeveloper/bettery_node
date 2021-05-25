@@ -6,6 +6,7 @@ const userData = require("../../helpers/userData");
 const Web3 = require("web3");
 const getNonce = require("../../contract-services/nonce/nonce");
 const limit = require("../../config/limits");
+const getGasPrice = require("../../contract-services/gasPrice/getGasPrice");
 
 const participate = async (req, res) => {
     let web3 = new Web3();
@@ -37,6 +38,7 @@ const participate = async (req, res) => {
         let contract = await contractInit.init(pathContr, PublicEvents)
         let tokens = web3.utils.toWei(String(amount), "ether");
 
+        let gasPrice = await getGasPrice.getGasPrice();
         let gasEstimate = await contract.methods.setAnswer(
             eventId,
             answerIndex,
@@ -51,7 +53,7 @@ const participate = async (req, res) => {
             wallet
         ).send({
             gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: 0,
+            gasPrice: gasPrice,
             nonce: nonce
         });
 
@@ -125,6 +127,7 @@ const validate = async (req, res) => {
         let pathContr = process.env.NODE_ENV;
         let contract = await contractInit.init(pathContr, PublicEvents)
 
+        let gasPrice = await getGasPrice.getGasPrice();
         let gasEstimate = await contract.methods.setValidator(
             eventId,
             answer,
@@ -139,7 +142,7 @@ const validate = async (req, res) => {
             reputation
         ).send({
             gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: 0,
+            gasPrice: gasPrice,
             nonce: nonce
         });
         if (transaction) {

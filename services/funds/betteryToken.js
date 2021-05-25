@@ -3,15 +3,17 @@ const path = require("../../config/path")
 const contractInit = require("../../contract-services/contractInit");
 const BET = require("../../contract-services/abi/BET.json");
 const getNonce = require("../../contract-services/nonce/nonce");
+const getGasPrice = require("../../contract-services/gasPrice/getGasPrice");
 
 const mintTokens = async (address) => {
     let pathContr = process.env.NODE_ENV;  
     let betteryContract = await contractInit.init(pathContr, BET)
+    let gasPrice = await getGasPrice.getGasPrice();
     let nonce = await getNonce.getNonce();
     let gasEstimate = await betteryContract.methods.mint(address).estimateGas();
     return await betteryContract.methods.mint(address).send({
         gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
-        gasPrice: 0,
+        gasPrice: gasPrice,
         nonce: nonce
     });
 }
