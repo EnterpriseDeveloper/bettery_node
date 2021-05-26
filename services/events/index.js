@@ -5,6 +5,7 @@ const publicActivites = require("./publicActivites");
 const eventLimitPrivate = require('../../middlewares/eventLimitsPrivate')
 const eventLimitPublic = require('../../middlewares/eventLimitsPublic')
 const revert = require("./revert");
+const contract = require("../../contract-services/publicEvents/findCorrectAnswer")
 
 module.exports = app => {
     app.post("/publicEvents/createEvent", eventLimitPublic, async (req, res) => {
@@ -51,5 +52,16 @@ module.exports = app => {
 
     app.post("/bettery_event", async (req, res) => {
         publicEvents.getBetteryEvent(req, res)
+    })
+
+    app.post("/public_event/finishEvent", async (req, res) => {
+        let id = req.body.id
+        let data = {
+            id: id
+        }
+
+        await contract.findCorrectAnswer(data);
+        res.status(200);
+        res.send({status: "OK"});
     })
 }
