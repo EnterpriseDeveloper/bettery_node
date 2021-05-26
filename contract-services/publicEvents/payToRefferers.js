@@ -20,7 +20,7 @@ const payToRefferers = async (data) => {
         let contract = await ContractInit.init(path, PlayerPaymentContract);
         let getPlayers = await fetchDataFromDb(id);
     
-        let mintedTokens = Number(getPlayers.data[0]["publicEvents/mintedTokens"]);
+        let mintedTokens = Number(getPlayers.data[0]["mintedTokens"]);
         let players = getPlayers.data[0]["publicEvents/parcipiantsAnswer"];
         const ref = letFindAllRef(players);
         let refAmount = getRefAmount(ref);
