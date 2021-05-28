@@ -22,16 +22,22 @@ async function webSoketInit(networkWay, contract) {
     let network = networkWay == "production" ? networkConfig.matciMainWSS : networkConfig.maticMumbaiWSS,
         networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId,
         keys = networkWay == "production" ? require("./keys/prod/privKey") : require("./keys/test/privKey");
-        const options = {
-            // Enable auto reconnection
-            reconnect: {
-                auto: true,
-                delay: 5000, // ms
-                maxAttempts: 5,
-                onTimeout: false
-            }
-          };
-    return await connectToNetwork(new Web3.providers.WebsocketProvider(network, options), networkId, contract, keys);
+    let options = {
+        // Enable auto reconnection
+        reconnect: {
+            auto: true,
+            delay: 1000, // ms
+            maxAttempts: 10,
+            onTimeout: false
+        }
+    };
+    let provider = new Web3.providers.WebsocketProvider(network, options);
+    provider.on('error', e => console.log('WS Error', e));
+    provider.on('end', e => {
+        console.log(e);
+        console.log('WS closed');
+    });
+    return await connectToNetwork(provider, networkId, contract, keys);
 }
 
 async function connectToNetwork(network, networkId, contract, keys) {
