@@ -18,4 +18,10 @@ module.exports = app => {
     app.post("/user/event_activites", async (req, res) =>{
         await myActivites.getAllUserEvents(req, res);
     })
+
+    app.get("/user/delete_account", async (req, res) =>{
+        // TODO
+        res.status(200);
+        res.send({status: "ok"})
+    })
 }
