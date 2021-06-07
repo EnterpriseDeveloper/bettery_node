@@ -1,74 +1,18 @@
 const Web3 = require("web3");
 const networkConfig = require("../../config/networks");
-const axios = require("axios");
-const url = require("../../config/path");
+
+var Nonce = 0;
 
 
 const nonceInit = async () => {
     let { account, web3 } = await getAccount();
-
-    // get Pending transaction
-    //   const getPendingTransaction = () => {
-    //     web3.eth.getPendingTransactions((err, pendingTxs) => {
-    //         console.log(err)
-    //       console.log('Pending transactions are: ', pendingTxs);
-    //       // In case if you want to return pendingTxs
-    //       return pendingTxs;
-    //     });
-    //   }
-
-    //   getPendingTransaction();
-
-    let nonce = await web3.eth.getTransactionCount(account);
-    let getNonceConfig = {
-        "select": ["*"],
-        "from": "configuration"
-    }
-
-    let getNonce = await axios.post(`${url.path}/query`, getNonceConfig).catch((err) => {
-        console.log("get nonce err: " + err);
-    })
-
-    if (getNonce.data.length != 0) {
-        let setNonce = [{
-            "_id": getNonce.data[0]["_id"],
-            "nonce": nonce
-        }]
-        return await axios.post(`${url.path}/transact`, setNonce).catch((err) => {
-            console.log("set nonce err: " + err);
-        })
-
-    } else {
-        let setNonce = [{
-            "_id": "configuration$newConfig",
-            "nonce": nonce
-        }]
-        return await axios.post(`${url.path}/transact`, setNonce).catch((err) => {
-            console.log("set new nonce err: " + err);
-        })
-    }
+    Nonce = await web3.eth.getTransactionCount(account);
 }
 
-const getNonce = async () => {
-    let getNonceConfig = {
-        "select": ["*"],
-        "from": "configuration"
-    }
-
-    let getNonce = await axios.post(`${url.path}/query`, getNonceConfig).catch((err) => {
-        console.log("get nonce err: " + err);
-    })
-
-    let nonce = getNonce.data[0]['configuration/nonce'];
-    let setNonce = [{
-        "_id": getNonce.data[0]["_id"],
-        "nonce": nonce + 1
-    }]
-    await axios.post(`${url.path}/transact`, setNonce).catch((err) => {
-        console.log("set nonce err: " + err);
-    })
-
-    return nonce;
+const getNonce = () => {
+    let x = Nonce;
+    Nonce++;
+    return x;
 }
 
 const getAccount = async () => {

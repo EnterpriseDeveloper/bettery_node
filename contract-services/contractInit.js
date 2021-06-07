@@ -23,11 +23,22 @@ async function webSoketInit(networkWay, contract) {
         networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId,
         keys = networkWay == "production" ? require("./keys/prod/privKey") : require("./keys/test/privKey");
     let options = {
+        timeout: 30000, // ms
+
+        clientConfig: {
+            // Useful if requests are large
+            maxReceivedFrameSize: 100000000,   // bytes - default: 1MiB
+            maxReceivedMessageSize: 100000000, // bytes - default: 8MiB
+
+            // Useful to keep a connection alive
+            keepalive: true,
+            keepaliveInterval: -1 // ms
+        },
         // Enable auto reconnection
         reconnect: {
             auto: true,
             delay: 1000, // ms
-            maxAttempts: 10,
+            maxAttempts: 20,
             onTimeout: false
         }
     };
