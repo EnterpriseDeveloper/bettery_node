@@ -7,12 +7,14 @@ const torusRegist = async (req, res) => {
 
     let wallet = req.body.wallet;
     let refId = req.body.refId;
+    let email = req.body.email;
+    let verifierId = getVerifier(req.body.verifierId);
 
     let findEmail = {
         "select": ["*",
             { "users/historyTransactions": ["*"] }
         ],
-        "from": ["users/email", req.body.email]
+        "from": email ? ["users/email", req.body.email] : ["users/nickName", req.body.nickName]
     }
 
     let user = await axios.post(`${path.path}/query`, findEmail)
@@ -23,6 +25,7 @@ const torusRegist = async (req, res) => {
         })
 
     if (user.data.length === 0) {
+        // TODO move token from old account to new
 
         let data = [{
             "_id": "users$newUser",
@@ -31,7 +34,7 @@ const torusRegist = async (req, res) => {
             "wallet": wallet,
             "avatar": req.body.avatar == "" ? 'https://api.bettery.io/image/avatar.png' : req.body.avatar,
             "verifier": req.body.verifier,
-            "verifierId": req.body.verifierId
+            "linkedAccounts": [verifierId]
         }]
 
         if (!isNaN(refId)) {
@@ -67,14 +70,39 @@ const torusRegist = async (req, res) => {
         })
 
     } else {
-        let userStruct = structure.userStructure(user.data)
+        // TODO check if account exist return error
+        let userStruct = structure.userStructure(user.data);
+
+        // update link account
+        let update = [{
+            "_id": userStruct[0]._id,
+            "linkedAccounts": [verifierId]
+        }]
+        await axios.post(`${path.path}/transact`, update).catch((err) => {
+            console.log(err)
+            res.status(400);
+            res.send(err.response.data.message);
+            return;
+        })
+
         res.status(200);
         res.send(userStruct[0]);
     }
-
 }
 
-let checkUserById = async (id, res) => {
+const getVerifier = (x) => {
+    if (x.search("google-oauth2") != -1) {
+        return "google";
+    } else if (x.search("oauth2") != -1) {
+        return x.split('|')[1];
+    } else {
+        return x.split('|')[0];
+    }
+}
+
+
+
+const checkUserById = async (id, res) => {
     let findUser = {
         "select": ["*"],
         "from": Number(id)

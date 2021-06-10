@@ -49,8 +49,32 @@ const allUsers = (req, res) => {
     })
 }
 
+const additionalInfo = async (req, res) => {
+    let conf = {
+        "select": ["*",
+            { "historyTransactions": ["*"] }
+        ],
+        "from": Number(req.body.id)
+    }
+
+    let data = await axios.post(path.path + "/query", conf).catch((err) => {
+        res.status(400);
+        res.send(err.response.data.message);
+        return;
+    })
+
+    // TODO add referer, location, language, share data, public/private email
+    let x = data.data[0];
+    let user = {
+        linkedAccounts: x['users/linkedAccounts'] == undefined ? [] : x['users/linkedAccounts'],
+    }
+    res.status(200);
+    res.send(user);
+}
+
 
 module.exports = {
     allUsers,
-    getUserById
+    getUserById,
+    additionalInfo
 }
