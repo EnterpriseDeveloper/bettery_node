@@ -1,7 +1,11 @@
 const axios = require("axios");
+const crypto = require('crypto-js');
 const path = require("../../config/path");
+
 const betteryToken = require("../funds/betteryToken");
 const structure = require('../../structure/user.struct');
+const {sendToRedis, redisDataStructure} = require('../../helpers/redis-helper')
+const {secretRedis} = require('../../config/key');
 
 const torusRegist = async (req, res) => {
 
@@ -84,6 +88,10 @@ const torusRegist = async (req, res) => {
             res.send(err.response.data.message);
             return;
         })
+        let dataToRedis = redisDataStructure(userStruct, req)
+
+        sendToRedis(userStruct[0].email, dataToRedis)
+        userStruct[0].sessionToken = crypto.AES.encrypt(userStruct[0].email, secretRedis).toString()
 
         res.status(200);
         res.send(userStruct[0]);

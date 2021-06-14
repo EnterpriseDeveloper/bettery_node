@@ -31,6 +31,7 @@
     "lodash": "^4.17.15",
     "multer": "^1.4.2",
     "nodemon": "1.18.3",
+    "redis": "^3.1.2",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "socket.io": "^2.3.0",
@@ -38,6 +39,7 @@
     "web3": "^1.2.9"
   },
   "devDependencies": {
+    "crypto-js": "^4.0.0",
     "node-env-run": "^4.0.2",
     "webpack": "^5.36.1",
     "webpack-cli": "^4.6.0",

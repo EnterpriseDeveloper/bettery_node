@@ -7,6 +7,7 @@ const awsBucketName = "event-image-bettery";
 const awsBucketRegion = "ap-southeast-1";
 const awsAccessKey = "AKIA5KE3NTIWRQ5FKCPP";
 const awsSecretKey = "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";
+const secretRedis = "eyJzZWNyZXQiOiJzdXBlci1kdXBlciBzZWNyZXQgd29yZCJ9";
 
 module.exports = {
    apiKey,
@@ -17,5 +18,6 @@ module.exports = {
    awsBucketName,
    awsBucketRegion,
    awsAccessKey,
-   awsSecretKey
+   awsSecretKey,
+   secretRedis
 }
