@@ -58,7 +58,7 @@ const torusRegist = async (req, res) => {
             return;
         })
 
-        await betteryToken.mintTokens(wallet);
+        await betteryToken.mintTokens(wallet, 10);
         res.status(200);
         res.send({
             _id: x.data.tempids['users$newUser'],
