@@ -55,9 +55,20 @@ const torusRegist = async (req, res) => {
             res.send(err.response.data.message);
             return;
         })
-
         await betteryToken.mintTokens(wallet, 10);
         // TODO add session token from Redis
+        const dataFromRedis = [{
+            email: req.body.email,
+            wallet: req.body.wallet,
+            _id: x.data.tempids['users$newUser'],
+            typeOfLogin: req.body.verifier
+        }]
+
+        let dataToRedis = redisDataStructure(dataFromRedis, req)
+
+        sendToRedis(req.body.email, dataToRedis)
+        const sessionToken = crypto.AES.encrypt(req.body.email, secretRedis).toString()
+
         res.status(200);
         res.send({
             _id: x.data.tempids['users$newUser'],
@@ -70,6 +81,7 @@ const torusRegist = async (req, res) => {
             listValidatorEvents: [],
             historyTransaction: [],
             verifier: req.body.verifier,
+            sessionToken: sessionToken
         })
 
     } else {
