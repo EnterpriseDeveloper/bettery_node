@@ -17,21 +17,21 @@ module.exports = app => {
         torusRegist.torusRegist(req, res)
     })
 
-    app.post("/user/event_activites", async (req, res) =>{
+    app.post("/user/event_activites", async (req, res) => {
         await myActivites.getAllUserEvents(req, res);
     })
 
-    app.post("/user/get_additional_info", async (req, res) =>{
+    app.post("/user/get_additional_info", async (req, res) => {
         await auth.additionalInfo(req, res)
     })
 
-    app.post("/user/link_account", authMiddleware, async (req, res)=>{
+    app.post("/user/link_account", authMiddleware, async (req, res) => {
         await linkAccount.linkAccount(req, res);
     })
 
-    app.get("/user/delete_account", async (req, res) =>{
+    app.get("/user/delete_account", async (req, res) => {
         // TODO
         res.status(200);
-        res.send({status: "ok"})
+        res.send({ status: "ok" })
     })
 }

@@ -75,30 +75,35 @@ const torusRegist = async (req, res) => {
     } else {
         // TODO move token from old account to new
         let userStruct = structure.userStructure(user.data);
-        // if (userStruct[0].linkedAccounts.length != 0 && !userStruct[0].linkedAccounts.includes(verifierId)) {
-        //     //check if account exist return error
-        //     res.status(302);
-        //     res.send(userStruct[0])
-        // } else {
-        // update link account
-        let update = [{
-            "_id": userStruct[0]._id,
-            "linkedAccounts": [verifierId]
-        }]
-        await axios.post(`${path.path}/transact`, update).catch((err) => {
-            console.log(err)
-            res.status(400);
-            res.send(err.response.data.message);
-            return;
-        })
-        let dataToRedis = redisDataStructure(userStruct, req)
+        if (userStruct[0].linkedAccounts.length != 0 &&
+            !userStruct[0].linkedAccounts.includes(verifierId)) {
+            //check if account exist return error
+            let data = {
+                email: userStruct[0].email,
+                linkedAccounts: userStruct[0].linkedAccounts
+            }
+            res.status(302);
+            res.send(data)
+        } else {
+            // update link account
+            let update = [{
+                "_id": userStruct[0]._id,
+                "linkedAccounts": [verifierId]
+            }]
+            await axios.post(`${path.path}/transact`, update).catch((err) => {
+                console.log(err)
+                res.status(400);
+                res.send(err.response.data.message);
+                return;
+            })
+            let dataToRedis = redisDataStructure(userStruct, req)
 
-        sendToRedis(userStruct[0].email, dataToRedis)
-        userStruct[0].sessionToken = crypto.AES.encrypt(userStruct[0].email, secretRedis).toString()
+            sendToRedis(userStruct[0].email, dataToRedis)
+            userStruct[0].sessionToken = crypto.AES.encrypt(userStruct[0].email, secretRedis).toString()
 
-        res.status(200);
-        res.send(userStruct[0]);
-        //  }
+            res.status(200);
+            res.send(userStruct[0]);
+        }
     }
 }
 
