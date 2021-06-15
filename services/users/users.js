@@ -51,9 +51,10 @@ const allUsers = (req, res) => {
 
 const additionalInfo = async (req, res) => {
     let conf = {
-        "select": ["*",
-            { "historyTransactions": ["*"] }
-        ],
+        "select": ["linkedAccounts", {
+            "invitedBy":
+                ["_id", "users/avatar", "users/nickName"]
+        }],
         "from": Number(req.body.id)
     }
 
@@ -63,10 +64,15 @@ const additionalInfo = async (req, res) => {
         return;
     })
 
-    // TODO add referer, location, language, share data, public/private email
+    // TODO add location, language, share data, public/private email
     let x = data.data[0];
     let user = {
-        linkedAccounts: x['users/linkedAccounts'] == undefined ? [] : x['users/linkedAccounts'],
+        linkedAccounts: x['linkedAccounts'] == undefined ? [] : x['linkedAccounts'],
+        invitedBy: x["invitedBy"] == undefined ? null : {
+            id: x["invitedBy"]["_id"],
+            nickName: x["invitedBy"]["users/nickName"],
+            avatar: x["invitedBy"]["users/avatar"]
+        }
     }
     res.status(200);
     res.send(user);

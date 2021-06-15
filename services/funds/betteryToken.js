@@ -56,8 +56,6 @@ const transferToken = async (oldWallet, newWallet) => {
     if (amount != "0") {
         let web3 = new Web3();
         amount = web3.utils.fromWei(amount, "ether");
-        console.log(typeof amount)
-        console.log(amount);
         return await mintTokens(newWallet, amount);
     } else {
         return;
