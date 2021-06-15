@@ -29,12 +29,12 @@ const linkAccount = async (req, res) => {
     let firstId = req.body.dataFromRedis.key[0].verifierId;
     let secondId = req.body.verifierId
     let secondUserId = secondId.substring(secondId.lastIndexOf('|') + 1);
-    let provider = getVerifier(secondId);
-    console.log(firstId, provider, secondUserId)
+    let verifier = getVerifier(secondId);
+    let provider = getProvider(secondId);
     let x = await axios.post(`${key.auth0Path}/api/v2/users/${firstId}/identities`,
         {
-            "provider": provider, 
-            "user_id": secondUserId
+            "provider": provider,
+            "user_id": provider == "oauth2" ? `${verifier}|${secondUserId}`  : secondUserId
         },
         {
             headers: {
@@ -50,7 +50,7 @@ const linkAccount = async (req, res) => {
     if (x) {
         let linked = [{
             "_id": req.body.dataFromRedis.id,
-            "linkedAccounts": [provider]
+            "linkedAccounts": [verifier]
         }]
 
         let z = await axios.post(`${path.path}/transact`, linked).catch((err) => {
@@ -61,9 +61,7 @@ const linkAccount = async (req, res) => {
         })
         if (z) {
             let wallet = req.body.dataFromRedis.wallet
-            console.log(wallet);
             let y = await betToken.mintTokens(wallet, 100)
-            console.log(y);
             res.status(200)
             res.send({ status: "done" })
         }
@@ -71,6 +69,16 @@ const linkAccount = async (req, res) => {
     }
 
 
+}
+
+const getProvider = (x) =>{
+    if (x.search("google-oauth2") != -1) {
+        return "google";
+    } else if (x.search("oauth2") != -1) {
+        return "oauth2" ;
+    } else {
+        return x.split('|')[0];
+    }
 }
 
 const getVerifier = (x) => {
