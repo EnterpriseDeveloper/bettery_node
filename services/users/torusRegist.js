@@ -4,8 +4,8 @@ const path = require("../../config/path");
 
 const betteryToken = require("../funds/betteryToken");
 const structure = require('../../structure/user.struct');
-const {sendToRedis, redisDataStructure} = require('../../helpers/redis-helper')
-const {secretRedis} = require('../../config/key');
+const { sendToRedis, redisDataStructure } = require('../../helpers/redis-helper')
+const { secretRedis } = require('../../config/key');
 
 const torusRegist = async (req, res) => {
 
@@ -29,8 +29,6 @@ const torusRegist = async (req, res) => {
         })
 
     if (user.data.length === 0) {
-        // TODO move token from old account to new
-
         let data = [{
             "_id": "users$newUser",
             "nickName": req.body.nickName,
@@ -59,6 +57,7 @@ const torusRegist = async (req, res) => {
         })
 
         await betteryToken.mintTokens(wallet, 10);
+        // TODO add session token from Redis
         res.status(200);
         res.send({
             _id: x.data.tempids['users$newUser'],
@@ -74,9 +73,13 @@ const torusRegist = async (req, res) => {
         })
 
     } else {
-        // TODO check if account exist return error
+        // TODO move token from old account to new
         let userStruct = structure.userStructure(user.data);
-
+        // if (userStruct[0].linkedAccounts.length != 0 && !userStruct[0].linkedAccounts.includes(verifierId)) {
+        //     //check if account exist return error
+        //     res.status(302);
+        //     res.send(userStruct[0])
+        // } else {
         // update link account
         let update = [{
             "_id": userStruct[0]._id,
@@ -95,6 +98,7 @@ const torusRegist = async (req, res) => {
 
         res.status(200);
         res.send(userStruct[0]);
+        //  }
     }
 }
 

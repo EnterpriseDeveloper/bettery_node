@@ -7,6 +7,7 @@ const userStructure = (data) => {
             avatar: x["users/avatar"],
             email: x["users/email"],
             verifier: x["users/verifier"],
+            linkedAccounts: x["users/linkedAccounts"] === undefined ? [] : x["users/linkedAccounts"],
             historyTransaction: x["historyTransactions"] === undefined ? [] : x["historyTransactions"].map((history) => {
                 return {
                     id: history._id,
