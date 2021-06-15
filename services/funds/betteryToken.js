@@ -7,7 +7,7 @@ const getGasPrice = require("../../contract-services/gasPrice/getGasPrice");
 const Web3 = require("web3");
 
 const mintTokens = async (address, amount) => {
-    let pathContr = process.env.NODE_ENV;  
+    let pathContr = process.env.NODE_ENV;
     let betteryContract = await contractInit.init(pathContr, BET)
     let gasPrice = await getGasPrice.getGasPrice();
     let nonce = await getNonce.getNonce();
@@ -35,7 +35,7 @@ const getBTYToken = async (req, res) => {
         if (getWallet) {
             if (getWallet.data.length != 0) {
                 let wallet = getWallet.data[0].wallet;
-                let data = await mintTokens(wallet)
+                let data = await mintTokens(wallet, 10)
                 res.status(200);
                 res.send(data);
             } else {
@@ -49,7 +49,22 @@ const getBTYToken = async (req, res) => {
     }
 }
 
+const transferToken = async (oldWallet, newWallet) => {
+    let pathContr = process.env.NODE_ENV;
+    let betteryContract = await contractInit.init(pathContr, BET);
+    let amount = await betteryContract.methods.balanceOf(oldWallet).call();
+    if (amount != "0") {
+        let web3 = new Web3();
+        amount = web3.utils.fromWei(amount, "ether");
+        console.log(typeof amount)
+        console.log(amount);
+        return await mintTokens(newWallet, amount);
+    } else {
+        return;
+    }
+}
 module.exports = {
     mintTokens,
-    getBTYToken
+    getBTYToken,
+    transferToken
 }

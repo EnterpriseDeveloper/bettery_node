@@ -73,7 +73,6 @@ const torusRegist = async (req, res) => {
         })
 
     } else {
-        // TODO move token from old account to new
         let userStruct = structure.userStructure(user.data);
         if (userStruct[0].linkedAccounts.length != 0 &&
             !userStruct[0].linkedAccounts.includes(verifierId)) {
@@ -85,11 +84,23 @@ const torusRegist = async (req, res) => {
             res.status(302);
             res.send(data)
         } else {
-            // update link account
-            let update = [{
-                "_id": userStruct[0]._id,
-                "linkedAccounts": [verifierId]
-            }]
+            // move token from old account to new
+            let update;
+            if (userStruct[0].wallet != wallet) {
+                await betteryToken.transferToken(userStruct[0].wallet, wallet);
+                update = [{
+                    "_id": userStruct[0]._id,
+                    "wallet": wallet,
+                    "linkedAccounts": [verifierId]
+                }]
+            } else {
+                // update link account
+                update = [{
+                    "_id": userStruct[0]._id,
+                    "linkedAccounts": [verifierId]
+                }]
+            }
+
             await axios.post(`${path.path}/transact`, update).catch((err) => {
                 console.log(err)
                 res.status(400);
