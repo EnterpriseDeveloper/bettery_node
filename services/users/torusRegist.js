@@ -18,7 +18,7 @@ const torusRegist = async (req, res) => {
         "select": ["*",
             { "users/historyTransactions": ["*"] }
         ],
-        "from": email ? ["users/email", req.body.email] : ["users/nickName", req.body.nickName]
+        "from": email ? ["users/email", req.body.email] : ["users/wallet", req.body.wallet]
     }
 
     let user = await axios.post(`${path.path}/query`, findEmail)
@@ -58,16 +58,14 @@ const torusRegist = async (req, res) => {
         await betteryToken.mintTokens(wallet, 10);
         // TODO add session token from Redis
         const dataFromRedis = [{
-            email: req.body.email,
+            email: req.body.email ? req.body.email : 'undefined',
             wallet: req.body.wallet,
             _id: x.data.tempids['users$newUser'],
             typeOfLogin: req.body.verifier
         }]
-
         let dataToRedis = redisDataStructure(dataFromRedis, req)
 
-        sendToRedis(req.body.email, dataToRedis)
-        const sessionToken = crypto.AES.encrypt(req.body.email, secretRedis).toString()
+        let sessionToken = dataRedisSend(req.body.email, req.body.wallet, dataToRedis )
 
         res.status(200);
         res.send({
@@ -121,8 +119,7 @@ const torusRegist = async (req, res) => {
             })
             let dataToRedis = redisDataStructure(userStruct, req)
 
-            sendToRedis(userStruct[0].email, dataToRedis)
-            userStruct[0].sessionToken = crypto.AES.encrypt(userStruct[0].email, secretRedis).toString()
+            userStruct[0].sessionToken = dataRedisSend(userStruct[0].email, userStruct[0].wallet, dataToRedis )
 
             res.status(200);
             res.send(userStruct[0]);
@@ -156,6 +153,16 @@ const checkUserById = async (id, res) => {
         })
 
     return user.data.length === 0 ? false : true;
+}
+
+const dataRedisSend = (email, wallet, dataToRedis) => {
+    if(email){
+        sendToRedis(email, dataToRedis)
+        return crypto.AES.encrypt(email, secretRedis).toString()
+    } else {
+        sendToRedis(wallet, dataToRedis)
+        return crypto.AES.encrypt(wallet, secretRedis).toString()
+    }
 }
 
 module.exports = {
