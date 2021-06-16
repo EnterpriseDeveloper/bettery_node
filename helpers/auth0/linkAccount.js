@@ -34,7 +34,7 @@ const linkAccount = async (req, res) => {
     let x = await axios.post(`${key.auth0Path}/api/v2/users/${firstId}/identities`,
         {
             "provider": provider,
-            "user_id": provider == "oauth2" ? `${verifier}|${secondUserId}`  : secondUserId
+            "user_id": provider == "oauth2" ? `${verifier}|${secondUserId}` : secondUserId
         },
         {
             headers: {
@@ -61,7 +61,7 @@ const linkAccount = async (req, res) => {
         })
         if (z) {
             let wallet = req.body.dataFromRedis.wallet
-            let y = await betToken.mintTokens(wallet, 100)
+            await betToken.mintTokens(wallet, 10)
             res.status(200)
             res.send({ status: "done" })
         }
@@ -71,11 +71,11 @@ const linkAccount = async (req, res) => {
 
 }
 
-const getProvider = (x) =>{
+const getProvider = (x) => {
     if (x.search("google-oauth2") != -1) {
         return "google";
     } else if (x.search("oauth2") != -1) {
-        return "oauth2" ;
+        return "oauth2";
     } else {
         return x.split('|')[0];
     }
