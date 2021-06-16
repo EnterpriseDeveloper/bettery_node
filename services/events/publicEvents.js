@@ -16,6 +16,8 @@ const helpers = require("../../helpers/helpers");
 const getGasPrice = require("../../contract-services/gasPrice/getGasPrice");
 
 const createEvent = async (req, res) => {
+    req.body.host = req.body.dataFromRedis.id
+    let wallet = req.body.dataFromRedis.wallet
     let dateNow = Number((new Date().getTime() / 1000).toFixed(0))
 
     if (dateNow > req.body.endTime) {
@@ -44,7 +46,6 @@ const createEvent = async (req, res) => {
         let questionQuantity = req.body.answers.length;
         let amountExperts = req.body.calculateExperts === "company" ? 0 : req.body.validatorsAmount;
         let calculateExperts = req.body.calculateExperts === "company" ? true : false
-        let { wallet } = await userData.getUserWallet(req.body.host, res)
         let amountPremiumEvent = req.body.amount;
         let pathContr = process.env.NODE_ENV;
         let contract = await contractInit.init(pathContr, PublicEvents)
@@ -59,6 +60,7 @@ const createEvent = async (req, res) => {
         });
         if (transaction) {
             let allData = req.body
+            delete allData.dataFromRedis
 
             // upload image
             if (req.body.thumImage != "undefined") {
@@ -131,7 +133,6 @@ const createEvent = async (req, res) => {
             } else {
                 delete allData['hashtagsId'];
             }
-
             data.push(allData)
             // ADD to host
             data.push({

@@ -13,7 +13,7 @@ const participate = async (req, res) => {
     let setAnswer = []
 
     let eventId = req.body.event_id;
-    let userId = Number(req.body.userId)
+    let userId = Number(req.body.dataFromRedis.id)
     let amount = req.body.amount;
     let answerIndex = req.body.answerIndex;
 
@@ -33,7 +33,7 @@ const participate = async (req, res) => {
     }
 
     try {
-        let { wallet } = await userData.getUserWallet(userId, res)
+        let wallet = req.body.dataFromRedis.wallet;
         let pathContr = process.env.NODE_ENV;
         let contract = await contractInit.init(pathContr, PublicEvents)
         let tokens = web3.utils.toWei(String(amount), "ether");
@@ -112,7 +112,8 @@ const validate = async (req, res) => {
     let setAnswer = []
 
     let eventId = Number(req.body.event_id);
-    let from = Number(req.body.userId)
+    let from = Number(req.body.dataFromRedis.id)
+
     let answer = Number(req.body.answer);
     if (eventId == undefined ||
         answer == undefined ||
@@ -123,7 +124,8 @@ const validate = async (req, res) => {
     }
 
     try {
-        let { wallet, reputation } = await userData.getUserWallet(from, res)
+        let { reputation } = await userData.getUserWallet(from, res)
+        let wallet = req.body.dataFromRedis.wallet;
         let pathContr = process.env.NODE_ENV;
         let contract = await contractInit.init(pathContr, PublicEvents)
 

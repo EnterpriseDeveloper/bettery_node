@@ -4,7 +4,7 @@ const _ = require('lodash');
 const struct = require('../../structure/room.struct');
 
 const getByUserId = async (req, res) => {
-    let userId = req.body.id
+    let userId = req.body.dataFromRedis.id
     let getRooms = {
         "select": ["*", { 'room/owner': ["users/nickName", "users/avatar"] }],
         "where": `room/owner = ${Number(userId)}`
@@ -50,7 +50,8 @@ const getAllRooms = async (req, res) => {
 
 const roomValidation = async (req, res) => {
     let roomName = req.body.name;
-    let userId = req.body.userId
+    let userId = req.body.dataFromRedis.id
+
     let findRoom = {
         "select": ["*"],
         "where": `room/owner = ${Number(userId)}`
@@ -77,7 +78,7 @@ const roomValidation = async (req, res) => {
 }
 
 const getJoinedRoom = async (req, res) => {
-    let id = req.body.id;
+    let id = req.body.dataFromRedis.id;
     let allRooms = [];
     let config = {
         "select": [{ "users/joinedRooms": [{ "joinRoom/roomId": ["*", { 'room/owner': ["*"] }] }] }],

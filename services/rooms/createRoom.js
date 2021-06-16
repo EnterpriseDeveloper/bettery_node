@@ -13,7 +13,7 @@ const createRoom = (data, type) => {
 }
 
 const joinToRoom = async (req, res) => {
-    let userId = req.body.userId;
+    let userId = req.body.dataFromRedis.id;
     let roomId = req.body.roomId;
     let config = [{
         '_id': "joinRoom$newJoin",

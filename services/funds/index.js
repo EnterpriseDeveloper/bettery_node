@@ -2,6 +2,7 @@ const setEthPrice = require("./ethPrice");
 const withdrawal = require("./withdrawal");
 const bettertToken = require('./betteryToken');
 const userTokens = require('./userTokens')
+const checkToken = require('../../middlewares/check-token');
 
 module.exports = app => {
     app.get("/eth_price", async (req, res) => {
@@ -12,7 +13,7 @@ module.exports = app => {
         withdrawal.setInitWithd(req, res);
     })
 
-    app.post("/withdrawal/exit", async (req, res) => {
+    app.get("/withdrawal/exit", checkToken, async (req, res) => {
         withdrawal.setInitWithd(req, res);
     })
 
@@ -20,7 +21,7 @@ module.exports = app => {
         bettertToken.getBTYToken(req, res);
     })
 
-    app.post("/users/updateBalance", async (req, res) => {
+    app.post("/users/updateBalance", checkToken, async (req, res) => {
         userTokens.sendTokens(req, res);
     })
 }
