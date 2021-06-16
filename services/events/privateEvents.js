@@ -13,6 +13,9 @@ const getGasPrice = require("../../contract-services/gasPrice/getGasPrice");
 
 const createPrivateEvent = async (req, res) => {
     let allData = req.body;
+    allData.host = allData.dataFromRedis.id
+    let wallet = allData.dataFromRedis.wallet
+    delete allData.dataFromRedis
     let id = "privateEvents$newEvents";
     allData.status = "deployed";
     allData._id = id;
@@ -85,7 +88,6 @@ const createPrivateEvent = async (req, res) => {
     let questionQuantity = req.body.answers.length;
 
     try {
-        let { wallet } = await userData.getUserWallet(req.body.host, res)
         let pathContr = process.env.NODE_ENV
         let contract = await contractInit.init(pathContr, PrivateEvents)
 
@@ -124,13 +126,13 @@ const createPrivateEvent = async (req, res) => {
 const participate = async (req, res) => {
     let eventId = Number(req.body.eventId);
     let answer = Number(req.body.answer);
-    let from = Number(req.body.from)
+    let from = req.body.dataFromRedis.id;
     if (eventId == undefined || answer == undefined || from == undefined) {
         res.status(400);
         res.send({ "error": "structure is incorrect" });
     } else {
         try {
-            let { wallet } = await userData.getUserWallet(from, res)
+            let wallet = req.body.dataFromRedis.wallet
             let pathContr = process.env.NODE_ENV
             let contract = await contractInit.init(pathContr, PrivateEvents)
             let gasPrice = await getGasPrice.getGasPrice();
@@ -184,13 +186,13 @@ const validate = async (req, res) => {
     let eventId = Number(req.body.eventId);
     let answer = req.body.answer;
     let answerNumber = Number(req.body.answerNumber);
-    let from = Number(req.body.from)
+    let from = Number(req.body.dataFromRedis.id)
     if (eventId == undefined || answer == undefined || from == undefined || answerNumber == undefined) {
         res.status(400);
         res.send({ "error": "structure is incorrect" });
     } else {
         try {
-            let { wallet } = await userData.getUserWallet(from, res)
+            let wallet = req.body.dataFromRedis.wallet;
             let pathContr = process.env.NODE_ENV;
             let contract = await contractInit.init(pathContr, PrivateEvents)
             let gasPrice = await getGasPrice.getGasPrice();

@@ -64,7 +64,7 @@ const sendNotificationToUser = async (roomId, eventId, res) => {
 }
 
 const getNotificationByUserId = async (req, res) => {
-    let userId = req.body.userId;
+    let userId = req.body.dataFromRedis.id;
     let config = {
         "select": [
             {

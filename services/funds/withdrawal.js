@@ -4,7 +4,7 @@ const path = require("../../config/path");
 const setInitWithd = (req, res) => {
     let data = [{
         "_id": "withdrawal$newWithdrawal",
-        "userId": req.body.userId,
+        "userId": req.body.dataFromRedis.id,
         "date": Math.floor(Date.now() / 1000),
         "transactionHash": req.body.transactionHash,
         "status": "pending",

@@ -6,9 +6,10 @@ const eventLimitPrivate = require('../../middlewares/eventLimitsPrivate')
 const eventLimitPublic = require('../../middlewares/eventLimitsPublic')
 const revert = require("./revert");
 const contract = require("../../contract-services/publicEvents/findCorrectAnswer")
+const checkToken = require('../../middlewares/check-token');
 
 module.exports = app => {
-    app.post("/publicEvents/createEvent", eventLimitPublic, async (req, res) => {
+    app.post("/publicEvents/createEvent", checkToken, eventLimitPublic, async (req, res) => {
         publicEvents.createEvent(req, res);
     })
 
@@ -20,25 +21,25 @@ module.exports = app => {
         publicEvents.getAll(req, res);
     })
 
-    app.post("/publicEvents/participate", async (req, res) => {
+    app.post("/publicEvents/participate", checkToken, async (req, res) => {
         publicActivites.participate(req, res);
     })
 
-    app.post("/publicEvents/validate", async (req, res) => {
+    app.post("/publicEvents/validate", checkToken, async (req, res) => {
         publicActivites.validate(req, res);
     })
 
-    app.post("/privateEvents/createEvent", eventLimitPrivate, async (req, res) => {
+    app.post("/privateEvents/createEvent", checkToken, eventLimitPrivate, async (req, res) => {
         privateEvents.createPrivateEvent(req, res);
     })
 
     app.post("/privateEvents/get_by_id", async (req, res) => {
         privateEvents.getById(req, res);
     })
-    app.post("/privateEvents/participate", async (req, res) => {
+    app.post("/privateEvents/participate", checkToken, async (req, res) => {
         privateEvents.participate(req, res);
     })
-    app.post("/privateEvents/validate", async (req, res) => {
+    app.post("/privateEvents/validate", checkToken, async (req, res) => {
         privateEvents.validate(req, res);
     })
 

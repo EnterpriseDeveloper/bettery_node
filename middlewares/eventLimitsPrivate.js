@@ -4,7 +4,7 @@ const _ = require("lodash");
 const config = require('../config/limits');
 
 module.exports = async (req, res, next) => {
-    let userID = req.body.host;
+    let userID = req.body.dataFromRedis.id;
     let prodDev = req.body.prodDev
 
     let query = {
