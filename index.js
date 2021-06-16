@@ -11,11 +11,11 @@ var http = require('http');
 if (process.env.NODE_TEST == 'false') {
     var https = require('https');
 
-    let key = process.env.NODE_ENV == "production" ? "./keys/key.pem" : "/home/ubuntu/node/keys/server.key",
-        cert = process.env.NODE_ENV == "production" ? "./keys/star_bettery_io.crt" : "/home/ubuntu/node/keys/13_229_200_135.crt",
-        ca1 = process.env.NODE_ENV == "production" ? "./keys/DigiCertCA.crt" : '/home/ubuntu/node/keys/AAACertificateServices.crt',
-        ca2 = process.env.NODE_ENV == "production" ? "./keys/My_CA_Bundle.crt" : '/home/ubuntu/node/keys/SectigoRSADomainValidationSecureServerCA.crt',
-        ca3 = process.env.NODE_ENV == "production" ? "./keys/TrustedRoot.crt" : '/home/ubuntu/node/keys/USERTrustRSAAAACA.crt';
+    let key = "./keys/key.pem",
+        cert = "./keys/star_bettery_io.crt",
+        ca1 = "./keys/DigiCertCA.crt",
+        ca2 = "./keys/My_CA_Bundle.crt",
+        ca3 = "./keys/TrustedRoot.crt";
 
     var credentials = {
         key: fs.readFileSync(key, 'utf8'),
