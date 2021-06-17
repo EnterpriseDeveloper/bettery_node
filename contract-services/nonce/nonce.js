@@ -1,18 +1,64 @@
 const Web3 = require("web3");
 const networkConfig = require("../../config/networks");
-
-var Nonce = 0;
-
+const axios = require("axios");
+const url = require("../../config/path");
+var Mutex = require('async-mutex').Mutex;
 
 const nonceInit = async () => {
     let { account, web3 } = await getAccount();
-    Nonce = await web3.eth.getTransactionCount(account);
+
+    let nonce = await web3.eth.getTransactionCount(account);
+    let getNonceConfig = {
+        "select": ["*"],
+        "from": "configuration"
+    }
+
+    let getNonce = await axios.post(`${url.path}/query`, getNonceConfig).catch((err) => {
+        console.log("get nonce err: " + err);
+    })
+
+    if (getNonce.data.length != 0) {
+        let setNonce = [{
+            "_id": getNonce.data[0]["_id"],
+            "nonce": nonce
+        }]
+        return await axios.post(`${url.path}/transact`, setNonce).catch((err) => {
+            console.log("set nonce err: " + err);
+        })
+
+    } else {
+        let setNonce = [{
+            "_id": "configuration$newConfig",
+            "nonce": nonce
+        }]
+        return await axios.post(`${url.path}/transact`, setNonce).catch((err) => {
+            console.log("set new nonce err: " + err);
+        })
+    }
 }
 
-const getNonce = () => {
-    let x = Nonce;
-    Nonce++;
-    return x;
+const getNonce = async () => {
+    const mutex = new Mutex();
+    const release = await mutex.acquire();
+    let getNonceConfig = {
+        "select": ["*"],
+        "from": "configuration"
+    }
+
+    let getNonce = await axios.post(`${url.path}/query`, getNonceConfig).catch((err) => {
+        console.log("get nonce err: " + err);
+    })
+
+    let nonce = getNonce.data[0]['configuration/nonce'];
+    let setNonce = [{
+        "_id": getNonce.data[0]["_id"],
+        "nonce": nonce + 1
+    }]
+    await axios.post(`${url.path}/transact`, setNonce).catch((err) => {
+        console.log("set nonce err: " + err);
+    })
+    release();
+    return nonce;
 }
 
 const getAccount = async () => {
