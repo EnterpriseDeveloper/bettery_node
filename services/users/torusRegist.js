@@ -98,6 +98,7 @@ const torusRegist = async (req, res) => {
             let update;
             if (userStruct[0].wallet != wallet) {
                 await betteryToken.transferToken(userStruct[0].wallet, wallet);
+                userStruct[0].wallet = wallet;
                 update = [{
                     "_id": userStruct[0]._id,
                     "wallet": wallet,

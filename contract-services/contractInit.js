@@ -14,7 +14,7 @@ async function getAccount(provider, keys) {
 async function init(networkWay, contract) {
     let network = networkWay == "production" ? networkConfig.maticMain : networkConfig.maticMumbaiHttps,
         networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId;
-    return await connectToNetwork(network, networkId, contract, keys, networkWay);
+    return await connectToNetwork(network, networkId, contract, networkWay);
 }
 
 function webSoketInit(networkWay) {
