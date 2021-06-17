@@ -65,7 +65,7 @@ const createEvent = async (req, res) => {
             // upload image
             if (req.body.thumImage != "undefined") {
                 let type = await helpers.uploadImage(req.body.thumImage, id);
-                let url = process.env.NODE_ENV == "production" ? "http://api.bettery.io" : `http://13.229.200.135`
+                let url = process.env.NODE_ENV == "production" ? "https://api.bettery.io" : `https://apitest.bettery.io`
                 allData.thumImage = `${url}/image/${id}.${type}`;
                 allData.thumColor = undefined;
             } else if (req.body.thumColor != "undefined") {
