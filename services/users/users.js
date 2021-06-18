@@ -21,7 +21,7 @@ const getUserById = (req, res) => {
         if (x.data.length != 0) {
             let o = structure.userStructure([x.data[0]])
                 o[0].accessToken = req.body.dataFromRedis.key[0].sessionKey
-                o[0].sessionToken = crypto.AES.encrypt(req.body.dataFromRedis.email, secretRedis).toString()
+                o[0].sessionToken = crypto.AES.encrypt(req.body.dataFromRedis.wallet, secretRedis).toString()
             res.status(200);
             res.send(o);
 
