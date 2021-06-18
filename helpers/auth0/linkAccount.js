@@ -73,7 +73,7 @@ const linkAccount = async (req, res) => {
 
 const getProvider = (x) => {
     if (x.search("google-oauth2") != -1) {
-        return "google";
+        return "google-oauth2";
     } else if (x.search("oauth2") != -1) {
         return "oauth2";
     } else {
