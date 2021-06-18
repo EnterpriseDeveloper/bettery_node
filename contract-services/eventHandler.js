@@ -10,12 +10,18 @@ const playPaymentSentToDB = require("./publicEvents/playerPayment/setPaymentToDB
 
 const loadHandler = async () => {
     let path = process.env.NODE_ENV
-    let publicEvent = await ContractInit.webSoketInit(path, PublicEventContract);
+    let { provider, networkId } = ContractInit.webSoketInit();
+    let publicEvent = await ContractInit.connectToNetwork(provider, networkId, PublicEventContract, path);
     publicEventsHandler(publicEvent);
-    let mpEvent = await ContractInit.webSoketInit(path, MiddlePaymentContract);
+    let mpEvent = await ContractInit.connectToNetwork(provider, networkId, MiddlePaymentContract, path);
     MiddlePayment(mpEvent);
-    let ppEvent = await ContractInit.webSoketInit(path, PlayerPaymentContract);
+    let ppEvent = await ContractInit.connectToNetwork(provider, networkId, PlayerPaymentContract, path);
     PlayerPayment(ppEvent);
+    setTimeout(() => {
+        provider.disconnect();
+        console.log("Reconnect");
+        loadHandler();
+    }, 7 * 60 * 60 * 1000)
 
 }
 

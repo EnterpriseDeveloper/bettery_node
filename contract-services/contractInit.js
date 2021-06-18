@@ -13,23 +13,19 @@ async function getAccount(provider, keys) {
 
 async function init(networkWay, contract) {
     let network = networkWay == "production" ? networkConfig.maticMain : networkConfig.maticMumbaiHttps,
-        networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId,
-        keys = networkWay == "production" ? require("./keys/prod/privKey") : require("./keys/test/privKey");
-    return await connectToNetwork(network, networkId, contract, keys);
+        networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId;
+    return await connectToNetwork(network, networkId, contract, networkWay);
 }
 
-async function webSoketInit(networkWay, contract) {
+function webSoketInit(networkWay) {
     let network = networkWay == "production" ? networkConfig.matciMainWSS : networkConfig.maticMumbaiWSS,
-        networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId,
-        keys = networkWay == "production" ? require("./keys/prod/privKey") : require("./keys/test/privKey");
+        networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId;
     let options = {
         timeout: 30000, // ms
-
         clientConfig: {
             // Useful if requests are large
             maxReceivedFrameSize: 100000000,   // bytes - default: 1MiB
             maxReceivedMessageSize: 100000000, // bytes - default: 8MiB
-
             // Useful to keep a connection alive
             keepalive: true,
             keepaliveInterval: -1 // ms
@@ -43,15 +39,20 @@ async function webSoketInit(networkWay, contract) {
         }
     };
     let provider = new Web3.providers.WebsocketProvider(network, options);
-    provider.on('error', e => console.log('WS Error', e));
-    provider.on('end', e => {
-        console.log(e);
-        console.log('WS closed');
+    provider.on('error', e => {
+        console.log('!!!!WS ERROR!!!!', e)
     });
-    return await connectToNetwork(provider, networkId, contract, keys);
+    provider.on('end', e => {
+        console.log('!!!!WS CLOSE!!!!');
+        console.log(e);
+    });
+    return { provider, networkId };
 }
 
-async function connectToNetwork(network, networkId, contract, keys) {
+
+
+async function connectToNetwork(network, networkId, contract, networkWay) {
+    let keys = networkWay == "production" ? require("./keys/prod/privKey") : require("./keys/test/privKey");
     let { web3, account } = await getAccount(network, keys);
     let abi = contract.abi;
     let address = contract.networks[networkId].address;
@@ -60,6 +61,7 @@ async function connectToNetwork(network, networkId, contract, keys) {
 
 module.exports = {
     init,
-    webSoketInit
+    webSoketInit,
+    connectToNetwork
 }
 
