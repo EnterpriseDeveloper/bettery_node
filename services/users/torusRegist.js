@@ -65,7 +65,7 @@ const torusRegist = async (req, res) => {
         }]
         let dataToRedis = redisDataStructure(dataFromRedis, req)
 
-        let sessionToken = dataRedisSend(req.body.email, req.body.wallet, dataToRedis )
+        let sessionToken = dataRedisSend(req.body.wallet, dataToRedis )
 
         res.status(200);
         res.send({
@@ -119,7 +119,7 @@ const torusRegist = async (req, res) => {
             })
             let dataToRedis = redisDataStructure(userStruct, req)
 
-            userStruct[0].sessionToken = dataRedisSend(userStruct[0].email, userStruct[0].wallet, dataToRedis )
+            userStruct[0].sessionToken = dataRedisSend( userStruct[0].wallet, dataToRedis )
 
             res.status(200);
             res.send(userStruct[0]);
@@ -155,14 +155,9 @@ const checkUserById = async (id, res) => {
     return user.data.length === 0 ? false : true;
 }
 
-const dataRedisSend = (email, wallet, dataToRedis) => {
-    if(email){
-        sendToRedis(email, dataToRedis)
-        return crypto.AES.encrypt(email, secretRedis).toString()
-    } else {
+const dataRedisSend = (wallet, dataToRedis) => {
         sendToRedis(wallet, dataToRedis)
         return crypto.AES.encrypt(wallet, secretRedis).toString()
-    }
 }
 
 module.exports = {

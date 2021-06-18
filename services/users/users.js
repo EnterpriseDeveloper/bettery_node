@@ -1,7 +1,13 @@
 
 const axios = require("axios");
 const path = require("../../config/path");
+const crypto = require('crypto-js');
 const structure = require('../../structure/user.struct')
+const { secretRedis } = require('../../config/key');
+
+const updateNickname = (req, res) => {
+};
+
 
 const getUserById = (req, res) => {
     let conf = {
@@ -14,7 +20,8 @@ const getUserById = (req, res) => {
     axios.post(path.path + "/query", conf).then((x) => {
         if (x.data.length != 0) {
             let o = structure.userStructure([x.data[0]])
-
+                o[0].accessToken = req.body.dataFromRedis.key[0].sessionKey
+                o[0].sessionToken = crypto.AES.encrypt(req.body.dataFromRedis.email, secretRedis).toString()
             res.status(200);
             res.send(o);
 
@@ -82,5 +89,6 @@ const additionalInfo = async (req, res) => {
 module.exports = {
     allUsers,
     getUserById,
-    additionalInfo
+    additionalInfo,
+    updateNickname
 }

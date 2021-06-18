@@ -5,7 +5,7 @@ const linkAccount = require("../../helpers/auth0/linkAccount");
 const authMiddleware = require("../../middlewares/check-token");
 
 module.exports = app => {
-    app.post("/user/getUserById", async (req, res) => {
+    app.post("/user/getUserById", authMiddleware, async (req, res) => {
         auth.getUserById(req, res);
     })
 
@@ -27,6 +27,10 @@ module.exports = app => {
 
     app.post("/user/link_account", authMiddleware, async (req, res) => {
         await linkAccount.linkAccount(req, res);
+    })
+
+    app.post("user/update_nickname",authMiddleware, async (req, res) => {
+        await auth.updateNickname(req, res)
     })
 
     app.get("/user/delete_account", async (req, res) => {
