@@ -5,7 +5,42 @@ const crypto = require('crypto-js');
 const structure = require('../../structure/user.struct')
 const { secretRedis } = require('../../config/key');
 
-const updateNickname = (req, res) => {
+const updateNickname = async (req, res) => {
+    let id = req.body.dataFromRedis.id;
+    let name = req.body.newNickName;
+
+    let  update = [{
+            "_id": id,
+            "users/nickName": name
+        }]
+
+    await axios.post(`${path.path}/transact`, update).catch((err) => {
+        console.log(err)
+        res.status(400);
+        res.send(err.response.data.message);
+        return
+    })
+    res.status(200);
+    res.send({name});
+};
+
+const updatePublicEmail = async (req, res) => {
+    let id = req.body.dataFromRedis.id;
+    let publicEmail = req.body.publicEmail;
+
+    let  update = [{
+        "_id": id,
+        "users/publicEmail": publicEmail
+    }]
+
+    await axios.post(`${path.path}/transact`, update).catch((err) => {
+        console.log(err)
+        res.status(400);
+        res.send(err.response.data.message);
+        return
+    })
+    res.status(200);
+    res.send({publicEmail});
 };
 
 
@@ -58,7 +93,7 @@ const allUsers = (req, res) => {
 
 const additionalInfo = async (req, res) => {
     let conf = {
-        "select": ["linkedAccounts", {
+        "select": ["linkedAccounts", "publicEmail", {
             "invitedBy":
                 ["_id", "users/avatar", "users/nickName"]
         }],
@@ -79,7 +114,8 @@ const additionalInfo = async (req, res) => {
             id: x["invitedBy"]["_id"],
             nickName: x["invitedBy"]["users/nickName"],
             avatar: x["invitedBy"]["users/avatar"]
-        }
+        },
+        publicEmail: x['publicEmail'] == undefined ? null : x['publicEmail']
     }
     res.status(200);
     res.send(user);
@@ -90,5 +126,6 @@ module.exports = {
     allUsers,
     getUserById,
     additionalInfo,
-    updateNickname
+    updateNickname,
+    updatePublicEmail
 }
