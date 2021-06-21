@@ -317,9 +317,34 @@ const getBetteryEvent = async (req, res) => {
     }
 }
 
+const getAllForTest = async (req, res) => {
+    let conf = {
+        "select": ["*",
+            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
+            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
+            { 'publicEvents/host': ["*"] },
+            { 'publicEvents/room': ["*"] }
+        ],
+        "from": "publicEvents"
+    }
+
+    let x = await axios.post(path.path + "/query", conf)
+        .catch((err) => {
+            res.status(400);
+            res.send(err.response.data.message);
+            console.log("DB error: " + err.response.data.message)
+            return;
+        })
+
+    let obj = structire.publicEventStructure(x.data)
+    res.status(200);
+    res.send(obj);
+}
+
 module.exports = {
     createEvent,
     getById,
     getAll,
-    getBetteryEvent
+    getBetteryEvent,
+    getAllForTest
 }

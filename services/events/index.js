@@ -21,6 +21,10 @@ module.exports = app => {
         publicEvents.getAll(req, res);
     })
 
+    app.get("/publicEvents/get_all_for_test", async (req, res) => {
+        publicEvents.getAllForTest(req, res);
+    })
+
     app.post("/publicEvents/participate", checkToken, async (req, res) => {
         publicActivites.participate(req, res);
     })
