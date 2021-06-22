@@ -32,7 +32,7 @@ const loadHandler = async () => {
 
 const checkConnection = (provider) => {
     if (!provider.currentProvider.connected) {
-        console.log("RELOAD")
+        console.log("RELOAD: ", Math.floor(new Date().getTime()/1000.0))
         clearInterval(interval);
         loadHandler();
     }
