@@ -7,6 +7,9 @@ const ExpertsCalcOracle = require('./oracels/exprestCalc');
 const setAnswer = require("../services/events/event_is_finish");
 const publicEvents = require("./publicEvents/index");
 const playPaymentSentToDB = require("./publicEvents/playerPayment/setPaymentToDB");
+const Web3 = require("web3");
+
+let interval;
 
 const loadHandler = async () => {
     let path = process.env.NODE_ENV
@@ -17,12 +20,22 @@ const loadHandler = async () => {
     MiddlePayment(mpEvent);
     let ppEvent = await ContractInit.connectToNetwork(provider, networkId, PlayerPaymentContract, path);
     PlayerPayment(ppEvent);
-    setTimeout(() => {
-        provider.disconnect();
-        console.log("Reconnect");
-        loadHandler();
-    }, 7 * 60 * 60 * 1000)
 
+    // restar connection
+    setTimeout(() => {
+        let web3 = new Web3(provider)
+        interval = setInterval(() => {
+            checkConnection(web3)
+        }, 2000)
+    }, 5000)
+}
+
+const checkConnection = (provider) => {
+    if (!provider.currentProvider.connected) {
+        console.log("RELOAD")
+        clearInterval(interval);
+        loadHandler();
+    }
 }
 
 const publicEventsHandler = (publicEvent) => {
