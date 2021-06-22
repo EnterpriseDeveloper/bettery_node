@@ -93,7 +93,7 @@ const allUsers = (req, res) => {
 
 const additionalInfo = async (req, res) => {
     let conf = {
-        "select": ["linkedAccounts", "publicEmail", {
+        "select": ["linkedAccounts", "publicEmail", "advisorReputPoins", "playerReputPoins", "hostReputPoins", "expertReputPoins", {
             "invitedBy":
                 ["_id", "users/avatar", "users/nickName"]
         }],
@@ -115,7 +115,11 @@ const additionalInfo = async (req, res) => {
             nickName: x["invitedBy"]["users/nickName"],
             avatar: x["invitedBy"]["users/avatar"]
         },
-        publicEmail: x['publicEmail'] == undefined ? null : x['publicEmail']
+        publicEmail: x['publicEmail'] == undefined ? null : x['publicEmail'],
+        advisorReputPoins: x['advisorReputPoins'] == undefined ? null : x['advisorReputPoins'],
+        playerReputPoins: x['playerReputPoins'] == undefined ? null : x['playerReputPoins'],
+        hostReputPoins: x['hostReputPoins'] == undefined ? null : x['hostReputPoins'],
+        expertReputPoins: x['expertReputPoins'] == undefined ? null : x['expertReputPoins'],
     }
     res.status(200);
     res.send(user);
