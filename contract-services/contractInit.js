@@ -38,7 +38,7 @@ function webSoketInit(networkWay) {
             onTimeout: false
         }
     };
-    let provider = new Web3.providers.WebsocketProvider(network, options);
+    let provider = new Web3.providers.WebsocketProvider(network);
     provider.on('error', e => {
         console.log('!!!!WS ERROR!!!!', e)
     });
