@@ -37,7 +37,7 @@
     "request-promise": "^4.2.4",
     "socket.io": "^2.3.0",
     "utf8": "^3.0.0",
-    "web3": "^1.3.6"
+    "web3": "^1.2.9"
   },
   "devDependencies": {
     "crypto-js": "^4.0.0",
