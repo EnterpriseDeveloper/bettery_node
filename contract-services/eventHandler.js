@@ -10,6 +10,7 @@ const playPaymentSentToDB = require("./publicEvents/playerPayment/setPaymentToDB
 const Web3 = require("web3");
 
 let interval;
+let timeOut;
 
 const loadHandler = async () => {
     let path = process.env.NODE_ENV
@@ -22,8 +23,16 @@ const loadHandler = async () => {
     let ppEvent = await ContractInit.connectToNetwork(provider, networkId, PlayerPaymentContract, path);
     PlayerPayment(ppEvent);
 
+    provider.on('error', e => {
+        console.log('!!!!WS ERROR!!!!', e)
+    });
+    provider.on('end', e => {
+        checkConnection(web3);
+        console.log('!!!!WS CLOSE!!!!');
+    });
+
     // restar connection
-    setTimeout(() => {
+    timeOut = setTimeout(() => {
         interval = setInterval(() => {
             checkConnection(web3)
         }, 2000)
@@ -34,6 +43,7 @@ const checkConnection = (provider) => {
     if (!provider.currentProvider.connected) {
         console.log("RELOAD: ", Math.floor(new Date().getTime()/1000.0))
         clearInterval(interval);
+        clearTimeout(timeOut);
         loadHandler();
     }
 }

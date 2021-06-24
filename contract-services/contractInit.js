@@ -39,13 +39,6 @@ function webSoketInit(networkWay) {
         }
     };
     let provider = new Web3.providers.WebsocketProvider(network);
-    provider.on('error', e => {
-        console.log('!!!!WS ERROR!!!!', e)
-    });
-    provider.on('end', e => {
-        console.log('!!!!WS CLOSE!!!!');
-        console.log(e);
-    });
     return { provider, networkId };
 }
 
