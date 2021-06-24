@@ -14,7 +14,7 @@ let timeOut;
 
 const loadHandler = async () => {
     let path = process.env.NODE_ENV
-    let { provider, networkId } = ContractInit.webSoketInit();
+    let { provider, networkId } = ContractInit.webSoketInit(path);
     let web3 = new Web3(provider)
     let publicEvent = await ContractInit.connectToNetwork(provider, networkId, PublicEventContract, path);
     publicEventsHandler(publicEvent);

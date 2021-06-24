@@ -12,7 +12,6 @@ const getStatus = async (id) => {
         return
     })
     return data.data[0]['publicEvents/status'];
-
 }
 
 const setStatus = async (id, status) => {

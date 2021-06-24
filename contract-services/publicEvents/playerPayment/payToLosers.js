@@ -3,37 +3,39 @@ const ContractInit = require("../../contractInit");
 const setToDB = require("./setPaymentToDB");
 const getNonce = require("../../nonce/nonce");
 const statuses = require("../status");
+const getGasPrice = require("../../gasPrice/getGasPrice")
 
 const payToLosers = async (data) => {
     console.log("from payToLosers")
     console.log(data);
     let id = data.id;
-    let status = await statuses.getStatus(id);
-    console.log(status)
-    if (status == "payToPlayers") {
-        await statuses.setStatus(id, "payToLosers");
-        let avarageBet = data.avarageBet;
-        let calcMintedToken = data.calcMintedToken;
+    // let status = await statuses.getStatus(id);
+    // console.log(status)
+    // if (status == "payToPlayers") {
+    //     await statuses.setStatus(id, "payToLosers");
+    let avarageBet = data.avarageBet;
+    let calcMintedToken = data.calcMintedToken;
 
-        let path = process.env.NODE_ENV
-        let contract = await ContractInit.init(path, PlayerPaymentContract);
-        try {
-            let gasEstimate = await contract.methods.letsPayToLoosers(id, avarageBet, calcMintedToken).estimateGas();
-            let nonce = await getNonce.getNonce();
-            await contract.methods.letsPayToLoosers(id, avarageBet, calcMintedToken).send({
-                gas: gasEstimate * 2,
-                gasPrice: 0,
-                nonce: nonce
-            });
+    let path = process.env.NODE_ENV
+    let contract = await ContractInit.init(path, PlayerPaymentContract);
+    try {
+        let gasPrice = await getGasPrice.getGasPriceSafeLow();
+        let gasEstimate = await contract.methods.letsPayToLoosers(id, avarageBet, calcMintedToken).estimateGas();
+        let nonce = await getNonce.getNonce();
+        await contract.methods.letsPayToLoosers(id, avarageBet, calcMintedToken).send({
+            gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: gasPrice,
+            nonce: nonce
+        });
 
-            await setToDB.setToDB(data);
+        await setToDB.setToDB(data);
 
-        } catch (err) {
-            console.log("err from pay to losers", err)
-        }
-    } else {
-        console.log("Duplicate from payToLosers")
+    } catch (err) {
+        console.log("err from pay to losers", err)
     }
+    // } else {
+    //     console.log("Duplicate from payToLosers")
+    // }
 }
 
 
