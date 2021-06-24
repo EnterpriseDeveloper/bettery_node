@@ -27,7 +27,6 @@ const loadHandler = async () => {
         console.log('!!!!WS ERROR!!!!', e)
     });
     provider.on('end', e => {
-        checkConnection(web3);
         console.log('!!!!WS CLOSE!!!!');
     });
 
@@ -35,7 +34,7 @@ const loadHandler = async () => {
     timeOut = setTimeout(() => {
         interval = setInterval(() => {
             checkConnection(web3)
-        }, 2000)
+        }, 1000)
     }, 5000)
 }
 
