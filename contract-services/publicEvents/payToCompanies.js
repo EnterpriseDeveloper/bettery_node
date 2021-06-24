@@ -3,17 +3,12 @@ const Web3 = require("web3");
 const setAnswer = require("../../services/events/event_is_finish");
 const ContractInit = require("../contractInit");
 const getNonce = require("../nonce/nonce");
-const statuses = require("./status");
 const getGasPrice = require("../gasPrice/getGasPrice")
 
 const payToCompanies = async (x) => {
     console.log("from payToCompanies")
     console.log(x);
     let id = x.id;
-    // let status = await statuses.getStatus(id)
-    // console.log(status)
-    // if(status == "findCorrectAnswer"){
-    //     await statuses.setStatus(id, "payToCompanies");
     let web3 = new Web3();
     let tokens = Number(web3.utils.fromWei(String(x.tokens), "ether"));
     let correctAnswer = Number(x.correctAnswer);
@@ -41,9 +36,6 @@ const payToCompanies = async (x) => {
     } catch (err) {
         console.log("err from pay to companies", err)
     }
-    // }else{
-    //     console.log("DUPLICATE FROM payToCompanies")
-    // }
 }
 
 

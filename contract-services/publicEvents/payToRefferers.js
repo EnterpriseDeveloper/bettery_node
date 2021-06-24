@@ -5,7 +5,6 @@ const url = require("../../config/path");
 const _ = require("lodash");
 const Web3 = require("web3");
 const getNonce = require("../nonce/nonce");
-const statuses = require("./status");
 const getGasPrice = require("../gasPrice/getGasPrice")
 
 const payToRefferers = async (data) => {
@@ -13,10 +12,6 @@ const payToRefferers = async (data) => {
     console.log(data);
 
     let id = data.id;
-    // let status = await statuses.getStatus(id);
-    // console.log(status)
-    // if(status == "payToLosers"){
-    //     await statuses.setStatus(id, "payToRefferers");
     let path = process.env.NODE_ENV
     let contract = await ContractInit.init(path, PlayerPaymentContract);
     let getPlayers = await fetchDataFromDb(id);
@@ -62,10 +57,6 @@ const payToRefferers = async (data) => {
     } catch (err) {
         console.log("err from pay to pay to refferers", err)
     }
-    // }else{
-    //     console.log("Duplicate from payToRefferers")
-    // }
-
 }
 
 const fetchDataFromDb = async (id) => {

@@ -2,17 +2,12 @@ const PlayerPaymentContract = require("../../abi/PlayerPayment.json");
 const ContractInit = require("../../contractInit");
 const setToDB = require("./setPaymentToDB");
 const getNonce = require("../../nonce/nonce");
-const statuses = require("../status");
 const getGasPrice = require("../../gasPrice/getGasPrice")
 
 const payToLosers = async (data) => {
     console.log("from payToLosers")
     console.log(data);
     let id = data.id;
-    // let status = await statuses.getStatus(id);
-    // console.log(status)
-    // if (status == "payToPlayers") {
-    //     await statuses.setStatus(id, "payToLosers");
     let avarageBet = data.avarageBet;
     let calcMintedToken = data.calcMintedToken;
 
@@ -33,9 +28,6 @@ const payToLosers = async (data) => {
     } catch (err) {
         console.log("err from pay to losers", err)
     }
-    // } else {
-    //     console.log("Duplicate from payToLosers")
-    // }
 }
 
 

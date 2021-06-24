@@ -1,17 +1,12 @@
 const MiddlePaymentContract = require("../abi/MiddlePayment.json");
 const ContractInit = require("../contractInit");
 const getNonce = require("../nonce/nonce");
-const statuses = require("./status");
 const getGasPrice = require("../gasPrice/getGasPrice")
 
 const payToHost = async (data) => {
     console.log("from payToHost")
     console.log(data);
     let id = data.id;
-    // let status = await statuses.getStatus(id);
-    // console.log(status)
-    // if(status == "payToCompanies"){
-    //     await statuses.setStatus(id, "payToHost")
     let premDF = data.premDF; // in wei
     let mintDF = data.mintDF; // in wei
     let mintCMF = data.mintCMF; // in wei
@@ -33,9 +28,6 @@ const payToHost = async (data) => {
     } catch (err) {
         console.log("err from pay to host", err)
     }
-    // }else{
-    //     console.log("DUBLICATE from payToHost")
-    // }
 }
 
 module.exports = {

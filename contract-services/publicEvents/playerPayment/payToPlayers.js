@@ -6,17 +6,11 @@ const url = require("../../../config/path");
 const axios = require('axios');
 const _ = require('lodash');
 const getNonce = require("../../nonce/nonce");
-const statuses = require("../status");
 const getGasPrice = require("../../gasPrice/getGasPrice")
 
 const payToPlayers = async (data) => {
     console.log("from payToPlayers", data)
     let id = data.id;
-    // let status = await statuses.getStatus(id);
-    // console.log(status)
-    // if (status == "payToExperts") {
-    //     await statuses.setStatus(id, "payToPlayers");
-    // calculate expert win and send to DB
     let expertPercMint = data.expertPercMint
     let percent = data.percent
     let expertPremiumPerc = data.expertPremiumPerc
@@ -113,10 +107,6 @@ const payToPlayers = async (data) => {
     } catch (err) {
         console.log("err from pay to players", err)
     }
-
-    // } else {
-    //     console.log("Duplicate from payToPlayers")
-    // }
 }
 
 let sendToDb = async (result) => {
