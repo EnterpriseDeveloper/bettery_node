@@ -1,12 +1,12 @@
 const keys = require("./key");
 
 // Matic main
-const maticMain = `https://wispy-spring-star.matic.quiknode.pro/${keys.quiknode}/`;
-const matciMainWSS = `wss://wispy-spring-star.matic.quiknode.pro/${keys.quiknode}/`;
+const maticMain = `https://angry-jepsen:aliens-swore-bagful-mulled-judge-hummus@nd-166-193-145.p2pify.com`;
+const matciMainWSS = `wss://angry-jepsen:aliens-swore-bagful-mulled-judge-hummus@ws-nd-166-193-145.p2pify.com`;
 const maticMainId = 137;
 // Mumbai
-const maticMumbaiHttps = 'https://matic-mumbai.chainstacklabs.com';
-const maticMumbaiWSS = 'wss://ws-matic-mumbai.chainstacklabs.com';
+const maticMumbaiHttps = 'https://competent-panini:demise-sphere-refuse-spoils-down-fiber@nd-425-039-881.p2pify.com';
+const maticMumbaiWSS = 'wss://competent-panini:demise-sphere-refuse-spoils-down-fiber@ws-nd-425-039-881.p2pify.com';
 const maticMumbaiId = 80001;
 // Goerli
 const goerli = `https://goerli.infura.io/v3/${keys.infura}`;
