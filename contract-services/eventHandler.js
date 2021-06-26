@@ -24,26 +24,26 @@ const loadHandler = async () => {
     PlayerPayment(ppEvent);
 
     provider.on('error', e => {
-        console.log('!!!!WS ERROR!!!!', e)
+        errorDebug('!!!!WS ERROR!!!!', e)
     });
     provider.on('end', e => {
-        console.log('!!!!WS CLOSE!!!!');
+        errorDebug('!!!!WS CLOSE!!!!', e);
     });
 
     // restar connection
     timeOut = setTimeout(() => {
-        interval = setInterval(() => {
-            checkConnection(web3)
+        interval = setInterval(async () => {
+            await checkConnection(web3)
         }, 1000)
     }, 5000)
 }
 
-const checkConnection = (provider) => {
+const checkConnection = async (provider) => {
     if (!provider.currentProvider.connected) {
-        console.log("RELOAD: ", Math.floor(new Date().getTime()/1000.0))
+        console.log("RELOAD: ", Math.floor(new Date().getTime() / 1000.0))
         clearInterval(interval);
         clearTimeout(timeOut);
-        loadHandler();
+        await loadHandler();
     }
 }
 
@@ -157,11 +157,11 @@ const PlayerPayment = async (playerPayment) => {
     })
 }
 
-const errorDebug = (from, err) =>{
-   let error = String(err);
-   if(error.search("close code `1006`") == -1){
-       console.log(from, err);
-   }
+const errorDebug = (from, err) => {
+    let error = String(err);
+    if (error.search("close code `1006`") == -1) {
+        console.log(from, err);
+    }
 }
 
 module.exports = {
