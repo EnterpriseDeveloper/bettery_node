@@ -29,12 +29,16 @@ module.exports = app => {
         await linkAccount.linkAccount(req, res);
     })
 
-    app.post("/user/update_nickname",authMiddleware, async (req, res) => {
+    app.post("/user/update_nickname", authMiddleware, async (req, res) => {
         await auth.updateNickname(req, res)
     })
 
-    app.post("/user/update_public_email",authMiddleware, async (req, res) => {
+    app.post("/user/update_public_email", authMiddleware, async (req, res) => {
         await auth.updatePublicEmail(req, res)
+    })
+
+    app.post("/user/auto_login", async (req, res) => {
+        await torusRegist.autoLogin(req, res);
     })
 
     app.get("/user/delete_account", async (req, res) => {

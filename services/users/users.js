@@ -4,15 +4,16 @@ const path = require("../../config/path");
 const crypto = require('crypto-js');
 const structure = require('../../structure/user.struct')
 const { secretRedis } = require('../../config/key');
+const reputationConvert = require("../../helpers/reputationConvert")
 
 const updateNickname = async (req, res) => {
     let id = req.body.dataFromRedis.id;
     let name = req.body.newNickName;
 
-    let  update = [{
-            "_id": id,
-            "users/nickName": name
-        }]
+    let update = [{
+        "_id": id,
+        "users/nickName": name
+    }]
 
     await axios.post(`${path.path}/transact`, update).catch((err) => {
         console.log(err)
@@ -21,14 +22,14 @@ const updateNickname = async (req, res) => {
         return
     })
     res.status(200);
-    res.send({name});
+    res.send({ name });
 };
 
 const updatePublicEmail = async (req, res) => {
     let id = req.body.dataFromRedis.id;
     let publicEmail = req.body.publicEmail;
 
-    let  update = [{
+    let update = [{
         "_id": id,
         "users/publicEmail": publicEmail
     }]
@@ -40,7 +41,7 @@ const updatePublicEmail = async (req, res) => {
         return
     })
     res.status(200);
-    res.send({publicEmail});
+    res.send({ publicEmail });
 };
 
 
@@ -55,8 +56,8 @@ const getUserById = (req, res) => {
     axios.post(path.path + "/query", conf).then((x) => {
         if (x.data.length != 0) {
             let o = structure.userStructure([x.data[0]])
-                o[0].accessToken = req.body.dataFromRedis.key[0].sessionKey
-                o[0].sessionToken = crypto.AES.encrypt(req.body.dataFromRedis.wallet, secretRedis).toString()
+            o[0].accessToken = req.body.dataFromRedis.key[0].sessionKey
+            o[0].sessionToken = crypto.AES.encrypt(req.body.dataFromRedis.wallet, secretRedis).toString()
             res.status(200);
             res.send(o);
 
@@ -119,7 +120,7 @@ const additionalInfo = async (req, res) => {
         advisorReputPoins: x['advisorReputPoins'] == undefined ? null : x['advisorReputPoins'],
         playerReputPoins: x['playerReputPoins'] == undefined ? null : x['playerReputPoins'],
         hostReputPoins: x['hostReputPoins'] == undefined ? null : x['hostReputPoins'],
-        expertReputPoins: x['expertReputPoins'] == undefined ? null : x['expertReputPoins'],
+        expertReputPoins: reputationConvert(x['expertReputPoins'] == undefined ? null : x['expertReputPoins'])
     }
     res.status(200);
     res.send(user);

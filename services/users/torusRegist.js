@@ -4,11 +4,11 @@ const path = require("../../config/path");
 
 const betteryToken = require("../funds/betteryToken");
 const structure = require('../../structure/user.struct');
-const { sendToRedis, redisDataStructure } = require('../../helpers/redis-helper')
+const { sendToRedis, redisDataStructure, getFromRedis } = require('../../helpers/redis-helper')
 const { secretRedis } = require('../../config/key');
+const _ = require("lodash");
 
 const torusRegist = async (req, res) => {
-
     let wallet = req.body.wallet;
     let refId = req.body.refId;
     let email = req.body.email;
@@ -65,7 +65,7 @@ const torusRegist = async (req, res) => {
         }]
         let dataToRedis = redisDataStructure(dataFromRedis, req)
 
-        let sessionToken = dataRedisSend(req.body.wallet, dataToRedis )
+        let sessionToken = dataRedisSend(req.body.wallet, dataToRedis)
 
         res.status(200);
         res.send({
@@ -120,7 +120,7 @@ const torusRegist = async (req, res) => {
             })
             let dataToRedis = redisDataStructure(userStruct, req)
 
-            userStruct[0].sessionToken = dataRedisSend( userStruct[0].wallet, dataToRedis )
+            userStruct[0].sessionToken = dataRedisSend(userStruct[0].wallet, dataToRedis)
 
             res.status(200);
             res.send(userStruct[0]);
@@ -135,6 +135,44 @@ const getVerifier = (x) => {
         return x.split('|')[1];
     } else {
         return x.split('|')[0];
+    }
+}
+
+const autoLogin = async (req, res) => {
+    let wallet = req.body.wallet;
+    let accessToken = req.body.accessToken;
+
+    let detectUser = await getFromRedis(wallet);
+    if (detectUser == null) {
+        res.status(400);
+        req.send('not valid token');
+        return
+    } else {
+        if (_.find(detectUser.key, (x) => { return x.sessionKey == accessToken }) == undefined) {
+            res.status(400);
+            req.send('not valid token');
+            return
+        } else {
+            let findUser = {
+                "select": ["*",
+                    { "users/historyTransactions": ["*"] }
+                ],
+                "from": ["users/wallet", wallet]
+            }
+
+            let user = await axios.post(`${path.path}/query`, findUser)
+                .catch((err) => {
+                    res.status(400);
+                    res.send(err.response.data.message);
+                    return;
+                })
+
+            let o = structure.userStructure(user.data);
+            o[0].accessToken = accessToken
+            o[0].sessionToken = crypto.AES.encrypt(wallet, secretRedis).toString()
+            res.status(200);
+            res.send(o[0]);
+        }
     }
 }
 
@@ -157,10 +195,11 @@ const checkUserById = async (id, res) => {
 }
 
 const dataRedisSend = (wallet, dataToRedis) => {
-        sendToRedis(wallet, dataToRedis)
-        return crypto.AES.encrypt(wallet, secretRedis).toString()
+    sendToRedis(wallet, dataToRedis)
+    return crypto.AES.encrypt(wallet, secretRedis).toString()
 }
 
 module.exports = {
-    torusRegist
+    torusRegist,
+    autoLogin
 }

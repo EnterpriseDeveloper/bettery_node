@@ -8,7 +8,7 @@ module.exports = async (req, res, next) => {
         const accessToken = req.get('Cookies')
 
         if (!sessionToken || !accessToken) {
-            return next(res.send('NO token'), 400)
+            return next(res.send('no token'), 400)
         }
 
         const bytes  = crypto.AES.decrypt(sessionToken, secretRedis);
@@ -17,14 +17,14 @@ module.exports = async (req, res, next) => {
         const fromRedis = await getFromRedis(decryptedData)
 
         if(!fromRedis) {
-            return next(res.send('NOT valid token'), 400)
+            return next(res.send('not valid token'), 400)
         }
 
         const data = fromRedis.key.filter(el => {
             return el.sessionKey === accessToken
         });
         if(!data.length) {
-            return next(res.send('NOT valid token'))
+            return next(res.send('not valid token'))
         }
         fromRedis.key = data
         req.body.dataFromRedis = fromRedis;
