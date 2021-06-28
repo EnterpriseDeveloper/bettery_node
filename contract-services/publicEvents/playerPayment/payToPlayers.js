@@ -1,7 +1,5 @@
 const PlayerPaymentContract = require("../../abi/PlayerPayment.json");
 const ContractInit = require("../../contractInit");
-const reputationConvert = require("../../../helpers/reputationConvert")
-
 const url = require("../../../config/path");
 const axios = require('axios');
 const _ = require('lodash');
@@ -24,10 +22,10 @@ const payToPlayers = async (data) => {
             {
                 "publicEvents/validatorsAnswer": [
                     "publicActivites/answer",
+                    "publicActivites/expertReput",
                     {
                         "publicActivites/from": [
-                            "users/_id",
-                            "users/expertReputPoins"
+                            "users/_id"
                         ]
                     }
                 ]
@@ -62,7 +60,7 @@ const payToPlayers = async (data) => {
 
     if (allReputation > 0) {
         for (let i = 0; i < rightValidators.length; i++) {
-            let reputation = reputationConvert(rightValidators[i]['publicActivites/from']['users/expertReputPoins'])
+            let reputation = rightValidators[i]['publicActivites/expertReput'] == undefined ? 0 : rightValidators[i]['publicActivites/expertReput'];
             let amountMint = 0;
             if (mintedTokens > 0) {
                 amountMint = expertPercMint * mintedTokens * (reputation + 1) / allReputation / 100
@@ -162,12 +160,9 @@ const calculateAllReput = (rightValidators) => {
     let total = 0;
 
     rightValidators.forEach((num) => {
-        let exRep = num['publicActivites/from']['users/expertReputPoins'];
-        if (exRep == undefined) {
-            exRep = 0
-        }
+        let exRep = num['publicActivites/expertReput'] == undefined ? 0 : num['publicActivites/expertReput'];
         if (exRep >= 0) {
-            total += reputationConvert(exRep) + 1
+            total += exRep + 1
         }
     });
     return Number(total)

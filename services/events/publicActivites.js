@@ -7,6 +7,7 @@ const Web3 = require("web3");
 const getNonce = require("../../contract-services/nonce/nonce");
 const limit = require("../../config/limits");
 const getGasPrice = require("../../contract-services/gasPrice/getGasPrice");
+const reputationConvert = require("../../helpers/reputationConvert")
 
 const participate = async (req, res) => {
     let web3 = new Web3();
@@ -124,7 +125,7 @@ const validate = async (req, res) => {
     }
 
     try {
-        let { reputation } = await userData.getUserWallet(from, res)
+        let reputation = await userData.getUserReput(from, res)
         let wallet = req.body.dataFromRedis.wallet;
         let pathContr = process.env.NODE_ENV;
         let contract = await contractInit.init(pathContr, PublicEvents)
@@ -158,7 +159,8 @@ const validate = async (req, res) => {
                 transactionHash: transaction.transactionHash,
                 // currencyType: currencyType, TODO remove from DB Shema
                 eventId: eventId,
-                amount: 0
+                amount: 0,
+                expertReput: reputation
             }
             setAnswer.push(publicActivites);
 
