@@ -25,7 +25,8 @@ const payToPlayers = async (data) => {
                     "publicActivites/expertReput",
                     {
                         "publicActivites/from": [
-                            "users/_id"
+                            "users/_id",
+                            "users/expertReputPoins"
                         ]
                     }
                 ]
@@ -86,7 +87,6 @@ const payToPlayers = async (data) => {
         // TODO add to db percent of expert to the Marketing Fund 
         console.log("ALL validators have minus reputation");
     }
-
 
     await sendToDb(payToValidators.concat(forSendReputation))
 
