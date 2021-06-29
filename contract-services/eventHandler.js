@@ -22,7 +22,6 @@ const loadHandler = async () => {
     let ppEvent = await ContractInit.connectToNetwork(provider, networkId, PlayerPaymentContract, path);
     PlayerPayment(ppEvent);
     hasProviderEnded = false;
-
     provider.on('error', e => {
         errorDebug('!!!!WS ERROR!!!!', e)
     });
@@ -36,7 +35,7 @@ const loadHandler = async () => {
         provider.removeAllListeners("end");
         setTimeout(() => {
             console.log("RELOAD: ", Math.floor(new Date().getTime() / 1000.0))
-            endCallback();
+            loadHandler();
         }, 1000);
     });
 

@@ -145,12 +145,12 @@ const autoLogin = async (req, res) => {
     let detectUser = await getFromRedis(wallet);
     if (detectUser == null) {
         res.status(400);
-        req.send('not valid token');
+        res.send('not valid token');
         return
     } else {
         if (_.find(detectUser.key, (x) => { return x.sessionKey == accessToken }) == undefined) {
             res.status(400);
-            req.send('not valid token');
+            res.send('not valid token');
             return
         } else {
             let findUser = {
