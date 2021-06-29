@@ -57,7 +57,6 @@ if (process.env.NODE_TEST != 'false') {
 
 require('./services/events')(app);
 require('./services/funds')(app);
-require('./services/history')(app);
 require('./services/users')(app);
 require('./services/rooms')(app);
 require('./services/subscribe')(app);
