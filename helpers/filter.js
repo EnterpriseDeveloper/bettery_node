@@ -1,7 +1,5 @@
-const _ = require('lodash');
-
 const searchData = (data, searchString) => {
-    return _.filter(data, (o) => {
+    return data.filter((o) => {
         return o.question.toLowerCase().includes(searchString.toLowerCase()) || findInAnswers(o.answers, searchString);
     });
 }

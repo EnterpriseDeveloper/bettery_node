@@ -1,6 +1,5 @@
 const axios = require("axios");
 const path = require("../config/path");
-const _ = require("lodash");
 
 const getAdditionalData = async (events, res) => {
     for (let i = 0; i < events.length; i++) {

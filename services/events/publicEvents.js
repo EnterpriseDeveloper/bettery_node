@@ -1,6 +1,5 @@
 const axios = require("axios");
 const path = require("../../config/path");
-const _ = require("lodash");
 const createRoom = require('../rooms/createRoom');
 const getRoom = require("../rooms/getRoom");
 const structire = require('../../structure/event.struct');
@@ -10,7 +9,6 @@ const additionalData = require('../../helpers/additionalData');
 const notification = require('../rooms/notification');
 const contractInit = require("../../contract-services/contractInit");
 const PublicEvents = require("../../contract-services/abi/PublicEvents.json");
-const userData = require("../../helpers/userData");
 const getNonce = require("../../contract-services/nonce/nonce");
 const helpers = require("../../helpers/helpers");
 const getGasPrice = require("../../contract-services/gasPrice/getGasPrice");
@@ -254,7 +252,7 @@ const getAll = async (req, res) => {
     let dataEvetns = search.length >= 1 ? filterData.searchData(obj, search) : obj;
 
     if (!finished) {
-        dataEvetns = _.filter(dataEvetns, (e) => { return e.finalAnswer === null && e.status.search("reverted") == -1 })
+        dataEvetns = dataEvetns.filter((e) => { return e.finalAnswer === null && e.status.search("reverted") == -1 })
     }
 
     let soringData;

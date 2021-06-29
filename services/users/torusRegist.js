@@ -6,7 +6,6 @@ const betteryToken = require("../funds/betteryToken");
 const structure = require('../../structure/user.struct');
 const { sendToRedis, redisDataStructure, getFromRedis, deleteFromRedis } = require('../../helpers/redis-helper')
 const { secretRedis } = require('../../config/key');
-const _ = require("lodash");
 
 const torusRegist = async (req, res) => {
     let wallet = req.body.wallet;
@@ -148,7 +147,7 @@ const autoLogin = async (req, res) => {
         res.send('not valid token');
         return
     } else {
-        if (_.find(detectUser.key, (x) => { return x.sessionKey == accessToken }) == undefined) {
+        if (detectUser.key.find((x) => { return x.sessionKey == accessToken }) == undefined) {
             res.status(400);
             res.send('not valid token');
             return

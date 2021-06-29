@@ -1,7 +1,5 @@
-const _ = require('lodash');
-
 const trendingSorting = (data) => {
-    let events = _.sortBy(data, (x) => { return x.answerAmount })
+    let events = data.sort((x) => { return x.answerAmount })
     return events.reverse();
 }
 
@@ -11,7 +9,7 @@ const controversialSorting = (data) => {
         // calcalate fomula
         data[i].controversial = (100 - allQuantity) / 100;
     }
-    let events = _.sortBy(data, (x) => { return x.controversial })
+    let events = data.sort(data, (x) => { return x.controversial })
     return events;
 }
 
