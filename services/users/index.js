@@ -41,6 +41,10 @@ module.exports = app => {
         await torusRegist.autoLogin(req, res);
     })
 
+    app.get("/user/logout",authMiddleware, async (req, res) => {
+        await torusRegist.logout(req, res);
+    })
+
     app.get("/user/delete_account", async (req, res) => {
         // TODO
         res.status(200);

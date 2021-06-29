@@ -4,7 +4,7 @@ const path = require("../../config/path");
 
 const betteryToken = require("../funds/betteryToken");
 const structure = require('../../structure/user.struct');
-const { sendToRedis, redisDataStructure, getFromRedis } = require('../../helpers/redis-helper')
+const { sendToRedis, redisDataStructure, getFromRedis, deleteFromRedis } = require('../../helpers/redis-helper')
 const { secretRedis } = require('../../config/key');
 const _ = require("lodash");
 
@@ -176,7 +176,18 @@ const autoLogin = async (req, res) => {
     }
 }
 
-
+const logout = async (req, res) => {
+    let wallet = req.body.dataFromRedis.wallet;
+    let accessToken = req.body.dataFromRedis.key[0].sessionKey;
+    try {
+        await deleteFromRedis(wallet, accessToken )
+        res.status(200)
+        res.send({})
+    } catch (e) {
+        res.status(400)
+        res.send(e , 'error logout')
+    }
+}
 
 const checkUserById = async (id, res) => {
     let findUser = {
@@ -201,5 +212,6 @@ const dataRedisSend = (wallet, dataToRedis) => {
 
 module.exports = {
     torusRegist,
-    autoLogin
+    autoLogin,
+    logout
 }
