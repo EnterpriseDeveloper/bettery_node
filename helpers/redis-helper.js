@@ -16,7 +16,7 @@ const sendToRedis = (key, data) => {
             fromRedisParse = JSON.parse(reply);
         }
 
-        if (fromRedisParse && fromRedisParse.key.length <= 4) {
+        if (fromRedisParse) {
             fromRedisParse.key.push(data.key[0])
             const dataToString = JSON.stringify(fromRedisParse)
             client.set(key, dataToString)
