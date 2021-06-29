@@ -9,7 +9,7 @@ const publicEvents = require("./publicEvents/index");
 const playPaymentSentToDB = require("./publicEvents/playerPayment/setPaymentToDB");
 const Web3 = require("web3");
 
-let interval;
+let hasProviderEnded = false;
 
 const loadHandler = async () => {
     let path = process.env.NODE_ENV
@@ -21,29 +21,43 @@ const loadHandler = async () => {
     MiddlePayment(mpEvent);
     let ppEvent = await ContractInit.connectToNetwork(provider, networkId, PlayerPaymentContract, path);
     PlayerPayment(ppEvent);
+    hasProviderEnded = false;
 
     provider.on('error', e => {
         errorDebug('!!!!WS ERROR!!!!', e)
     });
     provider.on('end', e => {
         console.log('!!!!WS CLOSE!!!!');
+        if (hasProviderEnded) return;
+        hasProviderEnded = true;
+        provider.reset();
+        provider.removeAllListeners("connect");
+        provider.removeAllListeners("error");
+        provider.removeAllListeners("end");
+        setTimeout(() => {
+            console.log("RELOAD: ", Math.floor(new Date().getTime() / 1000.0))
+            endCallback();
+        }, 1000);
     });
 
     // restar connection
-    setTimeout(() => {
-        interval = setInterval(() => {
-            checkConnection(web3)
-        }, 1000)
-    }, 5000)
+    // setTimeout(() => {
+    //     let interval = setInterval(() => {
+    //         checkConnection(web3, interval)
+    //     }, 1000)
+    // }, 5000)
 }
 
-const checkConnection = (provider) => {
-    if (!provider.currentProvider.connected) {
-        console.log("RELOAD: ", Math.floor(new Date().getTime() / 1000.0))
-        clearInterval(interval);
-        loadHandler();
-    }
-}
+// const checkConnection = (provider, interval) => {
+//     if (!provider.currentProvider.connected) {
+//         console.log("RELOAD: ", Math.floor(new Date().getTime() / 1000.0))
+//         clearInterval(interval);
+//         loadHandler();
+//         return;
+//     } else {
+//         return;
+//     }
+// }
 
 const publicEventsHandler = (publicEvent) => {
     publicEvent.events.calculateExpert(async (err, event) => {
