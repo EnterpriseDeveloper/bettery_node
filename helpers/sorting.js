@@ -9,7 +9,7 @@ const controversialSorting = (data) => {
         // calcalate fomula
         data[i].controversial = (100 - allQuantity) / 100;
     }
-    let events = data.sort(data, (x) => { return x.controversial })
+    let events = data.sort((x) => { return x.controversial })
     return events;
 }
 
