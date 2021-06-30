@@ -1,6 +1,5 @@
 const axios = require("axios");
 const path = require("../../config/path");
-const _ = require("lodash");
 const structure = require('../../structure/event.struct');
 const filterData = require('../../helpers/filter');
 const additionalData = require('../../helpers/additionalData');
@@ -51,7 +50,9 @@ const getAllUserEvents = async (req, res) => {
     } else {
         if (data['users/publicActivites'] != undefined) {
             data['users/publicActivites'].forEach((x) => {
-                eventData.push(x['publicActivites/eventId']);
+                if (x['publicActivites/eventId'] != undefined) {
+                    eventData.push(x['publicActivites/eventId']);
+                }
             })
         }
         if (data['users/hostPublicEvents'] != undefined) {
@@ -60,7 +61,7 @@ const getAllUserEvents = async (req, res) => {
             })
         }
 
-        let unique = _.uniqBy(eventData, "_id");
+        let unique = eventData.filter((v, i, a) => a.findIndex(t => (t._id === v._id)) === i)
         let obj = structure.publicEventStructure(unique);
         let dataEvetns = search.length >= 1 ? filterData.searchData(obj, search) : obj;
         if (!finished) {
