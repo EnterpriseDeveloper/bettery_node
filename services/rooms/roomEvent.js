@@ -1,7 +1,6 @@
 const axios = require('axios');
 const path = require('../../config/path');
 const structure = require('../../structure/event.struct');
-const _ = require("lodash");
 const helpers = require('../../helpers/filter');
 
 const getEventByRoomId = async (req, res) => {
@@ -81,11 +80,11 @@ const roomInfo = async (req, res) => {
 }
 
 const findJoined = (userId, data) => {
-    return _.find(data, (x) => { return x['joinRoom/userId']["_id"] == userId });
+    return data.find((x) => { return x['joinRoom/userId']["_id"] == userId });
 }
 
 const getActiveEvents = (data) => {
-    let events = _.filter(data, (x) => {
+    let events = data.filter((x) => {
         return x['publicEvents/finalAnswerNumber'] == undefined && x['publicEvents/status'].search("reverted") == -1
     })
     return events.length;

@@ -1,6 +1,5 @@
 const axios = require('axios');
 const path = require("../config/path");
-const _ = require("lodash");
 const config = require('../config/limits');
 
 module.exports = async (req, res, next) => {
@@ -22,7 +21,7 @@ module.exports = async (req, res, next) => {
 
     // let's find finised answer
 
-    let filterData = _.filter(data.data, (x) => { return x['publicEvents/finalAnswerNumber'] == undefined && x['publicEvents/status'].search("reverted") == -1 })
+    let filterData = data.data.filter((x) => { return x['publicEvents/finalAnswerNumber'] == undefined && x['publicEvents/status'].search("reverted") == -1 })
     if (filterData.length >= config.limit && prodDev) {
         res.status(400);
         res.send("Limit is reached");

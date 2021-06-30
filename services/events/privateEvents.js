@@ -1,6 +1,5 @@
 const axios = require("axios");
 const path = require("../../config/path");
-const _ = require("lodash");
 const createRoom = require('../rooms/createRoom');
 const structure = require('../../structure/event.struct');
 const contractInit = require("../../contract-services/contractInit");

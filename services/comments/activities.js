@@ -1,7 +1,6 @@
 const axios = require('axios');
 const path = require("../../config/path");
 const createComments = require('./createComments');
-const _ = require("lodash");
 
 const iconActivities = async (msg) => {
     let eventId = msg.eventId
@@ -19,7 +18,7 @@ const iconActivities = async (msg) => {
         console.log(err)
     })
     if (activites) {
-        let findEvent = _.findIndex(activites.data, (x) => { return x['commentsIconActivites/from']["_id"] == Number(userId) })
+        let findEvent = activites.data.findIndex((x) => { return x['commentsIconActivites/from']["_id"] == Number(userId) })
         if (findEvent !== -1) {
             if (activites.data[findEvent]['commentsIconActivites/type'] == type) {
                 let deleteEvent = [{

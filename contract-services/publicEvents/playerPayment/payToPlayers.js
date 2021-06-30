@@ -2,7 +2,6 @@ const PlayerPaymentContract = require("../../abi/PlayerPayment.json");
 const ContractInit = require("../../contractInit");
 const url = require("../../../config/path");
 const axios = require('axios');
-const _ = require('lodash');
 const getNonce = require("../../nonce/nonce");
 const getGasPrice = require("../../gasPrice/getGasPrice")
 
@@ -146,14 +145,15 @@ const calculateReput = (allData, correctAnswer) => {
 }
 
 const calculateLoserPool = (allData, correctAnswer) => {
-    let allParticipants = allData.data[0]['publicEvents/parcipiantsAnswer'];
+    let allPar = allData.data[0]['publicEvents/parcipiantsAnswer'];
 
-    let sort = _.filter(allParticipants, (x) => {
-        return x['publicActivites/answer'] != correctAnswer
-    })
-    return _.reduce(sort, (sum, n) => {
-        return sum + Number(n['publicActivites/amount'])
-    }, 0)
+    let sum = 0;
+    for (let i = 0; i < allPar; i++) {
+        if (allPar[i]['publicActivites/answer'] != correctAnswer) {
+            sum = sum + Number(allPar[i]['publicActivites/amount'])
+        }
+    }
+    return sum;
 }
 
 const calculateAllReput = (rightValidators) => {

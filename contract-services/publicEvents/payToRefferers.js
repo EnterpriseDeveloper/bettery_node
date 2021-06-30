@@ -2,7 +2,6 @@ const PlayerPaymentContract = require("../abi/PlayerPayment.json");
 const ContractInit = require("../contractInit");
 const axios = require("axios");
 const url = require("../../config/path");
-const _ = require("lodash");
 const Web3 = require("web3");
 const getNonce = require("../nonce/nonce");
 const getGasPrice = require("../gasPrice/getGasPrice")
@@ -98,7 +97,7 @@ const letFindAllRef = (players) => {
         // find L1
         if (players[i]['publicActivites/from']['users/invitedBy']) {
             let walletRef = players[i]['publicActivites/from']['users/invitedBy']['users/wallet']
-            let findRef = _.findIndex(allData, (x) => { return x.wallet == walletRef && x.level == 0 })
+            let findRef = allData.findIndex((x) => { return x.wallet == walletRef && x.level == 0 })
             if (findRef == -1) {
                 allData.push({
                     wallet: walletRef,
@@ -111,7 +110,7 @@ const letFindAllRef = (players) => {
             //  find L2
             if (players[i]['publicActivites/from']['users/invitedBy']['users/invitedBy']) {
                 let walletRef = players[i]['publicActivites/from']['users/invitedBy']['users/invitedBy']['users/wallet']
-                let findRef = _.findIndex(allData, (x) => { return x.wallet == walletRef && x.level == 1 })
+                let findRef = allData.findIndex((x) => { return x.wallet == walletRef && x.level == 1 })
                 if (findRef == -1) {
                     allData.push({
                         wallet: walletRef,
@@ -125,7 +124,7 @@ const letFindAllRef = (players) => {
                 // find L3
                 if (players[i]['publicActivites/from']['users/invitedBy']['users/invitedBy']['users/invitedBy']) {
                     let walletRef = players[i]['publicActivites/from']['users/invitedBy']['users/invitedBy']['users/invitedBy']['users/wallet']
-                    let findRef = _.findIndex(allData, (x) => { return x.wallet == walletRef && x.level == 2 })
+                    let findRef = allData.findIndex((x) => { return x.wallet == walletRef && x.level == 2 })
                     if (findRef == -1) {
                         allData.push({
                             wallet: walletRef,

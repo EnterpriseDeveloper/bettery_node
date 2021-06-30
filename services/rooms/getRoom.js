@@ -1,6 +1,5 @@
 const axios = require('axios');
 const path = require("../../config/path");
-const _ = require('lodash');
 const struct = require('../../structure/room.struct');
 
 const getByUserId = async (req, res) => {
@@ -18,7 +17,7 @@ const getByUserId = async (req, res) => {
     })
     let obj = struct.roomStruct(rooms.data)
     // filter rooms with private events
-    let data = _.filter(obj, (x) => { return x.publicEventsId.length != 0 })
+    let data = obj.filter((x) => { return x.publicEventsId.length != 0 })
     res.status(200)
     res.send(data)
 
@@ -38,7 +37,7 @@ const getAllRooms = async (req, res) => {
     })
     let obj = struct.roomStruct(rooms.data);
     // filter rooms with private events
-    let data = _.filter(obj, (x) => { return x.publicEventsId.length != 0 })
+    let data = obj.filter((x) => { return x.publicEventsId.length != 0 })
 
     for (let i = 0; i < data.length; i++) {
         data[i].publicEventsId = data[i].publicEventsId.reverse();
@@ -63,7 +62,7 @@ const roomValidation = async (req, res) => {
         return;
     })
     if (rooms.data.length !== 0) {
-        let findUser = _.find(rooms.data, (x) => { return x['room/name'] == roomName })
+        let findUser = rooms.data.find((x) => { return x['room/name'] == roomName })
         if (findUser !== undefined) {
             res.status(400);
             res.send({ message: "room with this name already exist" })
@@ -99,7 +98,7 @@ const getJoinedRoom = async (req, res) => {
 
         let obj = struct.roomStruct(allRooms);
         // filter rooms with private events
-        let data = _.filter(obj, (x) => { return x.publicEventsId.length != 0 })
+        let data = obj.filter((x) => { return x.publicEventsId.length != 0 })
         res.status(200)
         res.send(data)
     } else {

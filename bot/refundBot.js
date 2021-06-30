@@ -1,6 +1,5 @@
 const axios = require("axios");
 const url = require("../config/path");
-const _ = require("lodash")
 const epochWeek = require('../config/limits');
 const revertEvent = require("../services/events/revert");
 
@@ -18,7 +17,7 @@ const refundBot = async () => {
     })
 
     if (data.data.length != 0) {
-        let events = _.filter(data.data, (x) => { return x['publicEvents/finalAnswerNumber'] == undefined && !x['publicEvents/status'].includes("reverted")})
+        let events = data.data.filter((x) => { return x['publicEvents/finalAnswerNumber'] == undefined && !x['publicEvents/status'].includes("reverted")})
         if (events.length != 0) {
             for (let i = 0; i < events.length; i++) {
                 let eventId = events[i]["_id"]

@@ -64,7 +64,7 @@ const getAllUserEvents = async (req, res) => {
         let obj = structure.publicEventStructure(unique);
         let dataEvetns = search.length >= 1 ? filterData.searchData(obj, search) : obj;
         if (!finished) {
-            dataEvetns = _.filter(dataEvetns, (e) => { return e.finalAnswer === null })
+            dataEvetns = dataEvetns.filter((e) => { return e.finalAnswer === null })
         }
         let events = {
             allAmountEvents: obj.length,
