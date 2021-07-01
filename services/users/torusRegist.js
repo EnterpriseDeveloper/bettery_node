@@ -4,7 +4,7 @@ const path = require("../../config/path");
 
 const betteryToken = require("../funds/betteryToken");
 const structure = require('../../structure/user.struct');
-const { sendToRedis, redisDataStructure, getFromRedis, deleteFromRedis } = require('../../helpers/redis-helper')
+const { sendToRedis, redisDataStructure, getFromRedis, deleteFromRedis, saveKeyRedisDB } = require('../../helpers/redis-helper')
 const { secretRedis } = require('../../config/key');
 const _ = require("lodash");
 
@@ -207,6 +207,7 @@ const checkUserById = async (id, res) => {
 
 const dataRedisSend = (wallet, dataToRedis) => {
     sendToRedis(wallet, dataToRedis)
+    saveKeyRedisDB(wallet)
     return crypto.AES.encrypt(wallet, secretRedis).toString()
 }
 

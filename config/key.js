@@ -8,6 +8,7 @@ const awsBucketRegion = "ap-southeast-1";
 const awsAccessKey = "AKIA5KE3NTIWRQ5FKCPP";
 const awsSecretKey = "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";
 const secretRedis = "eyJzZWNyZXQiOiJzdXBlci1kdXBlciBzZWNyZXQgd29yZCJ9";
+const secretRedisForAllKey = "kdXBlciBzZWNyZXQgd";
 const auth0Path = "https://bettery.us.auth0.com";
 const auth0ClientId = "by3kXEWyBmVBWrAxrd5fVE97HRAQf1Wk";
 const auth0Secret = "uyXFkmokkGIJp4Wx9DngoBUkyarBXzUQ_9-hEGXCibIx8v5R6WuyYLz3fI6udHGe";
@@ -23,6 +24,7 @@ module.exports = {
    awsAccessKey,
    awsSecretKey,
    secretRedis,
+   secretRedisForAllKey,
    auth0Path,
    auth0ClientId,
    auth0Secret
