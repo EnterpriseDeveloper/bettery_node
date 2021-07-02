@@ -5,19 +5,18 @@ const BET = require("../../contract-services/abi/BET.json");
 const getNonce = require("../../contract-services/nonce/nonce");
 const getGasPrice = require("../../contract-services/gasPrice/getGasPrice");
 const Web3 = require("web3");
+const config = require("../../config/limits")
 
 const mintTokens = async (address, amount) => {
     let pathContr = process.env.NODE_ENV;
     let betteryContract = await contractInit.init(pathContr, BET)
-    let gasPrice = await getGasPrice.getGasPrice();
-    let nonce = await getNonce.getNonce();
     let web3 = new Web3();
     let amo = web3.utils.toWei(String(amount), "ether")
     let gasEstimate = await betteryContract.methods.mint(address, amo).estimateGas();
     return await betteryContract.methods.mint(address, amo).send({
-        gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
-        gasPrice: gasPrice,
-        nonce: nonce
+        gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
+        gasPrice: await getGasPrice.getGasPrice(),
+        nonce: await getNonce.getNonce()
     });
 }
 

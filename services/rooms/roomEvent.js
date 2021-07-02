@@ -31,7 +31,7 @@ const getCommentsAmount = async (events, res) => {
         let conf = {
             "select": ["comments/comment", "comments/date"],
             "where": `comments/publicEventsId = ${Number(events[i].id)}`,
-            "opts": {"orderBy": ["DESC", "comments/date"] }
+            "opts": { "orderBy": ["DESC", "comments/date"] }
         }
         let comments = await axios.post(path.path + "/query", conf)
             .catch((err) => {
@@ -80,7 +80,11 @@ const roomInfo = async (req, res) => {
 }
 
 const findJoined = (userId, data) => {
-    return data.find((x) => { return x['joinRoom/userId']["_id"] == userId });
+    if (data) {
+        return data.find((x) => { return x['joinRoom/userId']["_id"] == userId });
+    } else {
+        return false;
+    }
 }
 
 const getActiveEvents = (data) => {
@@ -120,7 +124,7 @@ const getData = async (id, res) => {
             { 'publicEvents/room': ["*"] }
         ],
         "where": `publicEvents/room = ${Number(id)}`,
-        "opts": {"orderBy": ["DESC", "publicEvents/startTime"]}
+        "opts": { "orderBy": ["DESC", "publicEvents/startTime"] }
     }
 
     const eventData = await axios.post(`${path.path}/query`, event).catch((err) => {

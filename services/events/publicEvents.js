@@ -12,6 +12,7 @@ const PublicEvents = require("../../contract-services/abi/PublicEvents.json");
 const getNonce = require("../../contract-services/nonce/nonce");
 const helpers = require("../../helpers/helpers");
 const getGasPrice = require("../../contract-services/gasPrice/getGasPrice");
+const config = require("../../config/limits")
 
 const createEvent = async (req, res) => {
     req.body.host = req.body.dataFromRedis.id
@@ -48,13 +49,11 @@ const createEvent = async (req, res) => {
         let pathContr = process.env.NODE_ENV;
         let contract = await contractInit.init(pathContr, PublicEvents)
 
-        let gasPrice = await getGasPrice.getGasPrice();
         let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).estimateGas();
-        let nonce = await getNonce.getNonce();
         let transaction = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).send({
-            gas: Number((((gasEstimate * 20) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: gasPrice,
-            nonce: nonce
+            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: await getGasPrice.getGasPrice(),
+            nonce: await getNonce.getNonce()
         });
         if (transaction) {
             let allData = req.body

@@ -9,6 +9,7 @@ const getNonce = require("../../contract-services/nonce/nonce");
 const helpers = require("../../helpers/helpers");
 const getRoom = require("../rooms/getRoom");
 const getGasPrice = require("../../contract-services/gasPrice/getGasPrice");
+const config = require("../../config/limits")
 
 const createPrivateEvent = async (req, res) => {
     let allData = req.body;
@@ -90,13 +91,11 @@ const createPrivateEvent = async (req, res) => {
         let pathContr = process.env.NODE_ENV
         let contract = await contractInit.init(pathContr, PrivateEvents)
 
-        let gasPrice = await getGasPrice.getGasPrice();
         let gasEstimate = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).estimateGas();
-        let nonce = await getNonce.getNonce();
         let transaction = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).send({
-            gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: gasPrice,
-            nonce: nonce
+            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: await getGasPrice.getGasPrice(),
+            nonce: await getNonce.getNonce()
         });
         if (transaction) {
             let transactionHash = transaction.transactionHash;
@@ -134,13 +133,11 @@ const participate = async (req, res) => {
             let wallet = req.body.dataFromRedis.wallet
             let pathContr = process.env.NODE_ENV
             let contract = await contractInit.init(pathContr, PrivateEvents)
-            let gasPrice = await getGasPrice.getGasPrice();
             let gasEstimate = await contract.methods.setAnswer(eventId, answer, wallet).estimateGas();
-            let nonce = await getNonce.getNonce();
             let transaction = await contract.methods.setAnswer(eventId, answer, wallet).send({
-                gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
-                gasPrice: gasPrice,
-                nonce: nonce
+                gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
+                gasPrice: await getGasPrice.getGasPrice(),
+                nonce: await getNonce.getNonce()
             });
 
             if (transaction) {
@@ -194,13 +191,11 @@ const validate = async (req, res) => {
             let wallet = req.body.dataFromRedis.wallet;
             let pathContr = process.env.NODE_ENV;
             let contract = await contractInit.init(pathContr, PrivateEvents)
-            let gasPrice = await getGasPrice.getGasPrice();
             let gasEstimate = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).estimateGas();
-            let nonce = await getNonce.getNonce();
             let transaction = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).send({
-                gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
-                gasPrice: gasPrice,
-                nonce: nonce
+                gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
+                gasPrice: await getGasPrice.getGasPrice(),
+                nonce: await getNonce.getNonce()
             });
 
             if (transaction) {

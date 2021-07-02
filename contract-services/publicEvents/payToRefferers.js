@@ -5,6 +5,7 @@ const url = require("../../config/path");
 const Web3 = require("web3");
 const getNonce = require("../nonce/nonce");
 const getGasPrice = require("../gasPrice/getGasPrice")
+const config = require("../../config/limits")
 
 const payToRefferers = async (data) => {
     console.log("from payToRefferers")
@@ -25,7 +26,6 @@ const payToRefferers = async (data) => {
     let { payRefAddr, payRefAmount, payComp } = getRefStruct(allData, fakeAddr, refAmount, mintedTokens, contrPercet);
 
     try {
-        let gasPrice = await getGasPrice.getGasPriceSafeLow();
         let gasEstimate = await contract.methods.payToReff(
             id,
             payRefAddr[0],
@@ -36,7 +36,6 @@ const payToRefferers = async (data) => {
             payRefAmount[2],
             payComp
         ).estimateGas();
-        let nonce = await getNonce.getNonce();
         await contract.methods.payToReff(
             id,
             payRefAddr[0],
@@ -47,9 +46,9 @@ const payToRefferers = async (data) => {
             payRefAmount[2],
             payComp
         ).send({
-            gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: gasPrice,
-            nonce: nonce
+            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: await getGasPrice.getGasPriceSafeLow(),
+            nonce: await getNonce.getNonce()
         });
 
         // TODO add to db ref payments

@@ -2,6 +2,7 @@ const MiddlePaymentContract = require("../abi/MiddlePayment.json");
 const ContractInit = require("../contractInit");
 const getNonce = require("../nonce/nonce");
 const getGasPrice = require("../gasPrice/getGasPrice")
+const config = require("../../config/limits")
 
 const payToHost = async (data) => {
     console.log("from payToHost")
@@ -15,13 +16,11 @@ const payToHost = async (data) => {
     let path = process.env.NODE_ENV;
     let contract = await ContractInit.init(path, MiddlePaymentContract);
     try {
-        let gasPrice = await getGasPrice.getGasPriceSafeLow();
         let gasEstimate = await contract.methods.letsPaytoHost(id).estimateGas();
-        let nonce = await getNonce.getNonce();
         await contract.methods.letsPaytoHost(id).send({
-            gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: gasPrice,
-            nonce: nonce
+            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: await getGasPrice.getGasPriceSafeLow(),
+            nonce: await getNonce.getNonce()
         });
 
         // TODO ADD TO DB
