@@ -47,7 +47,7 @@ const payToRefferers = async (data) => {
             payRefAmount[2],
             payComp
         ).send({
-            gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
+            gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
             gasPrice: gasPrice,
             nonce: nonce
         });

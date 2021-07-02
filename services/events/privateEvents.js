@@ -94,7 +94,7 @@ const createPrivateEvent = async (req, res) => {
         let gasEstimate = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).estimateGas();
         let nonce = await getNonce.getNonce();
         let transaction = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).send({
-            gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
+            gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
             gasPrice: gasPrice,
             nonce: nonce
         });
@@ -138,7 +138,7 @@ const participate = async (req, res) => {
             let gasEstimate = await contract.methods.setAnswer(eventId, answer, wallet).estimateGas();
             let nonce = await getNonce.getNonce();
             let transaction = await contract.methods.setAnswer(eventId, answer, wallet).send({
-                gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
+                gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
                 gasPrice: gasPrice,
                 nonce: nonce
             });
@@ -198,7 +198,7 @@ const validate = async (req, res) => {
             let gasEstimate = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).estimateGas();
             let nonce = await getNonce.getNonce();
             let transaction = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).send({
-                gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
+                gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
                 gasPrice: gasPrice,
                 nonce: nonce
             });

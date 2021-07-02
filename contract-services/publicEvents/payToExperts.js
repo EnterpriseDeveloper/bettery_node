@@ -23,7 +23,7 @@ const payToExperts = async (data) => {
         let gasEstimate = await contract.methods.letsPayToExperts(id).estimateGas();
         let nonce = await getNonce.getNonce();
         await contract.methods.letsPayToExperts(id).send({
-            gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
+            gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
             gasPrice: gasPrice,
             nonce: nonce
         });

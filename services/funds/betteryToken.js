@@ -15,7 +15,7 @@ const mintTokens = async (address, amount) => {
     let amo = web3.utils.toWei(String(amount), "ether")
     let gasEstimate = await betteryContract.methods.mint(address, amo).estimateGas();
     return await betteryContract.methods.mint(address, amo).send({
-        gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
+        gas: Number((((gasEstimate * 25) / 100) + gasEstimate).toFixed(0)),
         gasPrice: gasPrice,
         nonce: nonce
     });

@@ -52,7 +52,7 @@ const createEvent = async (req, res) => {
         let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).estimateGas();
         let nonce = await getNonce.getNonce();
         let transaction = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).send({
-            gas: Number((((gasEstimate * 50) / 100) + gasEstimate).toFixed(0)),
+            gas: Number((((gasEstimate * 20) / 100) + gasEstimate).toFixed(0)),
             gasPrice: gasPrice,
             nonce: nonce
         });
