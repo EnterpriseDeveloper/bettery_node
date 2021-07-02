@@ -83,7 +83,7 @@ const findJoined = (userId, data) => {
     if (data) {
         return data.find((x) => { return x['joinRoom/userId']["_id"] == userId });
     } else {
-        return false;
+        return undefined;
     }
 }
 
