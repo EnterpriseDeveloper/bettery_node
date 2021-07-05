@@ -20,7 +20,7 @@ fs.readdirSync('node_modules')
   });
 
 export = {
-  entry: './index.js',
+  entry: './index.ts',
   target: 'node',
   output: {
     path: path.join(__dirname, ''),

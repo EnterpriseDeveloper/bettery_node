@@ -1,5 +1,0 @@
-"use strict";
-var key = "CB25D2F1E2DBF91E59A0651EF66B0E8770AFEF8179BC820510BBD89410C2B831";
-module.exports = {
-    key: key
-};
