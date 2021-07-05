@@ -10,14 +10,14 @@ const { secretRedis } = require('../../config/key');
 const torusRegist = async (req, res) => {
     let wallet = req.body.wallet;
     let refId = req.body.refId;
-    let email = req.body.email;
+    let email = req.body.email ? req.body.email.slice(0, req.body.email.lastIndexOf('+') + 1) : undefined;
     let verifierId = getVerifier(req.body.verifierId);
 
     let findEmail = {
         "select": ["*",
             { "users/historyTransactions": ["*"] }
         ],
-        "from": email ? ["users/email", req.body.email] : ["users/wallet", req.body.wallet]
+        "from": email ? ["users/email", email] : ["users/wallet", req.body.wallet]
     }
 
     let user = await axios.post(`${path.path}/query`, findEmail)
@@ -31,7 +31,7 @@ const torusRegist = async (req, res) => {
         let data = [{
             "_id": "users$newUser",
             "nickName": req.body.nickName,
-            "email": req.body.email,
+            "email": email,
             "wallet": wallet,
             "avatar": req.body.avatar == "" ? 'https://api.bettery.io/image/avatar.png' : req.body.avatar,
             "verifier": req.body.verifier,
@@ -57,7 +57,7 @@ const torusRegist = async (req, res) => {
         await betteryToken.mintTokens(wallet, 10);
         // TODO add session token from Redis
         const dataFromRedis = [{
-            email: req.body.email ? req.body.email : 'undefined',
+            email: email ? email : 'undefined',
             wallet: req.body.wallet,
             _id: x.data.tempids['users$newUser'],
             typeOfLogin: req.body.verifier
@@ -70,7 +70,7 @@ const torusRegist = async (req, res) => {
         res.send({
             _id: x.data.tempids['users$newUser'],
             nickName: req.body.nickName,
-            email: req.body.email,
+            email: email,
             wallet: req.body.wallet,
             avatar: req.body.avatar,
             listHostEvents: [],
