@@ -47,9 +47,7 @@ const updatePublicEmail = async (req, res) => {
 
 const getUserById = (req, res) => {
     let conf = {
-        "select": ["*",
-            { "historyTransactions": ["*"] }
-        ],
+        "select": ["_id", "users/nickName", "users/email", "users/wallet", "users/avatar", "users/verifier", "users/linkedAccounts"],
         "from": Number(req.body.id)
     }
 
@@ -75,9 +73,7 @@ const getUserById = (req, res) => {
 const allUsers = (req, res) => {
 
     let conf = {
-        "select": ["*",
-            { "historyTransactions": ["*"] }
-        ],
+        "select": ["_id", "users/nickName", "users/email", "users/wallet", "users/avatar", "users/verifier", "users/linkedAccounts"],
         "from": "users"
     }
 

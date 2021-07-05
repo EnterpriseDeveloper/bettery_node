@@ -7,18 +7,7 @@ const userStructure = (data) => {
             avatar: x["users/avatar"],
             email: x["users/email"],
             verifier: x["users/verifier"],
-            linkedAccounts: x["users/linkedAccounts"] === undefined ? [] : x["users/linkedAccounts"],
-            historyTransaction: x["historyTransactions"] === undefined ? [] : x["historyTransactions"].map((history) => {
-                return {
-                    id: history._id,
-                    date: history['historyTransactions/date'],
-                    paymentWay: history['historyTransactions/paymentWay'],
-                    amount: history['historyTransactions/amount'],
-                    role: history['historyTransactions/role'],
-                    currencyType: history['historyTransactions/currencyType'],
-                    eventId: history['historyTransactions/eventId'] === undefined ? "Deleted" : history['historyTransactions/eventId']["_id"]
-                }
-            })
+            linkedAccounts: x["users/linkedAccounts"] === undefined ? [] : x["users/linkedAccounts"]
         }
     })
 }

@@ -10,13 +10,11 @@ const { secretRedis } = require('../../config/key');
 const torusRegist = async (req, res) => {
     let wallet = req.body.wallet;
     let refId = req.body.refId;
-    let email = req.body.email ? req.body.email.slice(0, req.body.email.lastIndexOf('+') + 1) : undefined;
+    let email = req.body.email;
     let verifierId = getVerifier(req.body.verifierId);
 
     let findEmail = {
-        "select": ["*",
-            { "users/historyTransactions": ["*"] }
-        ],
+        "select": ["_id", "users/nickName", "users/email", "users/wallet", "users/avatar", "users/verifier", "users/linkedAccounts"],
         "from": email ? ["users/email", email] : ["users/wallet", req.body.wallet]
     }
 
@@ -73,12 +71,9 @@ const torusRegist = async (req, res) => {
             email: email,
             wallet: req.body.wallet,
             avatar: req.body.avatar,
-            listHostEvents: [],
-            listParticipantEvents: [],
-            listValidatorEvents: [],
-            historyTransaction: [],
             verifier: req.body.verifier,
-            sessionToken: sessionToken
+            sessionToken: sessionToken,
+            accessToken: req.body.accessToken
         })
 
     } else {
@@ -120,6 +115,7 @@ const torusRegist = async (req, res) => {
             let dataToRedis = redisDataStructure(userStruct, req)
 
             userStruct[0].sessionToken = dataRedisSend(userStruct[0].wallet, dataToRedis)
+            userStruct[0].accessToken = req.body.accessToken
 
             res.status(200);
             res.send(userStruct[0]);
@@ -153,9 +149,7 @@ const autoLogin = async (req, res) => {
             return
         } else {
             let findUser = {
-                "select": ["*",
-                    { "users/historyTransactions": ["*"] }
-                ],
+                "select": ["_id", "users/nickName", "users/email", "users/wallet", "users/avatar", "users/verifier", "users/linkedAccounts"],
                 "from": ["users/wallet", wallet]
             }
 
@@ -179,12 +173,12 @@ const logout = async (req, res) => {
     let wallet = req.body.dataFromRedis.wallet;
     let accessToken = req.body.dataFromRedis.key[0].sessionKey;
     try {
-        await deleteFromRedis(wallet, accessToken )
+        await deleteFromRedis(wallet, accessToken)
         res.status(200)
         res.send({})
     } catch (e) {
         res.status(400)
-        res.send(e , 'error logout')
+        res.send(e, 'error logout')
     }
 }
 
