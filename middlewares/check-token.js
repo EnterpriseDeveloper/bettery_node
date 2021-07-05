@@ -1,5 +1,5 @@
 const crypto = require('crypto-js');
-const {getFromRedis} = require('../helpers/redis-helper')
+const {getFromRedis, updateLastUpdate} = require('../helpers/redis-helper')
 const {secretRedis} = require('../config/key')
 
 module.exports = async (req, res, next) => {
@@ -19,6 +19,14 @@ module.exports = async (req, res, next) => {
         if(!fromRedis) {
             return next(res.send('not valid token'), 400)
         }
+
+        fromRedis.key.forEach(el => {
+            if(el.sessionKey === accessToken){
+                el.lastUpdated = Date.now()
+            }
+        })
+
+        updateLastUpdate(decryptedData, fromRedis)
 
         const data = fromRedis.key.filter(el => {
             return el.sessionKey === accessToken
