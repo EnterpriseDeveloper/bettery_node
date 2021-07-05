@@ -1,19 +1,19 @@
-const trendingSorting = (data) => {
-    let events = data.sort((x) => { return x.answerAmount })
+const trendingSorting = (data: any) => {
+    let events = data.sort((x: any) => { return x.answerAmount })
     return events.reverse();
 }
 
-const controversialSorting = (data) => {
+const controversialSorting = (data: any) => {
     for (let i = 0; i < data.length; i++) {
         let allQuantity = data[i].parcipiantAnswers == undefined ? 0 : data[i].parcipiantAnswers.length;
         // calcalate fomula
         data[i].controversial = (100 - allQuantity) / 100;
     }
-    let events = data.sort((x) => { return x.controversial })
+    let events = data.sort((x: any) => { return x.controversial })
     return events;
 }
 
-module.exports = {
+export = {
     trendingSorting,
     controversialSorting
 }

@@ -1,13 +1,13 @@
-const path = require("../config/path");
-const axios = require("axios");
-const reputationConvert = require("../helpers/reputationConvert")
+import path from "../config/path";
+import axios from "axios";
+import reputationConvert from "../helpers/reputationConvert"
 
-const getUserReput = async (id, res) => {
+const getUserReput = async (id: any, res: any) => {
     let userConfig = {
         "select": ["users/expertReputPoins"],
         "from": Number(id)
     }
-    let hostDataWallet = await axios.post(`${path.path}/query`, userConfig).catch((err) => {
+    let hostDataWallet: any = await axios.post(`${path.path}/query`, userConfig).catch((err) => {
         console.log("DB error: " + err.response.data.message)
         res.status(400);
         res.send(err.response.data.message);
@@ -17,6 +17,6 @@ const getUserReput = async (id, res) => {
     return reputationConvert(hostDataWallet.data[0]['users/expertReputPoins']);
 }
 
-module.exports = {
+export = {
     getUserReput
 }

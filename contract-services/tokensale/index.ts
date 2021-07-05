@@ -1,24 +1,17 @@
-const Web3 = require("web3");
-const TokenSaleContract = require('../abi/QuizeTokenSale.json')
-const BetteryTokenContract = require('../abi/BTYmain.json'); // TODO rename
-const config = require('../../config/networks');
+// @ts-nocheck
+import Web3 from "web3";
+import TokenSaleContract from '../abi/QuizeTokenSale.json'
+import BetteryTokenContract from '../abi/BTYmain.json'; // TODO rename
+import config from '../../config/networks';
 
-module.exports = app => {
+export = (app: any) => {
     // TODO
-    app.post("/tokensale/info", async (req, res) => {
+    app.post("/tokensale/info", async (req: any, res: any) => {
         let from = req.body.from;
-        let provider;
-        let networkId;
-        let keys;
-        if (from == "prod") {
-            provider = config.mainnet;
-            networkId = config.mainnetID;
-            keys = require("../keys/prod/privKey"); 
-        } else if (from == "dev") {
-            provider = config.goerli;
-            networkId = config.mainId;
-            keys = require("../keys/test/privKey");
-        }
+        let provider = from == "prod" ? config.mainnet : config.goerli;
+        let networkId: any = from == "prod" ? config.mainnetID : config.mainId;
+        let keys = from == "prod" ? require("../keys/prod/privKey") : require("../keys/test/privKey");
+    
         let tokenMarket = await tokenSale(provider, networkId, keys);
         let tokenSold = await tokenMarket.methods.tokensSold().call();
         let price = await tokenMarket.methods.tokenPrice().call();
@@ -35,21 +28,21 @@ module.exports = app => {
     })
 }
 
-async function BetteryContract(provider, networkId, keys) {
+async function BetteryContract(provider: any, networkId: any, keys: any) {
     let { web3, account } = await connectToContract(provider, keys);
     let abi = BetteryTokenContract.abi;
     let address = BetteryTokenContract.networks[networkId].address;
     return new web3.eth.Contract(abi, address, { from: account });
 }
 
-async function tokenSale(provider, networkId, keys) {
+async function tokenSale(provider: any, networkId: any, keys: any) {
     let { web3, account } = await connectToContract(provider, keys);
     let abi = TokenSaleContract.abi;
     let address = TokenSaleContract.networks[networkId].address;
     return new web3.eth.Contract(abi, address, { from: account });
 }
 
-async function connectToContract(provider, keys) {
+async function connectToContract(provider: any, keys: any) {
     let web3 = new Web3(provider);
     const prKey = web3.eth.accounts.privateKeyToAccount('0x' + keys.key);
     await web3.eth.accounts.wallet.add(prKey);

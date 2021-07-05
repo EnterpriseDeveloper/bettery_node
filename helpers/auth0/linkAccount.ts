@@ -1,10 +1,10 @@
-const axios = require('axios');
-const key = require("../../config/key");
-const path = require("../../config/path");
-const betToken = require("../../services/funds/betteryToken")
+import axios from 'axios';
+import key from "../../config/key";
+import path from "../../config/path";
+import betToken from "../../services/funds/betteryToken"
 
-const init = async (res) => {
-    let data = await axios.post(`${key.auth0Path}/oauth/token`,
+const init = async (res: any) => {
+    let data: any = await axios.post(`${key.auth0Path}/oauth/token`,
         {
             "client_id": key.auth0ClientId,
             "client_secret": key.auth0Secret,
@@ -24,7 +24,7 @@ const init = async (res) => {
     return data.data.access_token;
 }
 
-const linkAccount = async (req, res) => {
+const linkAccount = async (req: any, res: any) => {
     let accessKey = await init(res);
     let firstId = req.body.dataFromRedis.key[0].verifierId;
     let secondId = req.body.verifierId
@@ -71,7 +71,7 @@ const linkAccount = async (req, res) => {
 
 }
 
-const getProvider = (x) => {
+const getProvider = (x: any) => {
     if (x.search("google-oauth2") != -1) {
         return "google-oauth2";
     } else if (x.search("oauth2") != -1) {
@@ -81,7 +81,7 @@ const getProvider = (x) => {
     }
 }
 
-const getVerifier = (x) => {
+const getVerifier = (x: any) => {
     if (x.search("google-oauth2") != -1) {
         return "google";
     } else if (x.search("oauth2") != -1) {
@@ -91,7 +91,7 @@ const getVerifier = (x) => {
     }
 }
 
-module.exports = {
+export = {
     linkAccount
 }
 

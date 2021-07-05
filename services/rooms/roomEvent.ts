@@ -1,9 +1,9 @@
-const axios = require('axios');
-const path = require('../../config/path');
-const structure = require('../../structure/event.struct');
-const helpers = require('../../helpers/filter');
+import axios from 'axios';
+import path from '../../config/path';
+import structure from '../../structure/event.struct';
+import helpers from '../../helpers/filter';
 
-const getEventByRoomId = async (req, res) => {
+const getEventByRoomId = async (req: any, res: any) => {
     let id = req.body.id;
     let from = req.body.from;
     let to = req.body.to;
@@ -26,15 +26,15 @@ const getEventByRoomId = async (req, res) => {
     }
 }
 
-const getCommentsAmount = async (events, res) => {
+const getCommentsAmount = async (events: any, res: any) => {
     for (let i = 0; i < events.length; i++) {
         let conf = {
             "select": ["comments/comment", "comments/date"],
             "where": `comments/publicEventsId = ${Number(events[i].id)}`,
             "opts": { "orderBy": ["DESC", "comments/date"] }
         }
-        let comments = await axios.post(path.path + "/query", conf)
-            .catch((err) => {
+        let comments: any = await axios.post(path.path + "/query", conf)
+            .catch((err: any) => {
                 res.status(400);
                 res.send(err.response);
                 console.log("DB error: " + err.response)
@@ -52,7 +52,7 @@ const getCommentsAmount = async (events, res) => {
     return events;
 }
 
-const roomInfo = async (req, res) => {
+const roomInfo = async (req: any, res: any) => {
     let roomId = req.body.roomId;
     let userId = req.body.userId;
     let eventData = await getData(roomId, res);
@@ -79,22 +79,22 @@ const roomInfo = async (req, res) => {
     }
 }
 
-const findJoined = (userId, data) => {
+const findJoined = (userId: any, data: any) => {
     if (data) {
-        return data.find((x) => { return x['joinRoom/userId']["_id"] == userId });
+        return data.find((x: any) => { return x['joinRoom/userId']["_id"] == userId });
     } else {
         return undefined;
     }
 }
 
-const getActiveEvents = (data) => {
-    let events = data.filter((x) => {
+const getActiveEvents = (data: any) => {
+    let events = data.filter((x: any) => {
         return x['publicEvents/finalAnswerNumber'] == undefined && x['publicEvents/status'].search("reverted") == -1
     })
     return events.length;
 }
 
-const getHostData = async (id, res) => {
+const getHostData = async (id: any, res: any) => {
     let host = {
         "select": ["*",
             {
@@ -105,7 +105,7 @@ const getHostData = async (id, res) => {
         "from": id,
     }
 
-    const hostData = await axios.post(`${path.path}/query`, host).catch((err) => {
+    const hostData: any = await axios.post(`${path.path}/query`, host).catch((err: any) => {
         res.status(404);
         res.send({ message: err });
         return undefined;
@@ -115,7 +115,7 @@ const getHostData = async (id, res) => {
 
 }
 
-const getData = async (id, res) => {
+const getData = async (id: any, res: any) => {
     let event = {
         "select": ["*",
             { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
@@ -127,7 +127,7 @@ const getData = async (id, res) => {
         "opts": { "orderBy": ["DESC", "publicEvents/startTime"] }
     }
 
-    const eventData = await axios.post(`${path.path}/query`, event).catch((err) => {
+    const eventData = await axios.post(`${path.path}/query`, event).catch((err: any) => {
         res.status(404);
         res.send({ message: err });
         return undefined;
@@ -135,7 +135,7 @@ const getData = async (id, res) => {
     return eventData;
 }
 
-module.exports = {
+export = {
     getEventByRoomId,
     roomInfo
 }

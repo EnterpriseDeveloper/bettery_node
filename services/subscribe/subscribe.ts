@@ -1,7 +1,7 @@
-const axios = require("axios");
-const path = require("../../config/path");
+import axios from "axios";
+import path from "../../config/path";
 
-const emailSub = async (req, res) => {
+const emailSub = async (req: any, res: any) => {
     const create = [{
         "_id": "emailSubscribe$newSub",
         "email": req.body.email,
@@ -13,11 +13,11 @@ const emailSub = async (req, res) => {
         res.send(err.response.data.message);
         return;
     })
-    
+
     res.status(200);
     res.send({ "status": "ok" });
 }
 
-module.exports = {
+export = {
     emailSub
 }

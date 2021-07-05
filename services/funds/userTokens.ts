@@ -1,7 +1,7 @@
-const axios = require("axios");
-const path = require("../../config/path");
+import axios from "axios";
+import path from "../../config/path";
 
-const sendTokens = async (req, res) => {
+const sendTokens = async (req: any, res: any) => {
     if (req.body.dataFromRedis.id && req.body.bet && req.body.bty) {
         let data = [{
             "_id": Number(req.body.dataFromRedis.id),
@@ -10,10 +10,10 @@ const sendTokens = async (req, res) => {
             "lastUpdate": Math.floor(Date.now() / 1000)
         }]
 
-        axios.post(path.path + "/transact", data).then(()=>{
+        axios.post(path.path + "/transact", data).then(() => {
             res.status(200);
             res.send({ "status": "done" })
-        }).catch((err)=>{
+        }).catch((err: any) => {
             res.status(400);
             res.send(err.response.data.message);
         })
@@ -21,10 +21,10 @@ const sendTokens = async (req, res) => {
         return
     }
     res.status(400)
-    res.send({status: "Bad request 400"})
+    res.send({ status: "Bad request 400" })
 }
 
 
-module.exports = {
+export = {
     sendTokens
 }

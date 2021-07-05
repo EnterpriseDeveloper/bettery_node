@@ -1,4 +1,4 @@
-const reputationConvert = (n) =>  {
+const reputationConvert = (n: any) =>  {
     let num1 = n === undefined ? 0 : Number(n);
     let num2 = num1 < 0 ? (num1 * -1) : num1;
 
@@ -11,4 +11,4 @@ const reputationConvert = (n) =>  {
     }
 }
 
-module.exports = reputationConvert
+export = reputationConvert

@@ -1,6 +1,5 @@
-const { secretRedisForAllKey } = require("../config/key")
-
-const redis = require("redis");
+import keys from "../config/key";
+import redis from "redis";
 const redisUrl = "redis://127.0.0.1:6379";
 const client = redis.createClient(redisUrl);
 
@@ -8,10 +7,10 @@ client.on("error", function (error) {
     console.error(error);
 });
 
-const {promisify} = require("util");
+const { promisify } = require("util");
 const getAsync = promisify(client.get).bind(client);
 
-const sendToRedis = (key, data) => {
+const sendToRedis = (key: any, data: any) => {
     client.get(key, function (err, reply) {
         let fromRedisParse;
         if (reply) {
@@ -29,12 +28,12 @@ const sendToRedis = (key, data) => {
     });
 }
 
-const updateLastUpdate = (key, data) => {
+const updateLastUpdate = (key: any, data: any) => {
     const result = JSON.stringify(data);
     client.set(key, result)
 }
 
-const getFromRedis = async (key) => {
+const getFromRedis = async (key: any) => {
     try {
         let value = await getAsync(key);
         return JSON.parse(value);
@@ -44,19 +43,19 @@ const getFromRedis = async (key) => {
     }
 }
 
-const deleteFromRedis = async (key, sessionKey) => {
+const deleteFromRedis = async (key: any, sessionKey: any) => {
     client.get(key, function (err, reply) {
         let fromRedisParse;
 
         if (reply) {
             fromRedisParse = JSON.parse(reply);
-            fromRedisParse.key = fromRedisParse.key.filter(el => {
+            fromRedisParse.key = fromRedisParse.key.filter((el: any) => {
                 return el.sessionKey !== sessionKey
             })
 
             if (!fromRedisParse.key.length) {
                 client.del(key)
-                client.lrem(secretRedisForAllKey, 0, key, (err) => {
+                client.lrem(keys.secretRedisForAllKey, 0, key, (err) => {
                     if (err) throw err
                 })
             } else {
@@ -67,7 +66,7 @@ const deleteFromRedis = async (key, sessionKey) => {
     })
 }
 
-const redisDataStructure = (userStruct, req) => {
+const redisDataStructure = (userStruct: any, req: any) => {
     return {
         email: userStruct[0].email,
         wallet: userStruct[0].wallet,
@@ -84,15 +83,15 @@ const redisDataStructure = (userStruct, req) => {
     }
 }
 
-const saveKeyRedisDB = (data) => {
+const saveKeyRedisDB = (data: any) => {
     try {
-        client.lrange(secretRedisForAllKey, 0, -1, (error, allItems) => {
+        client.lrange(keys.secretRedisForAllKey, 0, -1, (error, allItems) => {
             if (error) {
                 throw error
             }
             if (allItems.indexOf(data) === -1) {
                 let multi = client.multi();
-                multi.rpush(secretRedisForAllKey, data)
+                multi.rpush(keys.secretRedisForAllKey, data)
                 multi.exec(function (err) {
                     if (err) throw err;
                 })
@@ -107,7 +106,7 @@ const saveKeyRedisDB = (data) => {
 
 const botRedisCleaner = async () => {
     try {
-        client.lrange(secretRedisForAllKey, 0, -1, async (error, allItems) => {
+        client.lrange(keys.secretRedisForAllKey, 0, -1, async (error, allItems) => {
             if (error) {
                 throw error
             }
@@ -121,13 +120,13 @@ const botRedisCleaner = async () => {
                     let now = Date.now()
                     let day30 = 2592000000;
 
-                    let clearingData = userDetectKey.filter(el => {
+                    let clearingData = userDetectKey.filter((el: any) => {
                         return (now - el.lastUpdated) < day30
                     })
 
                     if (!clearingData.length) {
                         client.del(element)
-                        client.lrem(secretRedisForAllKey, 0, element, (err) => {
+                        client.lrem(keys.secretRedisForAllKey, 0, element, (err) => {
                             if (err) throw err
                         })
                     } else {
@@ -144,7 +143,7 @@ const botRedisCleaner = async () => {
 }
 
 
-module.exports = {
+export default {
     sendToRedis,
     updateLastUpdate,
     getFromRedis,

@@ -1,5 +1,5 @@
-const userStructure = (data) => {
-    return data.map((x) => {
+const userStructure = (data: any) => {
+    return data.map((x: any) => {
         return {
             _id: x["_id"],
             wallet: x["users/wallet"],
@@ -12,6 +12,6 @@ const userStructure = (data) => {
     })
 }
 
-module.exports = {
+export = {
     userStructure
 }

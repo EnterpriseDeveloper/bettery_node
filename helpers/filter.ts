@@ -1,10 +1,10 @@
-const searchData = (data, searchString) => {
-    return data.filter((o) => {
+const searchData = (data: any, searchString: any) => {
+    return data.filter((o: any) => {
         return o.question.toLowerCase().includes(searchString.toLowerCase()) || findInAnswers(o.answers, searchString);
     });
 }
 
-const findInAnswers = (data, searchString) => {
+const findInAnswers = (data: any, searchString: any) => {
     let i = 0
     let includesData = false;
     do {
@@ -14,6 +14,6 @@ const findInAnswers = (data, searchString) => {
     return includesData;
 }
 
-module.exports = {
+export = {
     searchData
 }

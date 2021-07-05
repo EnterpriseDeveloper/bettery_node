@@ -1,8 +1,8 @@
-const axios = require('axios');
-const path = require("../config/path");
-const config = require('../config/limits');
+import axios from 'axios';
+import path from "../config/path";
+import config from '../config/limits';
 
-module.exports = async (req, res, next) => {
+export = async (req: any, res: any, next: any) => {
     let userID = req.body.dataFromRedis.id;
     let prodDev = req.body.prodDev
 
@@ -12,7 +12,7 @@ module.exports = async (req, res, next) => {
         "from": "privateEvents"
     }
 
-    let data = await axios.post(`${path.path}/query`, query).catch((err) => {
+    let data: any = await axios.post(`${path.path}/query`, query).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
@@ -21,8 +21,8 @@ module.exports = async (req, res, next) => {
 
     // let's find finised answer
 
-    let filterData = data.data.filter((x)=>{return x['privateEvents/finalAnswer'] == ''});
-    if(filterData.length >= config.limit && prodDev){
+    let filterData = data.data.filter((x: any) => { return x['privateEvents/finalAnswer'] == '' });
+    if (filterData.length >= config.limit && prodDev) {
         res.status(400);
         res.send("Limit is reached");
         return;

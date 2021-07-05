@@ -1,6 +1,6 @@
 import crypto from 'crypto-js';
-import { getFromRedis, updateLastUpdate } from '../helpers/redis-helper'
-import { secretRedis } from '../config/key'
+import redis from '../helpers/redis-helper';
+import keys from '../config/key';
 
 export = async (req: any, res: any, next: any) => {
     try {
@@ -11,10 +11,10 @@ export = async (req: any, res: any, next: any) => {
             return next(res.send('no token'), 400)
         }
 
-        const bytes = crypto.AES.decrypt(sessionToken, secretRedis);
+        const bytes = crypto.AES.decrypt(sessionToken, keys.secretRedis);
         const decryptedData = bytes.toString(crypto.enc.Utf8);
 
-        const fromRedis = await getFromRedis(decryptedData)
+        const fromRedis = await redis.getFromRedis(decryptedData)
 
         if (!fromRedis) {
             return next(res.send('not valid token'), 400)
@@ -26,7 +26,7 @@ export = async (req: any, res: any, next: any) => {
             }
         })
 
-        updateLastUpdate(decryptedData, fromRedis)
+        redis.updateLastUpdate(decryptedData, fromRedis)
 
         const data = fromRedis.key.filter((el: any) => {
             return el.sessionKey === accessToken

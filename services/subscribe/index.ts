@@ -1,7 +1,7 @@
-const sub = require("./subscribe");
+import sub from "./subscribe";
 
-module.exports = app => {
-    app.post("/subscribe", async (req, res) => {
+export = (app:any) => {
+    app.post("/subscribe", async (req: any, res: any) => {
         sub.emailSub(req, res);
     })
 }

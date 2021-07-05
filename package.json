@@ -19,6 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.4.1",
+    "@types/crypto-js": "^4.0.1",
     "@types/express": "^4.17.12",
     "async-mutex": "^0.3.1",
     "aws-sdk": "^2.939.0",
@@ -37,6 +38,7 @@
     "web3": "^1.4.0"
   },
   "devDependencies": {
+    "@types/redis": "^2.8.30",
     "crypto-js": "^4.0.0",
     "webpack": "^5.36.1",
     "webpack-cli": "^4.6.0",

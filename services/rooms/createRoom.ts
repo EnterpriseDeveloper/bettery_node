@@ -1,8 +1,8 @@
-const axios = require('axios');
-const path = require("../../config/path");
+import axios from 'axios';
+import path from "../../config/path";
 
-const createRoom = (data, type) => {
-    return newRoom = {
+const createRoom = (data: any, type: any) => {
+    return {
         _id: "room$newRoom",
         [type]: [data._id],
         name: data.roomName,
@@ -12,7 +12,7 @@ const createRoom = (data, type) => {
     }
 }
 
-const joinToRoom = async (req, res) => {
+const joinToRoom = async (req: any, res: any) => {
     let userId = req.body.dataFromRedis.id;
     let roomId = req.body.roomId;
     let config = [{
@@ -39,7 +39,7 @@ const joinToRoom = async (req, res) => {
     res.send({ status: "ok" });
 }
 
-const leaveRoom = async (req, res) => {
+const leaveRoom = async (req: any, res: any) => {
     let joinedId = req.body.joinedId;
     let config = [{
         "_id": Number(joinedId),
@@ -58,7 +58,7 @@ const leaveRoom = async (req, res) => {
 }
 
 
-module.exports = {
+export = {
     createRoom,
     joinToRoom,
     leaveRoom

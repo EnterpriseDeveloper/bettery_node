@@ -1,12 +1,12 @@
 
-const axios = require("axios");
-const path = require("../../config/path");
-const crypto = require('crypto-js');
-const structure = require('../../structure/user.struct')
-const { secretRedis } = require('../../config/key');
-const reputationConvert = require("../../helpers/reputationConvert")
+import axios from "axios";
+import path from "../../config/path";
+import crypto from 'crypto-js';
+import structure from '../../structure/user.struct'
+import config from '../../config/key';
+import reputationConvert from "../../helpers/reputationConvert"
 
-const updateNickname = async (req, res) => {
+const updateNickname = async (req: any, res: any) => {
     let id = req.body.dataFromRedis.id;
     let name = req.body.newNickName;
 
@@ -25,7 +25,7 @@ const updateNickname = async (req, res) => {
     res.send({ name });
 };
 
-const updatePublicEmail = async (req, res) => {
+const updatePublicEmail = async (req: any, res: any) => {
     let id = req.body.dataFromRedis.id;
     let publicEmail = req.body.publicEmail;
 
@@ -45,7 +45,7 @@ const updatePublicEmail = async (req, res) => {
 };
 
 
-const getUserById = (req, res) => {
+const getUserById = (req: any, res: any) => {
     let conf = {
         "select": ["_id", "users/nickName", "users/email", "users/wallet", "users/avatar", "users/verifier", "users/linkedAccounts"],
         "from": Number(req.body.id)
@@ -55,7 +55,7 @@ const getUserById = (req, res) => {
         if (x.data.length != 0) {
             let o = structure.userStructure([x.data[0]])
             o[0].accessToken = req.body.dataFromRedis.key[0].sessionKey
-            o[0].sessionToken = crypto.AES.encrypt(req.body.dataFromRedis.wallet, secretRedis).toString()
+            o[0].sessionToken = crypto.AES.encrypt(req.body.dataFromRedis.wallet, config.secretRedis).toString()
             res.status(200);
             res.send(o);
 
@@ -70,7 +70,7 @@ const getUserById = (req, res) => {
     })
 }
 
-const allUsers = (req, res) => {
+const allUsers = (req: any, res: any) => {
 
     let conf = {
         "select": ["_id", "users/nickName", "users/email", "users/wallet", "users/avatar", "users/verifier", "users/linkedAccounts"],
@@ -88,7 +88,7 @@ const allUsers = (req, res) => {
     })
 }
 
-const additionalInfo = async (req, res) => {
+const additionalInfo = async (req: any, res: any) => {
     let conf = {
         "select": ["linkedAccounts", "publicEmail", "advisorReputPoins", "playerReputPoins", "hostReputPoins", "expertReputPoins", {
             "invitedBy":
@@ -97,7 +97,7 @@ const additionalInfo = async (req, res) => {
         "from": Number(req.body.id)
     }
 
-    let data = await axios.post(path.path + "/query", conf).catch((err) => {
+    let data: any = await axios.post(path.path + "/query", conf).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
         return;
@@ -123,7 +123,7 @@ const additionalInfo = async (req, res) => {
 }
 
 
-module.exports = {
+export = {
     allUsers,
     getUserById,
     additionalInfo,

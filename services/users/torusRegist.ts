@@ -4,8 +4,8 @@ import path from "../../config/path";
 
 import betteryToken from "../funds/betteryToken";
 import structure from '../../structure/user.struct';
-import { sendToRedis, redisDataStructure, getFromRedis, deleteFromRedis, saveKeyRedisDB } from '../../helpers/redis-helper';
-import { secretRedis } from '../../config/key';
+import redis from '../../helpers/redis-helper';
+import config from '../../config/key';
 
 const torusRegist = async (req: any, res: any) => {
     let wallet = req.body.wallet;
@@ -60,7 +60,7 @@ const torusRegist = async (req: any, res: any) => {
             _id: x.data.tempids['users$newUser'],
             typeOfLogin: req.body.verifier
         }]
-        let dataToRedis = redisDataStructure(dataFromRedis, req)
+        let dataToRedis = redis.redisDataStructure(dataFromRedis, req)
 
         let sessionToken = dataRedisSend(req.body.wallet, dataToRedis)
 
@@ -112,7 +112,7 @@ const torusRegist = async (req: any, res: any) => {
                 res.send(err.response.data.message);
                 return;
             })
-            let dataToRedis = redisDataStructure(userStruct, req)
+            let dataToRedis = redis.redisDataStructure(userStruct, req)
 
             userStruct[0].sessionToken = dataRedisSend(userStruct[0].wallet, dataToRedis)
             userStruct[0].accessToken = req.body.accessToken
@@ -137,7 +137,7 @@ const autoLogin = async (req: any, res: any) => {
     let wallet = req.body.wallet;
     let accessToken = req.body.accessToken;
 
-    let detectUser = await getFromRedis(wallet);
+    let detectUser = await redis.getFromRedis(wallet);
     if (detectUser == null) {
         res.status(400);
         res.send('not valid token');
@@ -162,7 +162,7 @@ const autoLogin = async (req: any, res: any) => {
 
             let o = structure.userStructure(user.data);
             o[0].accessToken = accessToken
-            o[0].sessionToken = crypto.AES.encrypt(wallet, secretRedis).toString()
+            o[0].sessionToken = crypto.AES.encrypt(wallet, config.secretRedis).toString()
             res.status(200);
             res.send(o[0]);
         }
@@ -173,7 +173,7 @@ const logout = async (req: any, res: any) => {
     let wallet = req.body.dataFromRedis.wallet;
     let accessToken = req.body.dataFromRedis.key[0].sessionKey;
     try {
-        await deleteFromRedis(wallet, accessToken)
+        await redis.deleteFromRedis(wallet, accessToken)
         res.status(200)
         res.send({})
     } catch (e) {
@@ -199,9 +199,9 @@ const checkUserById = async (id: any, res: any) => {
 }
 
 const dataRedisSend = (wallet: any, dataToRedis: any) => {
-    sendToRedis(wallet, dataToRedis)
-    saveKeyRedisDB(wallet)
-    return crypto.AES.encrypt(wallet, secretRedis).toString()
+    redis.sendToRedis(wallet, dataToRedis)
+    redis.saveKeyRedisDB(wallet)
+    return crypto.AES.encrypt(wallet, config.secretRedis).toString()
 }
 
 export = {

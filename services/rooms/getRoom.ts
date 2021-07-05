@@ -1,15 +1,15 @@
-const axios = require('axios');
-const path = require("../../config/path");
-const struct = require('../../structure/room.struct');
+import axios from 'axios';
+import path from"../../config/path";
+import struct from'../../structure/room.struct';
 
-const getByUserId = async (req, res) => {
+const getByUserId = async (req: any, res: any) => {
     let userId = req.body.dataFromRedis.id
     let getRooms = {
         "select": ["*", { 'room/owner': ["users/nickName", "users/avatar"] }],
         "where": `room/owner = ${Number(userId)}`
     }
 
-    let rooms = await axios.post(`${path.path}/query`, getRooms).catch(err => {
+    let rooms: any = await axios.post(`${path.path}/query`, getRooms).catch(err => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message);
@@ -17,19 +17,19 @@ const getByUserId = async (req, res) => {
     })
     let obj = struct.roomStruct(rooms.data)
     // filter rooms with private events
-    let data = obj.filter((x) => { return x.publicEventsId.length != 0 })
+    let data = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
     res.status(200)
     res.send(data)
 
 }
 
-const getAllRooms = async (req, res) => {
+const getAllRooms = async (req: any, res: any) => {
     let getRooms = {
         "select": ["*", { 'room/owner': ["users/nickName", "users/avatar"] }],
         "from": "room"
     }
 
-    let rooms = await axios.post(`${path.path}/query`, getRooms).catch(err => {
+    let rooms: any = await axios.post(`${path.path}/query`, getRooms).catch(err => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message);
@@ -37,7 +37,7 @@ const getAllRooms = async (req, res) => {
     })
     let obj = struct.roomStruct(rooms.data);
     // filter rooms with private events
-    let data = obj.filter((x) => { return x.publicEventsId.length != 0 })
+    let data = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
 
     for (let i = 0; i < data.length; i++) {
         data[i].publicEventsId = data[i].publicEventsId.reverse();
@@ -47,7 +47,7 @@ const getAllRooms = async (req, res) => {
 
 }
 
-const roomValidation = async (req, res) => {
+const roomValidation = async (req: any, res: any) => {
     let roomName = req.body.name;
     let userId = req.body.dataFromRedis.id
 
@@ -55,14 +55,14 @@ const roomValidation = async (req, res) => {
         "select": ["*"],
         "where": `room/owner = ${Number(userId)}`
     }
-    let rooms = await axios.post(`${path.path}/query`, findRoom).catch(err => {
+    let rooms: any = await axios.post(`${path.path}/query`, findRoom).catch(err => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
         return;
     })
     if (rooms.data.length !== 0) {
-        let findUser = rooms.data.find((x) => { return x['room/name'] == roomName })
+        let findUser = rooms.data.find((x: any) => { return x['room/name'] == roomName })
         if (findUser !== undefined) {
             res.status(400);
             res.send({ message: "room with this name already exist" })
@@ -76,15 +76,15 @@ const roomValidation = async (req, res) => {
     }
 }
 
-const getJoinedRoom = async (req, res) => {
+const getJoinedRoom = async (req: any, res: any) => {
     let id = req.body.dataFromRedis.id;
-    let allRooms = [];
+    let allRooms: any = [];
     let config = {
         "select": [{ "users/joinedRooms": [{ "joinRoom/roomId": ["*", { 'room/owner': ["*"] }] }] }],
         "from": Number(id)
     }
 
-    let rooms = await axios.post(`${path.path}/query`, config).catch(err => {
+    let rooms: any = await axios.post(`${path.path}/query`, config).catch(err => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
@@ -92,13 +92,13 @@ const getJoinedRoom = async (req, res) => {
     })
 
     if (rooms.data[0]['users/joinedRooms'] !== undefined) {
-        rooms.data[0]['users/joinedRooms'].forEach((x) => {
+        rooms.data[0]['users/joinedRooms'].forEach((x: any) => {
             allRooms.push(x['joinRoom/roomId'])
         })
 
         let obj = struct.roomStruct(allRooms);
         // filter rooms with private events
-        let data = obj.filter((x) => { return x.publicEventsId.length != 0 })
+        let data = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
         res.status(200)
         res.send(data)
     } else {
@@ -107,13 +107,13 @@ const getJoinedRoom = async (req, res) => {
     }
 }
 
-const getRoomColor = async (id) => {
+const getRoomColor = async (id: any) => {
     const config = {
         "select": ["room/roomColor"],
         "from": Number(id)
     }
 
-    let data = await axios.post(`${path.path}/query`, config).catch(err => {
+    let data: any = await axios.post(`${path.path}/query`, config).catch(err => {
         console.log("err from get room color: " + err.response)
         return;
     })
@@ -123,7 +123,7 @@ const getRoomColor = async (id) => {
 
 
 
-module.exports = {
+export = {
     getByUserId,
     roomValidation,
     getAllRooms,

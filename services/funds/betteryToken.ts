@@ -1,13 +1,13 @@
-const axios = require('axios');
-const path = require("../../config/path")
-const contractInit = require("../../contract-services/contractInit");
-const BET = require("../../contract-services/abi/BET.json");
-const getNonce = require("../../contract-services/nonce/nonce");
-const getGasPrice = require("../../contract-services/gasPrice/getGasPrice");
-const Web3 = require("web3");
-const config = require("../../config/limits")
+import axios from 'axios';
+import path from "../../config/path"
+import contractInit from "../../contract-services/contractInit";
+import BET from "../../contract-services/abi/BET.json";
+import getNonce from "../../contract-services/nonce/nonce";
+import getGasPrice from "../../contract-services/gasPrice/getGasPrice";
+import Web3 from "web3";
+import config from "../../config/limits"
 
-const mintTokens = async (address, amount) => {
+const mintTokens = async (address: any, amount: any) => {
     let pathContr = process.env.NODE_ENV;
     let betteryContract = await contractInit.init(pathContr, BET)
     let web3 = new Web3();
@@ -20,7 +20,7 @@ const mintTokens = async (address, amount) => {
     });
 }
 
-const getBTYToken = async (req, res) => {
+const getBTYToken = async (req: any, res: any) => {
     let email = req.body.email;
     if (email) {
         let findWallet = {
@@ -48,7 +48,7 @@ const getBTYToken = async (req, res) => {
     }
 }
 
-const transferToken = async (oldWallet, newWallet) => {
+const transferToken = async (oldWallet: any, newWallet: any) => {
     let pathContr = process.env.NODE_ENV;
     let betteryContract = await contractInit.init(pathContr, BET);
     let amount = await betteryContract.methods.balanceOf(oldWallet).call();
@@ -60,7 +60,7 @@ const transferToken = async (oldWallet, newWallet) => {
         return;
     }
 }
-module.exports = {
+export = {
     mintTokens,
     getBTYToken,
     transferToken

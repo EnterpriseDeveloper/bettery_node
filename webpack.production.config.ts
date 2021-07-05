@@ -1,8 +1,8 @@
-var webpack = require('webpack');
-var path = require('path');
-var fs = require('fs');
+import webpack from 'webpack';
+import path from 'path';
+import fs from 'fs';
 
-var nodeModules = {};
+var nodeModules: any = {};
 
 new webpack.DefinePlugin({
     'process.env': {
@@ -12,14 +12,14 @@ new webpack.DefinePlugin({
 });
 
 fs.readdirSync('node_modules')
-    .filter(function (x) {
+    .filter(function (x: any) {
         return ['.bin'].indexOf(x) === -1;
     })
-    .forEach(function (mod) {
+    .forEach(function (mod: any) {
         nodeModules[mod] = 'commonjs ' + mod;
     });
 
-module.exports = {
+export = {
     entry: './index.js',
     target: 'node',
     output: {

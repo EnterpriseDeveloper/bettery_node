@@ -1,10 +1,10 @@
 const fsPromise = require("fs").promises;
-const fs = require("fs");
-const util = require('util');
+import fs from "fs";
+import util from 'util';
 const unlinkFile = util.promisify(fs.unlink);
-const s3 = require("./S3/s3");
+import s3 from "./S3/s3";
 
-const arrayUnique = (array) => {
+const arrayUnique = (array: any) => {
     var a = array.concat();
     for (var i = 0; i < a.length; ++i) {
         for (var j = i + 1; j < a.length; ++j) {
@@ -16,17 +16,17 @@ const arrayUnique = (array) => {
     return a;
 }
 
-const decodeBase64Image = (dataString) => {
-    var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
-        response = {};
+const decodeBase64Image = (dataString: any) => {
+    var matches: any = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+        response: any = {};
 
     response.type = matches[1];
-    response.data = new Buffer.from(matches[2], 'base64');
+    response.data = Buffer.from(matches[2], 'base64');
 
     return response;
 }
 
-const uploadImage = async (thumImage, id) => {
+const uploadImage = async (thumImage: any, id: any) => {
     let imgBuffer = decodeBase64Image(thumImage);
     let type = imgBuffer.type.slice(imgBuffer.type.lastIndexOf('/') + 1);
     let imagePath = `./${id}.${type}`;
@@ -42,7 +42,7 @@ const uploadImage = async (thumImage, id) => {
 
 
 
-module.exports = {
+export = {
     arrayUnique,
     uploadImage
 }

@@ -1,23 +1,23 @@
-const withdrawal = require("./withdrawal");
-const bettertToken = require('./betteryToken');
-const userTokens = require('./userTokens')
-const checkToken = require('../../middlewares/check-token');
+import withdrawal from "./withdrawal";
+import bettertToken from './betteryToken';
+import userTokens from './userTokens'
+import checkToken from '../../middlewares/check-token';
 
-module.exports = app => {
+export = (app: any) => {
 
-    app.post("/withdrawal/init", async (req, res) => {
+    app.post("/withdrawal/init", async (req: any, res: any) => {
         withdrawal.setInitWithd(req, res);
     })
 
-    app.get("/withdrawal/exit", checkToken, async (req, res) => {
+    app.get("/withdrawal/exit", checkToken, async (req: any, res: any) => {
         withdrawal.setInitWithd(req, res);
     })
 
-    app.post("/tokens/bty", async (req, res) => {
+    app.post("/tokens/bty", async (req: any, res: any) => {
         bettertToken.getBTYToken(req, res);
     })
 
-    app.post("/users/updateBalance", checkToken, async (req, res) => {
+    app.post("/users/updateBalance", checkToken, async (req: any, res: any) => {
         userTokens.sendTokens(req, res);
     })
 }

@@ -1,6 +1,6 @@
-const fs = require('fs')
-const S3 = require('aws-sdk/clients/s3')
-const key = require("../../config/key");
+import fs from 'fs'
+import S3 from 'aws-sdk/clients/s3'
+import key from "../../config/key";
 
 const bucketName = key.awsBucketName;
 const region = key.awsBucketRegion;
@@ -13,7 +13,7 @@ const s3 = new S3({
   secretAccessKey
 })
 
-function uploadFile(file) {
+function uploadFile(file: any) {
   const fileStream = fs.createReadStream(file.path)
 
   const uploadParams = {
@@ -26,7 +26,7 @@ function uploadFile(file) {
 }
 
 
-const getFileStream = (key) =>{
+const getFileStream = (key: any) => {
   const downloadParams = {
     Key: key,
     Bucket: bucketName
@@ -35,7 +35,7 @@ const getFileStream = (key) =>{
   return s3.getObject(downloadParams).createReadStream()
 }
 
-module.exports = {
+export = {
   getFileStream,
   uploadFile
 }
