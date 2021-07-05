@@ -29,6 +29,6 @@ const payToHost = async (data: any) => {
     }
 }
 
-export = {
+export {
     payToHost
 }

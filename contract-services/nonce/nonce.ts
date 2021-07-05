@@ -1,7 +1,7 @@
 import Web3 from "web3";
-import networkConfig from "../../config/networks";
+import { maticMain, maticMumbaiHttps } from "../../config/networks";
 import axios from "axios";
-import url from "../../config/path";
+import { path } from "../../config/path";
 var Mutex = require('async-mutex').Mutex;
 
 const nonceInit = async () => {
@@ -13,7 +13,7 @@ const nonceInit = async () => {
         "from": "configuration"
     }
 
-    let getNonce: any = await axios.post(`${url.path}/query`, getNonceConfig).catch((err) => {
+    let getNonce: any = await axios.post(`${path}/query`, getNonceConfig).catch((err) => {
         console.log("get nonce err: " + err);
     })
 
@@ -22,7 +22,7 @@ const nonceInit = async () => {
             "_id": getNonce.data[0]["_id"],
             "nonce": nonce
         }]
-        return await axios.post(`${url.path}/transact`, setNonce).catch((err) => {
+        return await axios.post(`${path}/transact`, setNonce).catch((err) => {
             console.log("set nonce err: " + err);
         })
 
@@ -31,7 +31,7 @@ const nonceInit = async () => {
             "_id": "configuration$newConfig",
             "nonce": nonce
         }]
-        return await axios.post(`${url.path}/transact`, setNonce).catch((err) => {
+        return await axios.post(`${path}/transact`, setNonce).catch((err) => {
             console.log("set new nonce err: " + err);
         })
     }
@@ -45,7 +45,7 @@ const getNonce = async () => {
         "from": "configuration"
     }
 
-    let getNonce: any = await axios.post(`${url.path}/query`, getNonceConfig).catch((err) => {
+    let getNonce: any = await axios.post(`${path}/query`, getNonceConfig).catch((err) => {
         console.log("get nonce err: " + err);
     })
 
@@ -54,7 +54,7 @@ const getNonce = async () => {
         "_id": getNonce.data[0]["_id"],
         "nonce": nonce + 1
     }]
-    await axios.post(`${url.path}/transact`, setNonce).catch((err) => {
+    await axios.post(`${path}/transact`, setNonce).catch((err) => {
         console.log("set nonce err: " + err);
     })
     release();
@@ -62,7 +62,7 @@ const getNonce = async () => {
 }
 
 const getAccount = async () => {
-    let provider = process.env.NODE_ENV == "production" ? networkConfig.maticMain : networkConfig.maticMumbaiHttps;
+    let provider = process.env.NODE_ENV == "production" ? maticMain : maticMumbaiHttps;
     let keys = process.env.NODE_ENV == "production" ? require("../keys/prod/privKey") : require("../keys/test/privKey");
     let web3 = new Web3(provider);
     const prKey = web3.eth.accounts.privateKeyToAccount('0x' + keys.key);
@@ -72,7 +72,7 @@ const getAccount = async () => {
     return { account, web3 };
 }
 
-export = {
+export {
     nonceInit,
     getNonce
 }

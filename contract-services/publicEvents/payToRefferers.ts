@@ -1,11 +1,11 @@
 import PlayerPaymentContract from "../abi/PlayerPayment.json";
-import ContractInit from "../contractInit";
+import { init } from "../contractInit";
 import axios from "axios";
-import url from "../../config/path";
+import { path } from "../../config/path";
 import Web3 from "web3";
-import getNonce from "../nonce/nonce";
+import { getNonce } from "../nonce/nonce";
 import getGasPrice from "../gasPrice/getGasPrice"
-import config from "../../config/limits"
+import { gasPercent } from "../../config/limits"
 
 const payToRefferers = async (data: any) => {
     console.log("from payToRefferers")
@@ -13,7 +13,7 @@ const payToRefferers = async (data: any) => {
 
     let id = data.id;
     let path = process.env.NODE_ENV
-    let contract = await ContractInit.init(path, PlayerPaymentContract);
+    let contract = await init(path, PlayerPaymentContract);
     let getPlayers: any = await fetchDataFromDb(id);
 
     let mintedTokens = Number(getPlayers.data[0]["mintedTokens"]);
@@ -46,9 +46,9 @@ const payToRefferers = async (data: any) => {
             payRefAmount[2],
             payComp
         ).send({
-            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
             gasPrice: await getGasPrice.getGasPriceSafeLow(),
-            nonce: await getNonce.getNonce()
+            nonce: await getNonce()
         });
 
         // TODO add to db ref payments
@@ -84,7 +84,7 @@ const fetchDataFromDb = async (id: any) => {
         "from": Number(id)
     }
 
-    return await axios.post(`${url.path}/query`, fetchData).catch((err) => {
+    return await axios.post(`${path}/query`, fetchData).catch((err) => {
         console.log("DB error from query payToRefferers: " + err.response.data.message)
         return;
     })
@@ -228,6 +228,6 @@ const getRefStruct = (allData: any, fakeAddr: any, refAmount: any, mintedTokens:
     return { payRefAddr, payRefAmount, payComp }
 }
 
-export = {
+export {
     payToRefferers
 }

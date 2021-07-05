@@ -43,6 +43,6 @@ const expertCalc = async (data: any) => {
     }
 }
 
-export = {
+export {
     expertCalc
 }

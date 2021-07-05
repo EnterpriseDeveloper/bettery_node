@@ -1,5 +1,5 @@
 import axios from "axios";
-import url from "../../config/path";
+import { path } from "../../config/path";
 
 const reverted = async (data: any) => {
     let eventId = Number(data.id);
@@ -10,12 +10,12 @@ const reverted = async (data: any) => {
         "eventEnd": Math.floor(new Date().getTime() / 1000.0)
     }]
 
-    await axios.post(`${url.path}/transact`, revert).catch((err: any) => {
+    await axios.post(`${path}/transact`, revert).catch((err: any) => {
         console.log(err);
         return;
     })
 }
 
-export = {
+export {
     reverted
 }

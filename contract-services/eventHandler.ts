@@ -2,8 +2,8 @@ import PublicEventContract from "./abi/PublicEvents.json";
 import MiddlePaymentContract from "./abi/MiddlePayment.json";
 import PlayerPaymentContract from "./abi/PlayerPayment.json";
 
-import ContractInit from "./contractInit";
-import ExpertsCalcOracle from './oracels/exprestCalc';
+import { webSoketInit, connectToNetwork } from "./contractInit";
+import { expertCalc } from './oracels/exprestCalc';
 import setAnswer from "../services/events/event_is_finish";
 import publicEvents from "./publicEvents/index";
 import playPaymentSentToDB from "./publicEvents/playerPayment/setPaymentToDB";
@@ -13,13 +13,13 @@ let hasProviderEnded = false;
 
 const loadHandler = async () => {
     let path = process.env.NODE_ENV
-    let { provider, networkId } = ContractInit.webSoketInit(path);
+    let { provider, networkId } = webSoketInit(path);
     let web3 = new Web3(provider)
-    let publicEvent = await ContractInit.connectToNetwork(provider, networkId, PublicEventContract, path);
+    let publicEvent = await connectToNetwork(provider, networkId, PublicEventContract, path);
     publicEventsHandler(publicEvent);
-    let mpEvent = await ContractInit.connectToNetwork(provider, networkId, MiddlePaymentContract, path);
+    let mpEvent = await connectToNetwork(provider, networkId, MiddlePaymentContract, path);
     MiddlePayment(mpEvent);
-    let ppEvent = await ContractInit.connectToNetwork(provider, networkId, PlayerPaymentContract, path);
+    let ppEvent = await connectToNetwork(provider, networkId, PlayerPaymentContract, path);
     PlayerPayment(ppEvent);
     hasProviderEnded = false;
     provider.on('error', (e: void) => {
@@ -64,7 +64,7 @@ const publicEventsHandler = (publicEvent: any) => {
             errorDebug('Error from calculate expert events', err)
         } else {
             console.log("event calculateExpert work")
-            ExpertsCalcOracle.expertCalc(event.returnValues);
+            expertCalc(event.returnValues);
         }
     })
 

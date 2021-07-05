@@ -4,14 +4,14 @@ import TokenSaleContract from '../abi/QuizeTokenSale.json'
 import BetteryTokenContract from '../abi/BTYmain.json'; // TODO rename
 import config from '../../config/networks';
 
-export = (app: any) => {
+export default (app: any) => {
     // TODO
     app.post("/tokensale/info", async (req: any, res: any) => {
         let from = req.body.from;
         let provider = from == "prod" ? config.mainnet : config.goerli;
         let networkId: any = from == "prod" ? config.mainnetID : config.mainId;
         let keys = from == "prod" ? require("../keys/prod/privKey") : require("../keys/test/privKey");
-    
+
         let tokenMarket = await tokenSale(provider, networkId, keys);
         let tokenSold = await tokenMarket.methods.tokensSold().call();
         let price = await tokenMarket.methods.tokenPrice().call();
