@@ -13,7 +13,7 @@ const auth0Path = "https://bettery.us.auth0.com";
 const auth0ClientId = "by3kXEWyBmVBWrAxrd5fVE97HRAQf1Wk";
 const auth0Secret = "uyXFkmokkGIJp4Wx9DngoBUkyarBXzUQ_9-hEGXCibIx8v5R6WuyYLz3fI6udHGe";
 
-export default {
+export {
    apiKey,
    infura,
    APIprod,

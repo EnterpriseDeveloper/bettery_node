@@ -1,6 +1,6 @@
 import axios from "axios";
-import url from "../config/path";
-import epochWeek from '../config/limits';
+import { path } from "../config/path";
+import { epochWeek } from '../config/limits';
 import revertEvent from "../services/events/revert";
 
 
@@ -11,7 +11,7 @@ const refundBot = async () => {
         ],
         "from": "publicEvents"
     }
-    let data: any = await axios.post(`${url.path}/query`, config).catch((err) => {
+    let data: any = await axios.post(`${path}/query`, config).catch((err) => {
         console.log(err);
         return;
     })
@@ -23,7 +23,7 @@ const refundBot = async () => {
                 let eventId = events[i]["_id"]
                 let endTime = events[i]["publicEvents/endTime"];
                 let timeNow = Math.floor(new Date().getTime() / 1000.0)
-                let week = epochWeek.epochWeek;
+                let week = epochWeek;
                 if (timeNow - endTime > week) {
                     let participant = events[i]["publicEvents/parcipiantsAnswer"];
                     await revertEvent.revertEvent(eventId, participant, "not enough experts")
@@ -33,6 +33,6 @@ const refundBot = async () => {
     }
 }
 
-export = {
+export {
     refundBot
 }

@@ -1,8 +1,8 @@
 
 import axios from "axios";
-import path from "../../config/path";
+import { path } from "../../config/path";
 import crypto from 'crypto-js';
-import structure from '../../structure/user.struct'
+import { userStructure } from '../../structure/user.struct'
 import config from '../../config/key';
 import reputationConvert from "../../helpers/reputationConvert"
 
@@ -15,7 +15,7 @@ const updateNickname = async (req: any, res: any) => {
         "users/nickName": name
     }]
 
-    await axios.post(`${path.path}/transact`, update).catch((err) => {
+    await axios.post(`${path}/transact`, update).catch((err) => {
         console.log(err)
         res.status(400);
         res.send(err.response.data.message);
@@ -34,7 +34,7 @@ const updatePublicEmail = async (req: any, res: any) => {
         "users/publicEmail": publicEmail
     }]
 
-    await axios.post(`${path.path}/transact`, update).catch((err) => {
+    await axios.post(`${path}/transact`, update).catch((err) => {
         console.log(err)
         res.status(400);
         res.send(err.response.data.message);
@@ -51,9 +51,9 @@ const getUserById = (req: any, res: any) => {
         "from": Number(req.body.id)
     }
 
-    axios.post(path.path + "/query", conf).then((x) => {
+    axios.post(path + "/query", conf).then((x) => {
         if (x.data.length != 0) {
-            let o = structure.userStructure([x.data[0]])
+            let o = userStructure([x.data[0]])
             o[0].accessToken = req.body.dataFromRedis.key[0].sessionKey
             o[0].sessionToken = crypto.AES.encrypt(req.body.dataFromRedis.wallet, config.secretRedis).toString()
             res.status(200);
@@ -77,8 +77,8 @@ const allUsers = (req: any, res: any) => {
         "from": "users"
     }
 
-    axios.post(path.path + "/query", conf).then((o) => {
-        let result = structure.userStructure(o.data);
+    axios.post(path + "/query", conf).then((o) => {
+        let result = userStructure(o.data);
 
         res.status(200);
         res.send(result);
@@ -97,7 +97,7 @@ const additionalInfo = async (req: any, res: any) => {
         "from": Number(req.body.id)
     }
 
-    let data: any = await axios.post(path.path + "/query", conf).catch((err) => {
+    let data: any = await axios.post(path + "/query", conf).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
         return;
@@ -123,7 +123,7 @@ const additionalInfo = async (req: any, res: any) => {
 }
 
 
-export = {
+export {
     allUsers,
     getUserById,
     additionalInfo,

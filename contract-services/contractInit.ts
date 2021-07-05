@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import networkConfig from "../config/networks";
+import { maticMain, maticMumbaiHttps, maticMainId, maticMumbaiId, matciMainWSS, maticMumbaiWSS } from "../config/networks";
 
 
 async function getAccount(provider: any, keys: any) {
@@ -12,14 +12,14 @@ async function getAccount(provider: any, keys: any) {
 }
 
 async function init(networkWay: any, contract: any) {
-    let network = networkWay == "production" ? networkConfig.maticMain : networkConfig.maticMumbaiHttps,
-        networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId;
+    let network = networkWay == "production" ? maticMain : maticMumbaiHttps,
+        networkId = networkWay == "production" ? maticMainId : maticMumbaiId;
     return await connectToNetwork(network, networkId, contract, networkWay);
 }
 
 function webSoketInit(networkWay: any) {
-    let network = networkWay == "production" ? networkConfig.matciMainWSS : networkConfig.maticMumbaiWSS,
-        networkId = networkWay == "production" ? networkConfig.maticMainId : networkConfig.maticMumbaiId;
+    let network = networkWay == "production" ? matciMainWSS : maticMumbaiWSS,
+        networkId = networkWay == "production" ? maticMainId : maticMumbaiId;
     let options = {
         timeout: 30000, // ms
         clientConfig: {
@@ -52,7 +52,7 @@ async function connectToNetwork(network: any, networkId: any, contract: any, net
     return new web3.eth.Contract(abi, address, { from: account });
 }
 
-export = {
+export {
     init,
     webSoketInit,
     connectToNetwork

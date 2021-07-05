@@ -12,6 +12,6 @@ const userStructure = (data: any) => {
     })
 }
 
-export = {
+export {
     userStructure
 }

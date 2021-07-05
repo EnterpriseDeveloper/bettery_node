@@ -18,6 +18,6 @@ const notificationStruct = (data: any) => {
     })
 }
 
-export = {
+export {
     notificationStruct
 }

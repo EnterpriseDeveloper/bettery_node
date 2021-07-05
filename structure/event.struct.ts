@@ -137,7 +137,7 @@ const getPrivateColor = (z: any) => {
 
 }
 
-export = {
+export {
     publicEventStructure,
     privateEventStructure
 }

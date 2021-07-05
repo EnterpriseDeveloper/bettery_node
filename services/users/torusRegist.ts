@@ -1,9 +1,9 @@
 import axios from "axios";
 import crypto from 'crypto-js';
-import path from "../../config/path";
+import {path} from "../../config/path";
 
 import betteryToken from "../funds/betteryToken";
-import structure from '../../structure/user.struct';
+import {userStructure} from '../../structure/user.struct';
 import redis from '../../helpers/redis-helper';
 import config from '../../config/key';
 
@@ -18,7 +18,7 @@ const torusRegist = async (req: any, res: any) => {
         "from": email ? ["users/email", email] : ["users/wallet", req.body.wallet]
     }
 
-    let user: any = await axios.post(`${path.path}/query`, findEmail)
+    let user: any = await axios.post(`${path}/query`, findEmail)
         .catch((err) => {
             res.status(400);
             res.send(err.response.data.message);
@@ -47,7 +47,7 @@ const torusRegist = async (req: any, res: any) => {
             }
         }
 
-        let x: any = await axios.post(`${path.path}/transact`, data).catch((err) => {
+        let x: any = await axios.post(`${path}/transact`, data).catch((err) => {
             res.status(400);
             res.send(err.response.data.message);
             return;
@@ -77,7 +77,7 @@ const torusRegist = async (req: any, res: any) => {
         })
 
     } else {
-        let userStruct = structure.userStructure(user.data);
+        let userStruct = userStructure(user.data);
         if (userStruct[0].linkedAccounts.length != 0 &&
             !userStruct[0].linkedAccounts.includes(verifierId)) {
             //check if account exist return error
@@ -106,7 +106,7 @@ const torusRegist = async (req: any, res: any) => {
                 }]
             }
 
-            await axios.post(`${path.path}/transact`, update).catch((err) => {
+            await axios.post(`${path}/transact`, update).catch((err) => {
                 console.log(err)
                 res.status(400);
                 res.send(err.response.data.message);
@@ -153,14 +153,14 @@ const autoLogin = async (req: any, res: any) => {
                 "from": ["users/wallet", wallet]
             }
 
-            let user: any = await axios.post(`${path.path}/query`, findUser)
+            let user: any = await axios.post(`${path}/query`, findUser)
                 .catch((err) => {
                     res.status(400);
                     res.send(err.response.data.message);
                     return;
                 })
 
-            let o = structure.userStructure(user.data);
+            let o = userStructure(user.data);
             o[0].accessToken = accessToken
             o[0].sessionToken = crypto.AES.encrypt(wallet, config.secretRedis).toString()
             res.status(200);
@@ -188,7 +188,7 @@ const checkUserById = async (id: any, res: any) => {
         "from": Number(id)
     }
 
-    let user: any = await axios.post(`${path.path}/query`, findUser)
+    let user: any = await axios.post(`${path}/query`, findUser)
         .catch((err) => {
             res.status(400);
             res.send(err.response.data.message);

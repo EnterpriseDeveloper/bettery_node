@@ -1,8 +1,8 @@
-import keys from "./key";
+import { APIprod, APItest } from "./key";
 
-const ip = process.env.NODE_ENV == "production" ? keys.APIprod : keys.APItest;
+const ip = process.env.NODE_ENV == "production" ? APIprod : APItest;
 const path = `http://${ip}/fdb/demo/quize`;
 
-export = {
+export {
     path
 }

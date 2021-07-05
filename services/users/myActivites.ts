@@ -78,7 +78,7 @@ const getAllUserEvents = async (req: any, res: any) => {
 }
 
 
-export = {
+export {
     getAllUserEvents
 }
 

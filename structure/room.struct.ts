@@ -16,6 +16,6 @@ const roomStruct = (data: any) => {
     })
 }
 
-export = {
+export {
     roomStruct
 }

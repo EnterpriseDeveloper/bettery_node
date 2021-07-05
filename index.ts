@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser'
 const app = express();
 import fs from 'fs';
-import refundBot from './bot/refundBot';
+import { refundBot } from './bot/refundBot';
 import loadContractHandler from "./contract-services/eventHandler";
 import nonce from "./contract-services/nonce/nonce";
 
@@ -67,7 +67,7 @@ httpServer.listen(80, async () => {
     await nonce.nonceInit();
     await loadContractHandler.loadHandler();
     setInterval(() => {
-        refundBot.refundBot();
+        refundBot();
     }, 1000 * 60 * 60 * 24 * 3);
 
     console.log("server run port 80");

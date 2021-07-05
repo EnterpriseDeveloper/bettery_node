@@ -1,5 +1,5 @@
 import axios from "axios";
-import api from "../../config/networks";
+import { gasEstimationMainAPI, gasEstimationMumbaiAPI } from "../../config/networks";
 import Web3 from "web3";
 
 const getGasPrice = async () => {
@@ -17,7 +17,7 @@ const getGasPriceSafeLow = async () => {
 }
 
 const gas = async () => {
-    const path = process.env.NODE_ENV == "production" ? api.gasEstimationMainAPI : api.gasEstimationMumbaiAPI;
+    const path = process.env.NODE_ENV == "production" ? gasEstimationMainAPI : gasEstimationMumbaiAPI;
 
     let data: any = await axios.get(path).catch((err) => {
         console.log("get gas price err: " + err)
