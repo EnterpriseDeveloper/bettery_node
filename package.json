@@ -9,11 +9,8 @@
     "start_prod": "NODE_TEST=false NODE_ENV=production node index.ts",
     "forever": "NODE_TEST=false NODE_ENV=test nohup node server.ts > output.log &",
     "forever_prod": "NODE_TEST=false NODE_ENV=production nohup node server_prod.ts > outputData.log &",
-    "build": "webpack --mode=development --config webpack.config.ts",
-    "build_prod": "webpack --mode=production --config webpack.production.config.ts",
-    "buildTest": "npm run build:types && npm run build:js",
-    "build:types": "tsc --emitDeclarationOnly",
-    "build:js": "babel lib --extensions \".ts,.tsx\" --source-maps inline"
+    "build": "webpack --mode=development --config webpack.config.js",
+    "build_prod": "webpack --mode=production --config webpack.production.config.js"
   },
   "engines": {
     "node": "v14.17.2"
@@ -52,10 +49,11 @@
     "@babel/runtime": "^7.14.6",
     "@types/redis": "^2.8.30",
     "babel-cli": "^6.26.0",
+    "babel-loader": "^8.2.2",
     "babel-preset-es2015": "^6.24.1",
     "crypto-js": "^4.0.0",
-    "webpack": "^5.36.1",
-    "webpack-cli": "^4.6.0",
+    "webpack": "^5.42.1",
+    "webpack-cli": "^4.7.2",
     "webpack-node-externals": "^3.0.0"
   }
 }
