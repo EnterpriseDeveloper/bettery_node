@@ -2,5 +2,4 @@
 /node_modules
 /keys
 /config/keys.js
-/server_prod.js
-/server.js
+/build/*

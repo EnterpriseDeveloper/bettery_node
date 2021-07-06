@@ -24,7 +24,7 @@ module.exports = {
   target: 'node',
   output: {
     path: path.join(__dirname, ''),
-    filename: 'server.js'
+    filename: 'build/server.js'
   },
   externals: nodeModules,
   resolve: {
