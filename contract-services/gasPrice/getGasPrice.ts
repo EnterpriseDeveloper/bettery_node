@@ -1,6 +1,8 @@
 import axios from "axios";
 import { gasEstimationMainAPI, gasEstimationMumbaiAPI } from "../../config/networks";
 import Web3 from "web3";
+import { gasPercent } from '../../config/limits'
+import { getBlockGasLimit } from '../contractInit';
 
 const getGasPrice = async () => {
     let data = await gas();
@@ -16,6 +18,17 @@ const getGasPriceSafeLow = async () => {
     return safeLow;
 }
 
+const estimateGasLimit = async (gas: number) => {
+    let gasBlock = 0;
+    let neededGas = Number((((gas * gasPercent) / 100) + gas).toFixed(0));
+    do {
+        gasBlock = await getBlockGasLimit();
+        if (gasBlock > neededGas) {
+            return gasBlock;
+        }
+    } while (neededGas > gasBlock);
+}
+
 const gas = async () => {
     const path = process.env.NODE_ENV == "production" ? gasEstimationMainAPI : gasEstimationMumbaiAPI;
 
@@ -28,5 +41,6 @@ const gas = async () => {
 
 export {
     getGasPrice,
-    getGasPriceSafeLow
+    getGasPriceSafeLow,
+    estimateGasLimit
 }
