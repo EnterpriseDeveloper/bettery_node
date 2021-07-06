@@ -1,8 +1,8 @@
 import axios from "axios";
-import path from "../../config/path";
-import structure from '../../structure/event.struct';
-import filterData from '../../helpers/filter';
-import additionalData from '../../helpers/additionalData';
+import { path } from "../../config/path";
+import { publicEventStructure } from '../../structure/event.struct';
+import { searchData } from '../../helpers/filter';
+import { getAdditionalData } from '../../helpers/additionalData';
 
 const getAllUserEvents = async (req: any, res: any) => {
     let eventData: any[] = [];
@@ -34,7 +34,7 @@ const getAllUserEvents = async (req: any, res: any) => {
         from: userId
     }
 
-    let allData: any = await axios.post(path.path + "/query", config).catch((err) => {
+    let allData: any = await axios.post(path + "/query", config).catch((err) => {
         console.log(err)
         res.status(400);
         res.send(err.response.data.message);
@@ -62,15 +62,15 @@ const getAllUserEvents = async (req: any, res: any) => {
         }
 
         let unique = eventData.filter((v, i, a) => a.findIndex(t => (t._id === v._id)) === i)
-        let obj = structure.publicEventStructure(unique);
-        let dataEvetns = search.length >= 1 ? filterData.searchData(obj, search) : obj;
+        let obj = publicEventStructure(unique);
+        let dataEvetns = search.length >= 1 ? searchData(obj, search) : obj;
         if (!finished) {
             dataEvetns = dataEvetns.filter((e: any) => { return e.finalAnswer === null })
         }
         let events = {
             allAmountEvents: obj.length,
             amount: dataEvetns.length,
-            events: await additionalData.getAdditionalData(dataEvetns.slice(from, to), res)
+            events: await getAdditionalData(dataEvetns.slice(from, to), res)
         }
         res.status(200)
         res.send(events)

@@ -3,7 +3,7 @@ import axios from "axios";
 import { path } from "../../config/path";
 import crypto from 'crypto-js';
 import { userStructure } from '../../structure/user.struct'
-import config from '../../config/key';
+import { secretRedis } from '../../config/key';
 import reputationConvert from "../../helpers/reputationConvert"
 
 const updateNickname = async (req: any, res: any) => {
@@ -55,7 +55,7 @@ const getUserById = (req: any, res: any) => {
         if (x.data.length != 0) {
             let o = userStructure([x.data[0]])
             o[0].accessToken = req.body.dataFromRedis.key[0].sessionKey
-            o[0].sessionToken = crypto.AES.encrypt(req.body.dataFromRedis.wallet, config.secretRedis).toString()
+            o[0].sessionToken = crypto.AES.encrypt(req.body.dataFromRedis.wallet, secretRedis).toString()
             res.status(200);
             res.send(o);
 

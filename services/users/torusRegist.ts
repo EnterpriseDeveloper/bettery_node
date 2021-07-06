@@ -2,7 +2,7 @@ import axios from "axios";
 import crypto from 'crypto-js';
 import { path } from "../../config/path";
 
-import betteryToken from "../funds/betteryToken";
+import { mintTokens, transferToken } from "../funds/betteryToken";
 import { userStructure } from '../../structure/user.struct';
 import redis from '../../helpers/redis-helper';
 import { secretRedis } from '../../config/key';
@@ -52,7 +52,7 @@ const torusRegist = async (req: any, res: any) => {
             res.send(err.response.data.message);
             return;
         })
-        await betteryToken.mintTokens(wallet, 10);
+        await mintTokens(wallet, 10);
         // TODO add session token from Redis
         const dataFromRedis = [{
             email: email ? email : 'undefined',
@@ -91,7 +91,7 @@ const torusRegist = async (req: any, res: any) => {
             // move token from old account to new
             let update;
             if (userStruct[0].wallet != wallet) {
-                await betteryToken.transferToken(userStruct[0].wallet, wallet);
+                await transferToken(userStruct[0].wallet, wallet);
                 userStruct[0].wallet = wallet;
                 update = [{
                     "_id": userStruct[0]._id,

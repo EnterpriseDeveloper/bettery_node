@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { path } from "../../config/path";
-import createComments from './createComments';
+import {eventType} from './createComments';
 
 const iconActivities = async (msg: any) => {
     let eventId = msg.eventId
     let userId = msg.userId
     let commentId = msg.commentId
     let type = msg.type
-    let eventType = await createComments.eventType(eventId);
+    let eventTypeData = await eventType(eventId);
 
     let findActivites = {
         "select": ["*"],
@@ -36,19 +36,19 @@ const iconActivities = async (msg: any) => {
                 await axios.post(`${path}/transact`, deleteEvent).catch(err => {
                     console.log(err)
                 })
-                await createNewActivites(eventId, userId, type, commentId, eventType)
+                await createNewActivites(eventId, userId, type, commentId, eventTypeData)
             }
 
         } else {
-            await createNewActivites(eventId, userId, type, commentId, eventType)
+            await createNewActivites(eventId, userId, type, commentId, eventTypeData)
         }
     }
 }
 
-const createNewActivites = async (eventId: any, userId: any, type: any, commentId: any, eventType: any) => {
+const createNewActivites = async (eventId: any, userId: any, type: any, commentId: any, eventTypeData: any) => {
     let data = [{
         _id: "commentsIconActivites$newActivites",
-        [eventType]: eventId,
+        [eventTypeData]: eventId,
         date: Math.floor(Date.now() / 1000),
         from: userId,
         type: type,

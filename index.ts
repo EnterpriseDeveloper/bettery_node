@@ -3,8 +3,8 @@ import bodyParser from 'body-parser'
 const app = express();
 import fs from 'fs';
 import { refundBot } from './bot/refundBot';
-import loadContractHandler from "./contract-services/eventHandler";
-import nonce from "./contract-services/nonce/nonce";
+import { loadHandler } from "./contract-services/eventHandler";
+import { nonceInit } from "./contract-services/nonce/nonce";
 
 var http = require('http');
 
@@ -64,8 +64,8 @@ require('./services/image')(app);
 require('./contract-services/tokensale')(app);
 
 httpServer.listen(80, async () => {
-    await nonce.nonceInit();
-    await loadContractHandler.loadHandler();
+    await nonceInit();
+    await loadHandler();
     setInterval(() => {
         refundBot();
     }, 1000 * 60 * 60 * 24 * 3);

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { path } from "../config/path";
 import { epochWeek } from '../config/limits';
-import revertEvent from "../services/events/revert";
+import { revertEvent } from "../services/events/revert";
 
 
 const refundBot = async () => {
@@ -26,7 +26,7 @@ const refundBot = async () => {
                 let week = epochWeek;
                 if (timeNow - endTime > week) {
                     let participant = events[i]["publicEvents/parcipiantsAnswer"];
-                    await revertEvent.revertEvent(eventId, participant, "not enough experts")
+                    await revertEvent(eventId, participant, "not enough experts")
                 };
             }
         }
