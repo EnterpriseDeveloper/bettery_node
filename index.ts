@@ -5,11 +5,11 @@ import fs from 'fs';
 import { refundBot } from './bot/refundBot';
 import { loadHandler } from "./contract-services/eventHandler";
 import { nonceInit } from "./contract-services/nonce/nonce";
-
-var http = require('http');
+import https from 'https';
+import http from 'http';
+import comments from './services/comments/index';
 
 if (process.env.NODE_TEST == 'false') {
-    var https = require('https');
 
     let key = "./keys/key.pem",
         cert = "./keys/star_bettery_io.crt",
@@ -29,9 +29,7 @@ if (process.env.NODE_TEST == 'false') {
 
     var httpsServer = https.createServer(credentials, app);
     var io = require('socket.io')(httpsServer);
-
-    require('./services/comments')(io);
-
+    comments(io);
     httpsServer.listen(443);
 }
 
@@ -51,17 +49,23 @@ var httpServer = http.createServer(app);
 
 if (process.env.NODE_TEST != 'false') {
     var io = require('socket.io')(httpServer);
-    require('./services/comments')(io);
+    comments(io);
 }
 
-
-require('./services/events')(app);
-require('./services/funds')(app);
-require('./services/users')(app);
-require('./services/rooms')(app);
-require('./services/subscribe')(app);
-require('./services/image')(app);
-require('./contract-services/tokensale')(app);
+import Events from './services/events';
+Events(app);
+import Funds from './services/funds';
+Funds(app);
+import Users from './services/users';
+Users(app);
+import Rooms from './services/rooms';
+Rooms(app);
+import Subscribe from './services/subscribe';
+Subscribe(app);
+import Image from './services/image';
+Image(app);
+import TokenSale from './contract-services/tokensale';
+TokenSale(app);
 
 httpServer.listen(80, async () => {
     await nonceInit();

@@ -3,7 +3,7 @@ import { getBTYToken } from './betteryToken';
 import { sendTokens } from './userTokens'
 import checkToken from '../../middlewares/check-token';
 
-export = (app: any) => {
+export default function Funds(app: any) {
 
     app.post("/withdrawal/init", async (req: any, res: any) => {
         setInitWithd(req, res);

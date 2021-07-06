@@ -4,7 +4,7 @@ import { getAllUserEvents } from "./myActivites";
 import { linkAccount } from "../../helpers/auth0/linkAccount";
 import authMiddleware from "../../middlewares/check-token";
 
-export default (app: any) => {
+export default function Users(app: any) {
     app.post("/user/getUserById", authMiddleware, async (req: any, res: any) => {
         getUserById(req, res);
     })

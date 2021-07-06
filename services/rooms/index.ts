@@ -5,7 +5,7 @@ import { subscribeToNotification, getNotificationByUserId, deleteNotifications, 
 import checkToken from '../../middlewares/check-token';
 
 
-export default (app: any) => {
+export default function Rooms(app: any) {
     app.get("/room/get_by_user_id", checkToken, async (req: any, res: any) => {
         getByUserId(req, res);
     })

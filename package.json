@@ -2,7 +2,7 @@
   "name": "quize_backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "dev": "NODE_TEST=true NODE_ENV=test nodemon",
     "start": "NODE_TEST=false NODE_ENV=test node index.ts",

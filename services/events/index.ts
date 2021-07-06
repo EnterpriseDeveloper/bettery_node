@@ -8,7 +8,7 @@ import { getEventData } from "./revert";
 import { findCorrectAnswer } from "../../contract-services/publicEvents/findCorrectAnswer"
 import checkToken from '../../middlewares/check-token'
 
-export default (app: any) => {
+export default function Events(app: any) {
     app.post("/publicEvents/createEvent", checkToken, eventLimitPublic, async (req: any, res: any) => {
         createEvent(req, res);
     })

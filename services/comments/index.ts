@@ -2,7 +2,7 @@ import { getAllCommentsById } from './getComments';
 import { createComment, replyToComment } from './createComments';
 import { iconActivities } from './activities';
 
-export default (io: any) => {
+export default function Comments(io: any) {
     io.on('connection', (socket: any) => {
         socket.on('get comments', async (eventId: any) => {
             socket.join(eventId);

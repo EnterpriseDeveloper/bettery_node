@@ -4,7 +4,7 @@ import TokenSaleContract from '../abi/QuizeTokenSale.json'
 import BetteryTokenContract from '../abi/BTYmain.json'; // TODO rename
 import { mainnet, goerli, mainnetID, mainId } from '../../config/networks';
 
-export default (app: any) => {
+export default function TokenSale(app: any) {
     // TODO
     app.post("/tokensale/info", async (req: any, res: any) => {
         let from = req.body.from;
