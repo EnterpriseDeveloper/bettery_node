@@ -20,7 +20,7 @@ fs.readdirSync('node_modules')
   });
 
 module.exports = {
-  entry: './index.ts',
+  entry: ['babel-polyfill', './index.ts'],
   target: 'node',
   output: {
     path: path.join(__dirname, ''),
