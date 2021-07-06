@@ -5,7 +5,7 @@ import Web3 from "web3";
 const getGasPrice = async () => {
     let data = await gas();
     let web3 = new Web3();
-    let fast = web3.utils.toWei(String(data.fast), "gwei");
+    let fast = web3.utils.toWei(String(data.fastest), "gwei");
     return fast;
 }
 
