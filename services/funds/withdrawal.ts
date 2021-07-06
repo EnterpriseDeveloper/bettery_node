@@ -1,5 +1,5 @@
 import axios from "axios";
-import path from "../../config/path";
+import { path } from "../../config/path";
 
 const setInitWithd = (req: any, res: any) => {
     let data = [{
@@ -10,7 +10,7 @@ const setInitWithd = (req: any, res: any) => {
         "status": "pending",
         "amount": req.body.amount
     }]
-    axios.post(path.path + "/transact", data).then(() => {
+    axios.post(path + "/transact", data).then(() => {
         res.status(200);
         res.send({ "status": "done" })
     }).catch((err: any) => {
@@ -23,7 +23,7 @@ const getWithdInfo = (req: any, res: any) => {
     // TODO
 }
 
-export = {
+export {
     setInitWithd,
     getWithdInfo
 }

@@ -1,8 +1,8 @@
 import crypto from 'crypto-js';
 import redis from '../helpers/redis-helper';
-import keys from '../config/key';
+import { secretRedis } from '../config/key';
 
-export = async (req: any, res: any, next: any) => {
+export default async (req: any, res: any, next: any) => {
     try {
         const sessionToken = req.get('Authorization');
         const accessToken = req.get('Cookies')
@@ -11,7 +11,7 @@ export = async (req: any, res: any, next: any) => {
             return next(res.send('no token'), 400)
         }
 
-        const bytes = crypto.AES.decrypt(sessionToken, keys.secretRedis);
+        const bytes = crypto.AES.decrypt(sessionToken, secretRedis);
         const decryptedData = bytes.toString(crypto.enc.Utf8);
 
         const fromRedis = await redis.getFromRedis(decryptedData)

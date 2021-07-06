@@ -1,5 +1,5 @@
 import axios from "axios";
-import path from '../../config/path'
+import { path } from '../../config/path'
 
 const getAllHashtags = async (req: any, res: any) => {
 
@@ -8,7 +8,7 @@ const getAllHashtags = async (req: any, res: any) => {
         "from": "hashtags"
     }
 
-    let allHashtags: any = await axios.post(path.path + "/query", config).catch((err) => {
+    let allHashtags: any = await axios.post(path + "/query", config).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
@@ -30,6 +30,6 @@ const getAllHashtags = async (req: any, res: any) => {
 }
 
 
-export = {
+export {
     getAllHashtags
 }

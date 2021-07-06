@@ -26,7 +26,7 @@ const gas = async () => {
     return data.data
 }
 
-export = {
+export {
     getGasPrice,
     getGasPriceSafeLow
 }

@@ -1,9 +1,9 @@
 import axios from 'axios'
-import path from "../../config/path";
-import createComments from './createComments';
+import { path } from "../../config/path";
+import { eventType } from './createComments';
 
 const getAllCommentsById = async (msg: any) => {
-    let eventType = await createComments.eventType(msg);
+    let eventTypeData = await eventType(msg);
 
     let conf = {
         "select": ["*", {
@@ -14,10 +14,10 @@ const getAllCommentsById = async (msg: any) => {
             'comments/star': ["*", { 'commentsIconActivites/from': ["*"] }],
             'comments/reply': ["*", { 'comments/from': ["users/nickName", "users/avatar"] }]
         }],
-        "where": `comments/${eventType} = ${Number(msg)}`
+        "where": `comments/${eventTypeData} = ${Number(msg)}`
     }
 
-    let getComments = await axios.post(`${path.path}/query`, conf).catch(err => {
+    let getComments = await axios.post(`${path}/query`, conf).catch(err => {
         console.log(err)
     })
     if (getComments) {
@@ -84,6 +84,6 @@ const activitesStructure = (x: any) => {
 }
 
 
-export = {
+export {
     getAllCommentsById
 }

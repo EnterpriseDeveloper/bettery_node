@@ -1,5 +1,5 @@
 import axios from "axios";
-import url from "../../../config/path";
+import { path } from "../../../config/path";
 import Web3 from "web3";
 
 const setToDB = async (data: any) => {
@@ -23,7 +23,7 @@ const setToDB = async (data: any) => {
         ], "from": Number(id)
     }
 
-    let getPlayers: any = await axios.post(`${url.path}/query`, getData).catch((err) => {
+    let getPlayers: any = await axios.post(`${path}/query`, getData).catch((err) => {
         console.log("DB error from query payToLosers: " + err.response.data.message)
         return;
     })
@@ -56,13 +56,13 @@ const setToDB = async (data: any) => {
         }
     }
 
-    await axios.post(`${url.path}/transact`, allData).catch((err) => {
+    await axios.post(`${path}/transact`, allData).catch((err) => {
         console.log("DB error from transact payToLosers: " + err.response.data.message)
         return;
     })
     return;
 }
 
-export = {
+export {
     setToDB
 }

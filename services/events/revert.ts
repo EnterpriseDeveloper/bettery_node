@@ -1,8 +1,8 @@
-import contractInit from "../../contract-services/contractInit";
+import { init } from "../../contract-services/contractInit";
 import MPContr from "../../contract-services/abi/MiddlePayment.json";
 import axios from "axios";
-import url from "../../config/path";
-import getNonce from "../../contract-services/nonce/nonce";
+import { path } from "../../config/path";
+import { getNonce } from "../../contract-services/nonce/nonce";
 
 const getEventData = async (req: any, res: any) => {
     let id = Number(req.body.id);
@@ -15,7 +15,7 @@ const getEventData = async (req: any, res: any) => {
         "from": id
     }
 
-    let data: any = await axios.post(`${url.path}/query`, config).catch((err: any) => {
+    let data: any = await axios.post(`${path}/query`, config).catch((err: any) => {
         console.log(err);
         return;
     })
@@ -48,17 +48,17 @@ const revertEvent = async (eventId: any, participant: any, purpose: any) => {
         "eventEnd": Math.floor(new Date().getTime() / 1000.0)
     }]
 
-    await axios.post(`${url.path}/transact`, revert).catch((err: any) => {
+    await axios.post(`${path}/transact`, revert).catch((err: any) => {
         console.log(err);
         return;
     })
 
     if (participant !== undefined) {
         let path = process.env.NODE_ENV
-        let betteryContract = await contractInit.init(path, MPContr)
+        let betteryContract = await init(path, MPContr)
         try {
             const gasEstimate = await betteryContract.methods.revertedPayment(eventId, purpose).estimateGas();
-            let nonce = await getNonce.getNonce();
+            let nonce = await getNonce();
             await betteryContract.methods.revertedPayment(eventId, purpose).send({
                 gas: gasEstimate * 2,
                 gasPrice: 0,
@@ -71,7 +71,7 @@ const revertEvent = async (eventId: any, participant: any, purpose: any) => {
     }
 }
 
-export = {
+export {
     getEventData,
     revertEvent
 }

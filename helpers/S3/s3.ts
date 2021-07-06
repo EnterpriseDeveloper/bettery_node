@@ -1,11 +1,11 @@
 import fs from 'fs'
 import S3 from 'aws-sdk/clients/s3'
-import key from "../../config/key";
+import {awsBucketName, awsBucketRegion, awsAccessKey, awsSecretKey} from "../../config/key";
 
-const bucketName = key.awsBucketName;
-const region = key.awsBucketRegion;
-const accessKeyId = key.awsAccessKey;
-const secretAccessKey = key.awsSecretKey;
+const bucketName = awsBucketName;
+const region = awsBucketRegion;
+const accessKeyId = awsAccessKey;
+const secretAccessKey = awsSecretKey;
 
 const s3 = new S3({
   region,
@@ -35,7 +35,7 @@ const getFileStream = (key: any) => {
   return s3.getObject(downloadParams).createReadStream()
 }
 
-export = {
+export {
   getFileStream,
   uploadFile
 }

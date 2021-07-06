@@ -1,14 +1,14 @@
 import axios from "axios";
-import path from "../../config/path";
-import createRoom from '../rooms/createRoom';
-import structure from '../../structure/event.struct';
-import contractInit from "../../contract-services/contractInit";
+import { path } from "../../config/path";
+import { createRoom } from '../rooms/createRoom';
+import { privateEventStructure } from '../../structure/event.struct';
+import { init } from "../../contract-services/contractInit";
 import PrivateEvents from "../../contract-services/abi/PrivateEvents.json";
-import getNonce from "../../contract-services/nonce/nonce";
-import helpers from "../../helpers/helpers";
-import getRoom from "../rooms/getRoom";
-import getGasPrice from "../../contract-services/gasPrice/getGasPrice";
-import config from "../../config/limits"
+import { getNonce } from "../../contract-services/nonce/nonce";
+import { uploadImage } from "../../helpers/helpers";
+import { getRoomColor } from "../rooms/getRoom";
+import { getGasPrice } from "../../contract-services/gasPrice/getGasPrice";
+import { gasPercent } from "../../config/limits"
 
 const createPrivateEvent = async (req: any, res: any) => {
     let allData = req.body;
@@ -22,7 +22,7 @@ const createPrivateEvent = async (req: any, res: any) => {
     allData.dateCreation = Math.floor(Date.now() / 1000)
 
     if (req.body.thumImage !== "undefined") {
-        let type = await helpers.uploadImage(req.body.thumImage, id);
+        let type = await uploadImage(req.body.thumImage, id);
         let url = process.env.NODE_ENV == "production" ? "https://api.bettery.io" : `https://apitest.bettery.io`
         allData.thumImage = `${url}/image/${id}.${type}`;
         allData.thumColor = undefined;
@@ -33,7 +33,7 @@ const createPrivateEvent = async (req: any, res: any) => {
         if (req.body.whichRoom == "new") {
             allData.thumColor = req.body.roomColor;
         } else {
-            allData.thumColor = await getRoom.getRoomColor(allData.roomId);
+            allData.thumColor = await getRoomColor(allData.roomId);
         }
     }
 
@@ -41,7 +41,7 @@ const createPrivateEvent = async (req: any, res: any) => {
     delete allData.prodDev;
     let data;
     if (req.body.whichRoom == "new") {
-        let room = createRoom.createRoom(allData, "privateEventsId");
+        let room = createRoom(allData, "privateEventsId");
         allData.room = [room._id]
         delete allData.roomName;
         delete allData.roomColor;
@@ -74,7 +74,7 @@ const createPrivateEvent = async (req: any, res: any) => {
     }
 
     data.push(hostData);
-    let eventData: any = await axios.post(`${path.path}/transact`, data)
+    let eventData: any = await axios.post(`${path}/transact`, data)
         .catch((err: any) => {
             console.log("DB error: " + err.response.data.message)
             res.status(400);
@@ -88,13 +88,13 @@ const createPrivateEvent = async (req: any, res: any) => {
 
     try {
         let pathContr = process.env.NODE_ENV
-        let contract = await contractInit.init(pathContr, PrivateEvents)
+        let contract = await init(pathContr, PrivateEvents)
 
         let gasEstimate = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).estimateGas();
         let transaction = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).send({
-            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: await getGasPrice.getGasPrice(),
-            nonce: await getNonce.getNonce()
+            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: await getGasPrice(),
+            nonce: await getNonce()
         });
         if (transaction) {
             let transactionHash = transaction.transactionHash;
@@ -105,7 +105,7 @@ const createPrivateEvent = async (req: any, res: any) => {
                 transactionHash: transactionHash,
             }]
 
-            await axios.post(`${path.path}/transact`, transactionData).catch((err: any) => {
+            await axios.post(`${path}/transact`, transactionData).catch((err: any) => {
                 console.log("DB error: " + err.response.data.message)
                 res.status(400);
                 res.send(err.response.data.message);
@@ -120,7 +120,7 @@ const createPrivateEvent = async (req: any, res: any) => {
     }
 }
 
-const participate = async (req: any, res: any) => {
+const privParticipate = async (req: any, res: any) => {
     let eventId = Number(req.body.eventId);
     let answer = Number(req.body.answer);
     let from = req.body.dataFromRedis.id;
@@ -131,12 +131,12 @@ const participate = async (req: any, res: any) => {
         try {
             let wallet = req.body.dataFromRedis.wallet
             let pathContr = process.env.NODE_ENV
-            let contract = await contractInit.init(pathContr, PrivateEvents)
+            let contract = await init(pathContr, PrivateEvents)
             let gasEstimate = await contract.methods.setAnswer(eventId, answer, wallet).estimateGas();
             let transaction = await contract.methods.setAnswer(eventId, answer, wallet).send({
-                gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
-                gasPrice: await getGasPrice.getGasPrice(),
-                nonce: await getNonce.getNonce()
+                gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+                gasPrice: await getGasPrice(),
+                nonce: await getNonce()
             });
 
             if (transaction) {
@@ -160,7 +160,7 @@ const participate = async (req: any, res: any) => {
                     _id: eventId,
                     parcipiantsAnswer: ["privateActivites$newEvents"],
                 })
-                await axios.post(`${path.path}/transact`, data).catch((err: any) => {
+                await axios.post(`${path}/transact`, data).catch((err: any) => {
                     res.status(400);
                     res.send(err.response.data.message);
                     console.log("DB error: " + err.response.data.message)
@@ -177,7 +177,7 @@ const participate = async (req: any, res: any) => {
     }
 }
 
-const validate = async (req: any, res: any) => {
+const privValidate = async (req: any, res: any) => {
     let eventId = Number(req.body.eventId);
     let answer = req.body.answer;
     let answerNumber = Number(req.body.answerNumber);
@@ -189,12 +189,12 @@ const validate = async (req: any, res: any) => {
         try {
             let wallet = req.body.dataFromRedis.wallet;
             let pathContr = process.env.NODE_ENV;
-            let contract = await contractInit.init(pathContr, PrivateEvents)
+            let contract = await init(pathContr, PrivateEvents)
             let gasEstimate = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).estimateGas();
             let transaction = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).send({
-                gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
-                gasPrice: await getGasPrice.getGasPrice(),
-                nonce: await getNonce.getNonce()
+                gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+                gasPrice: await getGasPrice(),
+                nonce: await getNonce()
             });
 
             if (transaction) {
@@ -220,7 +220,7 @@ const validate = async (req: any, res: any) => {
                     finalAnswerNumber: answerNumber,
                     finalAnswer: answer
                 })
-                axios.post(path.path + "/transact", data).then(() => {
+                axios.post(path + "/transact", data).then(() => {
                     res.status(200);
                     res.send({ done: "ok" });
                 }).catch((err: any) => {
@@ -237,7 +237,7 @@ const validate = async (req: any, res: any) => {
     }
 }
 
-const getById = async (req: any, res: any) => {
+const privGetById = async (req: any, res: any) => {
     let id = Number(req.body.id);
     if (!id) {
         res.status(400);
@@ -253,14 +253,14 @@ const getById = async (req: any, res: any) => {
             "from": id
         }
 
-        let event = await axios.post(path.path + "/query", conf).catch((err: any) => {
+        let event = await axios.post(path + "/query", conf).catch((err: any) => {
             res.status(400);
             res.send(err.response.data);
             console.log("DB error: " + err.response.data)
         })
         if (event) {
             if (event.data.length != 0) {
-                let obj = structure.privateEventStructure([event.data[0]])
+                let obj = privateEventStructure([event.data[0]])
                 res.status(200)
                 res.send(obj[0])
             } else {
@@ -271,9 +271,9 @@ const getById = async (req: any, res: any) => {
     }
 }
 
-export = {
+export {
     createPrivateEvent,
-    getById,
-    participate,
-    validate
+    privGetById,
+    privParticipate,
+    privValidate
 }

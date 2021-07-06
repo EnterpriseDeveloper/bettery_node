@@ -1,13 +1,13 @@
 import axios from "axios";
-import path from "../../config/path";
-import contractInit from "../../contract-services/contractInit";
+import { path } from "../../config/path";
+import { init } from "../../contract-services/contractInit";
 import PublicEvents from "../../contract-services/abi/PublicEvents.json";
-import userData from "../../helpers/userData";
+import { getUserReput } from "../../helpers/userData";
 import Web3 from "web3";
-import getNonce from "../../contract-services/nonce/nonce";
-import limit from "../../config/limits";
-import getGasPrice from "../../contract-services/gasPrice/getGasPrice";
-import config from "../../config/limits"
+import { getNonce } from "../../contract-services/nonce/nonce";
+import { minBetAmount } from "../../config/limits";
+import { getGasPrice } from "../../contract-services/gasPrice/getGasPrice";
+import { gasPercent } from "../../config/limits"
 
 const participate = async (req: any, res: any) => {
     let web3 = new Web3();
@@ -27,7 +27,7 @@ const participate = async (req: any, res: any) => {
         return;
     }
 
-    if (Number(amount) < limit.minBetAmount) {
+    if (Number(amount) < minBetAmount) {
         res.status(400);
         res.send("The minimum amount for betting is 0.01 BET");
         return;
@@ -36,7 +36,7 @@ const participate = async (req: any, res: any) => {
     try {
         let wallet = req.body.dataFromRedis.wallet;
         let pathContr = process.env.NODE_ENV;
-        let contract = await contractInit.init(pathContr, PublicEvents)
+        let contract = await init(pathContr, PublicEvents)
         let tokens = web3.utils.toWei(String(amount), "ether");
 
         let gasEstimate = await contract.methods.setAnswer(
@@ -51,9 +51,9 @@ const participate = async (req: any, res: any) => {
             tokens,
             wallet
         ).send({
-            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: await getGasPrice.getGasPrice(),
-            nonce: await getNonce.getNonce()
+            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: await getGasPrice(),
+            nonce: await getNonce()
         });
 
 
@@ -89,7 +89,7 @@ const participate = async (req: any, res: any) => {
             }
             setAnswer.push(user)
 
-            await axios.post(`${path.path}/transact`, setAnswer).catch((err) => {
+            await axios.post(`${path}/transact`, setAnswer).catch((err) => {
                 res.status(400);
                 res.send(err.response.data.message);
                 console.log("DB error: " + err.response.data.message)
@@ -123,10 +123,10 @@ const validate = async (req: any, res: any) => {
     }
 
     try {
-        let reputation = await userData.getUserReput(from, res)
+        let reputation = await getUserReput(from, res)
         let wallet = req.body.dataFromRedis.wallet;
         let pathContr = process.env.NODE_ENV;
-        let contract = await contractInit.init(pathContr, PublicEvents)
+        let contract = await init(pathContr, PublicEvents)
 
         let gasEstimate = await contract.methods.setValidator(
             eventId,
@@ -140,9 +140,9 @@ const validate = async (req: any, res: any) => {
             wallet,
             reputation
         ).send({
-            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: await getGasPrice.getGasPrice(),
-            nonce: await getNonce.getNonce()
+            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: await getGasPrice(),
+            nonce: await getNonce()
         });
         if (transaction) {
             // add to the publicActivites table
@@ -173,7 +173,7 @@ const validate = async (req: any, res: any) => {
             }
             setAnswer.push(user)
 
-            await axios.post(`${path.path}/transact`, setAnswer).catch((err) => {
+            await axios.post(`${path}/transact`, setAnswer).catch((err) => {
                 res.status(400);
                 res.send(err.response.data.message);
                 console.log("DB error: " + err.response.data.message)
@@ -191,7 +191,7 @@ const validate = async (req: any, res: any) => {
 }
 
 
-export = {
+export {
     participate,
     validate
 }

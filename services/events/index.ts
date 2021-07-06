@@ -1,62 +1,62 @@
-import publicEvents from "./publicEvents";
-import privateEvents from "./privateEvents";
-import hashtags from "./hashtags";
-import publicActivites from "./publicActivites";
+import { createEvent, getById, getAll, getAllForTest, getBetteryEvent } from "./publicEvents";
+import { createPrivateEvent, privGetById, privParticipate, privValidate } from "./privateEvents";
+import { getAllHashtags } from "./hashtags";
+import { participate, validate } from "./publicActivites";
 import eventLimitPrivate from '../../middlewares/eventLimitsPrivate'
 import eventLimitPublic from '../../middlewares/eventLimitsPublic'
-import revert from "./revert";
-import contract from "../../contract-services/publicEvents/findCorrectAnswer"
+import { getEventData } from "./revert";
+import { findCorrectAnswer } from "../../contract-services/publicEvents/findCorrectAnswer"
 import checkToken from '../../middlewares/check-token'
 
-module.exports = (app: any) => {
+export default (app: any) => {
     app.post("/publicEvents/createEvent", checkToken, eventLimitPublic, async (req: any, res: any) => {
-        publicEvents.createEvent(req, res);
+        createEvent(req, res);
     })
 
     app.post("/publicEvents/get_by_id", async (req: any, res: any) => {
-        publicEvents.getById(req, res);
+        getById(req, res);
     })
 
     app.post("/publicEvents/get_all", async (req: any, res: any) => {
-        publicEvents.getAll(req, res);
+        getAll(req, res);
     })
 
     app.get("/publicEvents/get_all_for_test", async (req: any, res: any) => {
-        publicEvents.getAllForTest(req, res);
+        getAllForTest(req, res);
     })
 
     app.post("/publicEvents/participate", checkToken, async (req: any, res: any) => {
-        publicActivites.participate(req, res);
+        participate(req, res);
     })
 
     app.post("/publicEvents/validate", checkToken, async (req: any, res: any) => {
-        publicActivites.validate(req, res);
+        validate(req, res);
     })
 
     app.post("/privateEvents/createEvent", checkToken, eventLimitPrivate, async (req: any, res: any) => {
-        privateEvents.createPrivateEvent(req, res);
+        createPrivateEvent(req, res);
     })
 
     app.post("/privateEvents/get_by_id", async (req: any, res: any) => {
-        privateEvents.getById(req, res);
+        privGetById(req, res);
     })
     app.post("/privateEvents/participate", checkToken, async (req: any, res: any) => {
-        privateEvents.participate(req, res);
+        privParticipate(req, res);
     })
     app.post("/privateEvents/validate", checkToken, async (req: any, res: any) => {
-        privateEvents.validate(req, res);
+        privValidate(req, res);
     })
 
     app.get("/hashtags/get_all", async (req: any, res: any) => {
-        hashtags.getAllHashtags(req, res);
+        getAllHashtags(req, res);
     })
 
     app.post("/publicEvents/revert", async (req: any, res: any) => {
-        revert.getEventData(req, res);
+        getEventData(req, res);
     })
 
     app.post("/bettery_event", async (req: any, res: any) => {
-        publicEvents.getBetteryEvent(req, res)
+        getBetteryEvent(req, res)
     })
 
     app.post("/public_event/finishEvent", async (req: any, res: any) => {
@@ -65,7 +65,7 @@ module.exports = (app: any) => {
             id: id
         }
 
-        await contract.findCorrectAnswer(data);
+        await findCorrectAnswer(data);
         res.status(200);
         res.send({ status: "OK" });
     })

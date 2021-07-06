@@ -1,10 +1,10 @@
 import MiddlePaymentContract from "../abi/MiddlePayment.json";
 import Web3 from "web3";
-import setAnswer from "../../services/events/event_is_finish";
-import ContractInit from "../contractInit";
-import getNonce from "../nonce/nonce";
-import getGasPrice from "../gasPrice/getGasPrice"
-import config from "../../config/limits"
+import { setCorrectAnswer } from "../../services/events/event_is_finish";
+import { init } from "../contractInit";
+import { getNonce } from "../nonce/nonce";
+import { getGasPriceSafeLow } from "../gasPrice/getGasPrice"
+import { gasPercent } from "../../config/limits"
 
 const payToCompanies = async (x: any) => {
     console.log("from payToCompanies")
@@ -20,16 +20,16 @@ const payToCompanies = async (x: any) => {
         tokens: tokens
     }
 
-    await setAnswer.setCorrectAnswer(data);
+    await setCorrectAnswer(data);
 
     let path = process.env.NODE_ENV;
-    let contract = await ContractInit.init(path, MiddlePaymentContract);
+    let contract = await init(path, MiddlePaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPayToCompanies(id).estimateGas();
         await contract.methods.letsPayToCompanies(id).send({
-            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: await getGasPrice.getGasPriceSafeLow(),
-            nonce: await getNonce.getNonce()
+            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: await getGasPriceSafeLow(),
+            nonce: await getNonce()
         });
 
     } catch (err) {
@@ -38,6 +38,6 @@ const payToCompanies = async (x: any) => {
 }
 
 
-export = {
+export {
     payToCompanies
 }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import path from "../../config/path";
+import { path } from "../../config/path";
 import createComments from './createComments';
 
 const iconActivities = async (msg: any) => {
@@ -14,7 +14,7 @@ const iconActivities = async (msg: any) => {
         "where": `commentsIconActivites/commentId = ${Number(commentId)}`
     }
 
-    let activites = await axios.post(`${path.path}/query`, findActivites).catch(err => {
+    let activites = await axios.post(`${path}/query`, findActivites).catch(err => {
         console.log(err)
     })
     if (activites) {
@@ -25,7 +25,7 @@ const iconActivities = async (msg: any) => {
                     "_id": activites.data[findEvent]["_id"],
                     "_action": "delete"
                 }]
-                await axios.post(`${path.path}/transact`, deleteEvent).catch(err => {
+                await axios.post(`${path}/transact`, deleteEvent).catch(err => {
                     console.log(err)
                 })
             } else {
@@ -33,7 +33,7 @@ const iconActivities = async (msg: any) => {
                     "_id": activites.data[findEvent]["_id"],
                     "_action": "delete"
                 }]
-                await axios.post(`${path.path}/transact`, deleteEvent).catch(err => {
+                await axios.post(`${path}/transact`, deleteEvent).catch(err => {
                     console.log(err)
                 })
                 await createNewActivites(eventId, userId, type, commentId, eventType)
@@ -57,11 +57,11 @@ const createNewActivites = async (eventId: any, userId: any, type: any, commentI
         _id: commentId,
         [type]: ["commentsIconActivites$newActivites"]
     }]
-    await axios.post(`${path.path}/transact`, data).catch(err => {
+    await axios.post(`${path}/transact`, data).catch(err => {
         console.log(err)
     })
 }
 
-export = {
+export {
     iconActivities,
 }

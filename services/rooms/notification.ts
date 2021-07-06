@@ -1,6 +1,6 @@
 import axios from 'axios';
-import path from "../../config/path";
-import struct from '../../structure/notification.struct';
+import { path } from "../../config/path";
+import { notificationStruct } from '../../structure/notification.struct';
 
 const subscribeToNotification = async (req: any, res: any) => {
     let joinedId = req.body.joinedId;
@@ -10,7 +10,7 @@ const subscribeToNotification = async (req: any, res: any) => {
         "notifications": subscribe
     }]
 
-    await axios.post(`${path.path}/transact`, config).catch((err: any) => {
+    await axios.post(`${path}/transact`, config).catch((err: any) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
@@ -28,7 +28,7 @@ const sendNotificationToUser = async (roomId: any, eventId: any, res: any) => {
         "from": Number(roomId),
     }
 
-    let getData: any = await axios.post(`${path.path}/query`, config).catch((err: any) => {
+    let getData: any = await axios.post(`${path}/query`, config).catch((err: any) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
@@ -54,7 +54,7 @@ const sendNotificationToUser = async (roomId: any, eventId: any, res: any) => {
             }
         }
 
-        await axios.post(`${path.path}/transact`, sendData).catch((err: any) => {
+        await axios.post(`${path}/transact`, sendData).catch((err: any) => {
             res.status(400);
             res.send(err.response.data.message);
             console.log("DB error: " + err.response.data.message)
@@ -81,7 +81,7 @@ const getNotificationByUserId = async (req: any, res: any) => {
         "opts": { "orderBy": ["DESC", "notificationFromRoom/date"] }
     }
 
-    let getData: any = await axios.post(`${path.path}/query`, config).catch((err: any) => {
+    let getData: any = await axios.post(`${path}/query`, config).catch((err: any) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
@@ -91,7 +91,7 @@ const getNotificationByUserId = async (req: any, res: any) => {
     let data = getData.data[0].notificationFromRoom;
 
     if (data != undefined) {
-        let notif = struct.notificationStruct(data);
+        let notif = notificationStruct(data);
         res.status(200);
         res.send(notif);
 
@@ -111,7 +111,7 @@ const readNotification = async (req: any, res: any) => {
         })
     })
 
-    await axios.post(`${path.path}/transact`, data).catch((err: any) => {
+    await axios.post(`${path}/transact`, data).catch((err: any) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
@@ -132,7 +132,7 @@ const deleteNotifications = async (req: any, res: any) => {
         })
     })
 
-    await axios.post(`${path.path}/transact`, data).catch((err: any) => {
+    await axios.post(`${path}/transact`, data).catch((err: any) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
@@ -143,7 +143,7 @@ const deleteNotifications = async (req: any, res: any) => {
     res.send({ status: "ok" });
 }
 
-export = {
+export {
     subscribeToNotification,
     sendNotificationToUser,
     getNotificationByUserId,

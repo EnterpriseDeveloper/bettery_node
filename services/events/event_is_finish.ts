@@ -1,5 +1,5 @@
 import axios from "axios";
-import path from "../../config/path";
+import { path } from "../../config/path";
 
 
 const setCorrectAnswer = async (data: any) => {
@@ -10,7 +10,7 @@ const setCorrectAnswer = async (data: any) => {
         "mintedTokens": Number(data.tokens)
     }]
 
-    return await axios.post(path.path + "/transact", finalAnswer)
+    return await axios.post(path + "/transact", finalAnswer)
         .catch((err: any) => {
             console.log("DB error: " + err.response.data.message)
         })
@@ -23,14 +23,14 @@ const eventEnd = async (data: any) => {
         "eventEnd": Math.floor(new Date().getTime() / 1000.0)
     }]
 
-    return await axios.post(path.path + "/transact", finalAnswer)
+    return await axios.post(path + "/transact", finalAnswer)
         .catch((err: any) => {
             console.log("DB error: " + err.response.data.message)
         })
 }
 
 
-export = {
+export {
     setCorrectAnswer,
     eventEnd
 }

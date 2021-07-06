@@ -1,5 +1,5 @@
 import axios from 'axios';
-import path from "../../config/path";
+import {path} from "../../config/path";
 
 const createRoom = (data: any, type: any) => {
     return {
@@ -28,7 +28,7 @@ const joinToRoom = async (req: any, res: any) => {
         "_id": Number(roomId),
         "joinedUsers": ["joinRoom$newJoin"]
     }]
-    await axios.post(`${path.path}/transact`, config).catch((err) => {
+    await axios.post(`${path}/transact`, config).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
@@ -46,7 +46,7 @@ const leaveRoom = async (req: any, res: any) => {
         "_action": "delete"
     }]
 
-    await axios.post(`${path.path}/transact`, config).catch((err) => {
+    await axios.post(`${path}/transact`, config).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
@@ -58,7 +58,7 @@ const leaveRoom = async (req: any, res: any) => {
 }
 
 
-export = {
+export {
     createRoom,
     joinToRoom,
     leaveRoom

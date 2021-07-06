@@ -1,11 +1,11 @@
 import MiddlePaymentContract from "../abi/MiddlePayment.json";
-import ContractInit from "../contractInit";
+import { init } from "../contractInit";
 import Web3 from "web3";
-import url from "../../config/path";
+import { path } from "../../config/path";
 import axios from "axios";
-import getNonce from "../nonce/nonce";
-import getGasPrice from "../gasPrice/getGasPrice"
-import config from "../../config/limits"
+import { getNonce } from "../nonce/nonce";
+import { getGasPriceSafeLow } from "../gasPrice/getGasPrice"
+import { gasPercent } from "../../config/limits"
 
 const payToExperts = async (data: any) => {
     console.log("from payToExperts")
@@ -18,13 +18,13 @@ const payToExperts = async (data: any) => {
     let payAdv = data.payAdv;
 
     let path = process.env.NODE_ENV
-    let contract = await ContractInit.init(path, MiddlePaymentContract);
+    let contract = await init(path, MiddlePaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPayToExperts(id).estimateGas();
         await contract.methods.letsPayToExperts(id).send({
-            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: await getGasPrice.getGasPriceSafeLow(),
-            nonce: await getNonce.getNonce()
+            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: await getGasPriceSafeLow(),
+            nonce: await getNonce()
         });
 
         await setToDb(id, mintHost, payHost, mintAdv, payAdv);
@@ -42,13 +42,13 @@ const setToDb = async (id: any, mintHost: any, payHost: any, mintAdv: any, payAd
         "mintedAdvisorAmount": Number(web3.utils.fromWei(String(mintAdv), "ether")),
         "payAdvisorAmount": Number(web3.utils.fromWei(String(payAdv), "ether"))
     }]
-    await axios.post(`${url.path}/transact`, data).catch((err) => {
+    await axios.post(`${path}/transact`, data).catch((err) => {
         console.log("DB error from transact payToLosers: " + err.response.data.message)
         return;
     })
     return;
 }
 
-export = {
+export {
     payToExperts
 }

@@ -1,14 +1,14 @@
 import axios from 'axios';
-import key from "../../config/key";
-import path from "../../config/path";
-import betToken from "../../services/funds/betteryToken"
+import { auth0Path, auth0ClientId, auth0Secret } from "../../config/key";
+import { path } from "../../config/path";
+import { mintTokens } from "../../services/funds/betteryToken"
 
 const init = async (res: any) => {
-    let data: any = await axios.post(`${key.auth0Path}/oauth/token`,
+    let data: any = await axios.post(`${auth0Path}/oauth/token`,
         {
-            "client_id": key.auth0ClientId,
-            "client_secret": key.auth0Secret,
-            "audience": `${key.auth0Path}/api/v2/`,
+            "client_id": auth0ClientId,
+            "client_secret": auth0Secret,
+            "audience": `${auth0Path}/api/v2/`,
             "grant_type": "client_credentials"
         },
         {
@@ -31,7 +31,7 @@ const linkAccount = async (req: any, res: any) => {
     let secondUserId = secondId.substring(secondId.lastIndexOf('|') + 1);
     let verifier = getVerifier(secondId);
     let provider = getProvider(secondId);
-    let x = await axios.post(`${key.auth0Path}/api/v2/users/${firstId}/identities`,
+    let x = await axios.post(`${auth0Path}/api/v2/users/${firstId}/identities`,
         {
             "provider": provider,
             "user_id": provider == "oauth2" ? `${verifier}|${secondUserId}` : secondUserId
@@ -53,7 +53,7 @@ const linkAccount = async (req: any, res: any) => {
             "linkedAccounts": [verifier]
         }]
 
-        let z = await axios.post(`${path.path}/transact`, linked).catch((err) => {
+        let z = await axios.post(`${path}/transact`, linked).catch((err) => {
             console.log("from link auth0 DB ", err)
             res.status(400)
             res.send({ status: err })
@@ -61,7 +61,7 @@ const linkAccount = async (req: any, res: any) => {
         })
         if (z) {
             let wallet = req.body.dataFromRedis.wallet
-            await betToken.mintTokens(wallet, 10)
+            await mintTokens(wallet, 10)
             res.status(200)
             res.send({ status: "done" })
         }
@@ -91,7 +91,7 @@ const getVerifier = (x: any) => {
     }
 }
 
-export = {
+export {
     linkAccount
 }
 

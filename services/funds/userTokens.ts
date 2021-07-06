@@ -1,5 +1,5 @@
 import axios from "axios";
-import path from "../../config/path";
+import { path } from "../../config/path";
 
 const sendTokens = async (req: any, res: any) => {
     if (req.body.dataFromRedis.id && req.body.bet && req.body.bty) {
@@ -10,7 +10,7 @@ const sendTokens = async (req: any, res: any) => {
             "lastUpdate": Math.floor(Date.now() / 1000)
         }]
 
-        axios.post(path.path + "/transact", data).then(() => {
+        axios.post(path + "/transact", data).then(() => {
             res.status(200);
             res.send({ "status": "done" })
         }).catch((err: any) => {
@@ -25,6 +25,6 @@ const sendTokens = async (req: any, res: any) => {
 }
 
 
-export = {
+export {
     sendTokens
 }

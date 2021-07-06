@@ -1,4 +1,4 @@
-import keys from "../config/key";
+import { secretRedisForAllKey } from "../config/key";
 import redis from "redis";
 const redisUrl = "redis://127.0.0.1:6379";
 const client = redis.createClient(redisUrl);
@@ -55,7 +55,7 @@ const deleteFromRedis = async (key: any, sessionKey: any) => {
 
             if (!fromRedisParse.key.length) {
                 client.del(key)
-                client.lrem(keys.secretRedisForAllKey, 0, key, (err) => {
+                client.lrem(secretRedisForAllKey, 0, key, (err) => {
                     if (err) throw err
                 })
             } else {
@@ -85,13 +85,13 @@ const redisDataStructure = (userStruct: any, req: any) => {
 
 const saveKeyRedisDB = (data: any) => {
     try {
-        client.lrange(keys.secretRedisForAllKey, 0, -1, (error, allItems) => {
+        client.lrange(secretRedisForAllKey, 0, -1, (error, allItems) => {
             if (error) {
                 throw error
             }
             if (allItems.indexOf(data) === -1) {
                 let multi = client.multi();
-                multi.rpush(keys.secretRedisForAllKey, data)
+                multi.rpush(secretRedisForAllKey, data)
                 multi.exec(function (err) {
                     if (err) throw err;
                 })
@@ -106,7 +106,7 @@ const saveKeyRedisDB = (data: any) => {
 
 const botRedisCleaner = async () => {
     try {
-        client.lrange(keys.secretRedisForAllKey, 0, -1, async (error, allItems) => {
+        client.lrange(secretRedisForAllKey, 0, -1, async (error, allItems) => {
             if (error) {
                 throw error
             }
@@ -126,7 +126,7 @@ const botRedisCleaner = async () => {
 
                     if (!clearingData.length) {
                         client.del(element)
-                        client.lrem(keys.secretRedisForAllKey, 0, element, (err) => {
+                        client.lrem(secretRedisForAllKey, 0, element, (err) => {
                             if (err) throw err
                         })
                     } else {

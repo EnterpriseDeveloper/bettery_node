@@ -1,11 +1,11 @@
 import axios from "axios";
 import crypto from 'crypto-js';
-import {path} from "../../config/path";
+import { path } from "../../config/path";
 
 import betteryToken from "../funds/betteryToken";
-import {userStructure} from '../../structure/user.struct';
+import { userStructure } from '../../structure/user.struct';
 import redis from '../../helpers/redis-helper';
-import config from '../../config/key';
+import { secretRedis } from '../../config/key';
 
 const torusRegist = async (req: any, res: any) => {
     let wallet = req.body.wallet;
@@ -162,7 +162,7 @@ const autoLogin = async (req: any, res: any) => {
 
             let o = userStructure(user.data);
             o[0].accessToken = accessToken
-            o[0].sessionToken = crypto.AES.encrypt(wallet, config.secretRedis).toString()
+            o[0].sessionToken = crypto.AES.encrypt(wallet, secretRedis).toString()
             res.status(200);
             res.send(o[0]);
         }
@@ -201,10 +201,10 @@ const checkUserById = async (id: any, res: any) => {
 const dataRedisSend = (wallet: any, dataToRedis: any) => {
     redis.sendToRedis(wallet, dataToRedis)
     redis.saveKeyRedisDB(wallet)
-    return crypto.AES.encrypt(wallet, config.secretRedis).toString()
+    return crypto.AES.encrypt(wallet, secretRedis).toString()
 }
 
-export = {
+export {
     torusRegist,
     autoLogin,
     logout

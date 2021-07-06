@@ -2,7 +2,7 @@ const fsPromise = require("fs").promises;
 import fs from "fs";
 import util from 'util';
 const unlinkFile = util.promisify(fs.unlink);
-import s3 from "./S3/s3";
+import { uploadFile } from "./S3/s3";
 
 const arrayUnique = (array: any) => {
     var a = array.concat();
@@ -35,14 +35,14 @@ const uploadImage = async (thumImage: any, id: any) => {
         path: imagePath,
         filename: `${id}.${type}`
     }
-    await s3.uploadFile(file)
+    await uploadFile(file)
     await unlinkFile(file.path);
     return type;
 }
 
 
 
-export = {
+export {
     arrayUnique,
     uploadImage
 }

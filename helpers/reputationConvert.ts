@@ -11,4 +11,4 @@ const reputationConvert = (n: any) =>  {
     }
 }
 
-export = reputationConvert
+export default reputationConvert

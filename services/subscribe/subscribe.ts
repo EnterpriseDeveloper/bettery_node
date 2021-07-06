@@ -1,5 +1,5 @@
 import axios from "axios";
-import path from "../../config/path";
+import { path } from "../../config/path";
 
 const emailSub = async (req: any, res: any) => {
     const create = [{
@@ -8,7 +8,7 @@ const emailSub = async (req: any, res: any) => {
         "from": req.body.from
     }]
 
-    await axios.post(`${path.path}/transact`, create).catch((err) => {
+    await axios.post(`${path}/transact`, create).catch((err) => {
         res.status(400);
         res.send(err.response.data.message);
         return;
@@ -18,6 +18,6 @@ const emailSub = async (req: any, res: any) => {
     res.send({ "status": "ok" });
 }
 
-export = {
+export {
     emailSub
 }

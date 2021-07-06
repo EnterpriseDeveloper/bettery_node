@@ -1,5 +1,5 @@
 import axios from "axios";
-import path from "../../config/path";
+import {path} from "../../config/path";
 
 const createComment = async (msg: any) => {
     if (msg.eventId !== undefined || msg.userId !== undefined || msg.comment !== undefined) {
@@ -12,7 +12,7 @@ const createComment = async (msg: any) => {
             comment: msg.comment,
             [type]: msg.eventId
         }]
-        await axios.post(`${path.path}/transact`, comments).catch(err => {
+        await axios.post(`${path}/transact`, comments).catch(err => {
             console.log(err)
         })
     } else {
@@ -20,7 +20,7 @@ const createComment = async (msg: any) => {
     }
 }
 
-const replyToComment = async (msg: any) =>{
+const replyToComment = async (msg: any) => {
     let eventId = msg.eventId;
     let commentId = msg.commentId;
     let userId = msg.userId;
@@ -35,7 +35,7 @@ const replyToComment = async (msg: any) =>{
         [type]: eventId,
         reply: [commentId]
     }]
-    await axios.post(`${path.path}/transact`, comments).catch(err => {
+    await axios.post(`${path}/transact`, comments).catch(err => {
         console.log(err)
     })
 
@@ -46,7 +46,7 @@ const eventType = async (id: any) => {
         "select": ["*"],
         "from": Number(id)
     }
-    let getEvent = await axios.post(`${path.path}/query`, conf).catch(err => {
+    let getEvent = await axios.post(`${path}/query`, conf).catch(err => {
         console.log(err)
     })
     if (getEvent) {
@@ -60,7 +60,7 @@ const eventType = async (id: any) => {
     }
 }
 
-export = {
+export {
     createComment,
     eventType,
     replyToComment

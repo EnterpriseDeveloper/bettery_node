@@ -13,7 +13,7 @@ const controversialSorting = (data: any) => {
     return events;
 }
 
-export = {
+export {
     trendingSorting,
     controversialSorting
 }

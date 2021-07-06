@@ -1,10 +1,10 @@
 import PlayerPaymentContract from "../../abi/PlayerPayment.json";
-import ContractInit from"../../contractInit";
-import url from"../../../config/path";
-import axios from'axios';
-import getNonce from"../../nonce/nonce";
-import getGasPrice from"../../gasPrice/getGasPrice";
-import config from"../../../config/limits";
+import {init} from "../../contractInit";
+import {path} from "../../../config/path";
+import axios from 'axios';
+import {getNonce} from "../../nonce/nonce";
+import {getGasPriceSafeLow} from "../../gasPrice/getGasPrice";
+import {gasPercent} from "../../../config/limits";
 
 const payToPlayers = async (data: any) => {
     console.log("from payToPlayers", data)
@@ -40,7 +40,7 @@ const payToPlayers = async (data: any) => {
         ],
         "from": Number(id)
     }
-    let allData: any = await axios.post(`${url.path}/query`, params).catch(err => {
+    let allData: any = await axios.post(`${path}/query`, params).catch(err => {
         console.log("DB error in 'payToPlayers': " + err.response.data.message)
         return
     })
@@ -90,14 +90,13 @@ const payToPlayers = async (data: any) => {
 
     await sendToDb(payToValidators.concat(forSendReputation))
 
-    let path = process.env.NODE_ENV
-    let contract = await ContractInit.init(path, PlayerPaymentContract);
+    let contract = await init(process.env.NODE_ENV, PlayerPaymentContract);
     try {
         let gasEstimate = await contract.methods.letsPayToPlayers(id).estimateGas();
         await contract.methods.letsPayToPlayers(id).send({
-            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: await getGasPrice.getGasPriceSafeLow(),
-            nonce: await getNonce.getNonce()
+            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: await getGasPriceSafeLow(),
+            nonce: await getNonce()
         });
 
     } catch (err) {
@@ -106,7 +105,7 @@ const payToPlayers = async (data: any) => {
 }
 
 let sendToDb = async (result: any) => {
-    await axios.post(url.path + "/transact", result).catch((err) => {
+    await axios.post(path + "/transact", result).catch((err) => {
         console.log("error in payToPlayers: " + err.response.statusText)
     })
     console.log("payToPlayers works")
@@ -167,6 +166,6 @@ const calculateAllReput = (rightValidators: any) => {
     return Number(total)
 }
 
-export = {
+export {
     payToPlayers
 }

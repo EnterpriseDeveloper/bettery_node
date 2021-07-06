@@ -14,6 +14,6 @@ const findInAnswers = (data: any, searchString: any) => {
     return includesData;
 }
 
-export = {
+export {
     searchData
 }

@@ -1,18 +1,18 @@
 import axios from "axios";
-import path from "../../config/path";
-import createRoom from '../rooms/createRoom';
-import getRoom from "../rooms/getRoom";
-import structire from '../../structure/event.struct';
-import filterData from '../../helpers/filter';
-import sortData from '../../helpers/sorting';
-import additionalData from '../../helpers/additionalData';
-import notification from '../rooms/notification';
-import contractInit from "../../contract-services/contractInit";
+import { path } from "../../config/path";
+import { createRoom } from '../rooms/createRoom';
+import { getRoomColor } from "../rooms/getRoom";
+import { publicEventStructure } from '../../structure/event.struct';
+import { searchData } from '../../helpers/filter';
+import { trendingSorting, controversialSorting } from '../../helpers/sorting';
+import { getAdditionalData } from '../../helpers/additionalData';
+import { sendNotificationToUser } from '../rooms/notification';
+import { init } from "../../contract-services/contractInit";
 import PublicEvents from "../../contract-services/abi/PublicEvents.json";
-import getNonce from "../../contract-services/nonce/nonce";
-import helpers from "../../helpers/helpers";
-import getGasPrice from "../../contract-services/gasPrice/getGasPrice";
-import config from "../../config/limits"
+import { getNonce } from "../../contract-services/nonce/nonce";
+import { uploadImage } from "../../helpers/helpers";
+import { getGasPrice } from "../../contract-services/gasPrice/getGasPrice";
+import { gasPercent } from "../../config/limits"
 
 const createEvent = async (req: any, res: any) => {
     req.body.host = req.body.dataFromRedis.id
@@ -30,7 +30,7 @@ const createEvent = async (req: any, res: any) => {
         _id: "publicEvents$newEvents",
         status: 'id created',
     }]
-    let eventData: any = await axios.post(`${path.path}/transact`, createEventID)
+    let eventData: any = await axios.post(`${path}/transact`, createEventID)
         .catch((err) => {
             console.log("DB error: " + err.response.data.message)
             res.status(400);
@@ -47,13 +47,13 @@ const createEvent = async (req: any, res: any) => {
         let calculateExperts = req.body.calculateExperts === "company" ? true : false
         let amountPremiumEvent = req.body.amount;
         let pathContr = process.env.NODE_ENV;
-        let contract = await contractInit.init(pathContr, PublicEvents)
+        let contract = await init(pathContr, PublicEvents)
 
         let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).estimateGas();
         let transaction = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).send({
-            gas: Number((((gasEstimate * config.gasPercent) / 100) + gasEstimate).toFixed(0)),
-            gasPrice: await getGasPrice.getGasPrice(),
-            nonce: await getNonce.getNonce()
+            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gasPrice: await getGasPrice(),
+            nonce: await getNonce()
         });
         if (transaction) {
             let allData = req.body
@@ -61,7 +61,7 @@ const createEvent = async (req: any, res: any) => {
 
             // upload image
             if (req.body.thumImage != "undefined") {
-                let type = await helpers.uploadImage(req.body.thumImage, id);
+                let type = await uploadImage(req.body.thumImage, id);
                 let url = process.env.NODE_ENV == "production" ? "https://api.bettery.io" : `https://apitest.bettery.io`
                 allData.thumImage = `${url}/image/${id}.${type}`;
                 allData.thumColor = undefined;
@@ -72,7 +72,7 @@ const createEvent = async (req: any, res: any) => {
                 if (req.body.whichRoom == "new") {
                     allData.thumColor = req.body.roomColor;
                 } else {
-                    allData.thumColor = await getRoom.getRoomColor(allData.roomId);
+                    allData.thumColor = await getRoomColor(allData.roomId);
                 }
             }
 
@@ -97,7 +97,7 @@ const createEvent = async (req: any, res: any) => {
 
             // add room
             if (whichRoom == "new") {
-                let room = createRoom.createRoom(allData, "publicEventsId");
+                let room = createRoom(allData, "publicEventsId");
                 allData.room = [room._id]
                 delete allData.roomName;
                 delete allData.roomColor;
@@ -113,7 +113,7 @@ const createEvent = async (req: any, res: any) => {
                 allData.room = [Number(roomId)]
 
                 // Add notification
-                notification.sendNotificationToUser(roomId, id, res);
+                sendNotificationToUser(roomId, id, res);
 
                 delete allData.roomName;
                 delete allData.roomColor;
@@ -136,7 +136,7 @@ const createEvent = async (req: any, res: any) => {
                 _id: hostId,
                 hostPublicEvents: [id],
             })
-            await axios.post(path.path + "/transact", data).catch((err) => {
+            await axios.post(path + "/transact", data).catch((err) => {
                 console.log("DB error: " + err.response.data.message)
                 res.status(400);
                 res.send(err.response.data.message);
@@ -163,7 +163,7 @@ const createEvent = async (req: any, res: any) => {
             _id: id,
             _action: 'delete',
         }]
-        axios.post(`${path.path}/transact`, removeEvent)
+        axios.post(`${path}/transact`, removeEvent)
             .catch((err) => {
                 console.log("DB error: " + err.response.data.message)
                 res.status(400);
@@ -180,7 +180,7 @@ const getRoomId = async (eventId: any, res: any) => {
         "from": eventId
     }
 
-    let data: any = await axios.post(`${path.path}/query`, conf).catch((err) => {
+    let data: any = await axios.post(`${path}/query`, conf).catch((err) => {
         console.log("DB error: " + err.response.data.message)
         res.status(400);
         res.send(err.response.data.message);
@@ -202,9 +202,9 @@ const getById = (req: any, res: any) => {
         "from": id
     }
 
-    axios.post(path.path + "/query", conf).then((x) => {
+    axios.post(path + "/query", conf).then((x) => {
         if (x.data.length !== 0) {
-            let obj = structire.publicEventStructure([x.data[0]]);
+            let obj = publicEventStructure([x.data[0]]);
             res.status(200)
             res.send(obj[0])
         } else {
@@ -237,7 +237,7 @@ const getAll = async (req: any, res: any) => {
         "from": "publicEvents"
     }
 
-    let x: any = await axios.post(path.path + "/query", conf)
+    let x: any = await axios.post(path + "/query", conf)
         .catch((err) => {
             res.status(400);
             res.send(err.response.data.message);
@@ -245,10 +245,10 @@ const getAll = async (req: any, res: any) => {
             return;
         })
 
-    let obj = structire.publicEventStructure(x.data)
+    let obj = publicEventStructure(x.data)
 
     // filter
-    let dataEvetns = search.length >= 1 ? filterData.searchData(obj, search) : obj;
+    let dataEvetns = search.length >= 1 ? searchData(obj, search) : obj;
 
     if (!finished) {
         dataEvetns = dataEvetns.filter((e: any) => { return e.finalAnswer === null && e.status.search("reverted") == -1 })
@@ -258,11 +258,11 @@ const getAll = async (req: any, res: any) => {
     // soring
     switch (sort) {
         case 'trending':
-            soringData = sortData.trendingSorting(dataEvetns);
+            soringData = trendingSorting(dataEvetns);
             sendResponceAllEvents(res, soringData, from, to, obj);
             break;
         case 'controversial':
-            soringData = sortData.controversialSorting(dataEvetns);
+            soringData = controversialSorting(dataEvetns);
             sendResponceAllEvents(res, soringData, from, to, obj);
             break;
     }
@@ -272,7 +272,7 @@ const sendResponceAllEvents = async (res: any, dataEvetns: any, from: any, to: a
     let events = {
         allAmountEvents: obj.length,
         amount: dataEvetns.length,
-        events: await additionalData.getAdditionalData(dataEvetns.slice(from, to), res)
+        events: await getAdditionalData(dataEvetns.slice(from, to), res)
     }
     res.status(200)
     res.send(events)
@@ -288,7 +288,7 @@ const getBetteryEvent = async (req: any, res: any) => {
             "select": ["_id"],
             "where": `users/email = \"${email}\"`
         }
-        let getUserInfo = await axios.post(path.path + "/query", userInfo).catch((err) => {
+        let getUserInfo = await axios.post(path + "/query", userInfo).catch((err) => {
             res.status(400);
             res.send(err.response.data);
             return
@@ -300,7 +300,7 @@ const getBetteryEvent = async (req: any, res: any) => {
                 "where": `publicEvents/host = ${id}`,
                 "opts": { "orderBy": ["DESC", "publicEvents/startTime"] }
             }
-            let data = await axios.post(path.path + "/query", conf).catch((err) => {
+            let data = await axios.post(path + "/query", conf).catch((err) => {
                 res.status(400);
                 res.send(err.response.data);
                 return
@@ -325,7 +325,7 @@ const getAllForTest = async (req: any, res: any) => {
         "from": "publicEvents"
     }
 
-    let x: any = await axios.post(path.path + "/query", conf)
+    let x: any = await axios.post(path + "/query", conf)
         .catch((err) => {
             res.status(400);
             res.send(err.response.data.message);
@@ -333,12 +333,12 @@ const getAllForTest = async (req: any, res: any) => {
             return;
         })
 
-    let obj = structire.publicEventStructure(x.data)
+    let obj = publicEventStructure(x.data)
     res.status(200);
     res.send(obj);
 }
 
-export = {
+export {
     createEvent,
     getById,
     getAll,

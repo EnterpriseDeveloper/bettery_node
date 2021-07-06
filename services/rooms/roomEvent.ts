@@ -1,7 +1,7 @@
 import axios from 'axios';
-import path from '../../config/path';
-import structure from '../../structure/event.struct';
-import helpers from '../../helpers/filter';
+import { path } from '../../config/path';
+import { publicEventStructure } from '../../structure/event.struct';
+import { searchData } from '../../helpers/filter';
 
 const getEventByRoomId = async (req: any, res: any) => {
     let id = req.body.id;
@@ -13,8 +13,8 @@ const getEventByRoomId = async (req: any, res: any) => {
 
     if (eventData !== undefined) {
 
-        let roomEvent = structure.publicEventStructure(eventData.data);
-        let dataEvetns = search.length >= 1 ? helpers.searchData(roomEvent, search) : roomEvent;
+        let roomEvent = publicEventStructure(eventData.data);
+        let dataEvetns = search.length >= 1 ? searchData(roomEvent, search) : roomEvent;
 
         let events = {
             allAmountEvents: roomEvent.length,
@@ -33,7 +33,7 @@ const getCommentsAmount = async (events: any, res: any) => {
             "where": `comments/publicEventsId = ${Number(events[i].id)}`,
             "opts": { "orderBy": ["DESC", "comments/date"] }
         }
-        let comments: any = await axios.post(path.path + "/query", conf)
+        let comments: any = await axios.post(path + "/query", conf)
             .catch((err: any) => {
                 res.status(400);
                 res.send(err.response);
@@ -105,7 +105,7 @@ const getHostData = async (id: any, res: any) => {
         "from": id,
     }
 
-    const hostData: any = await axios.post(`${path.path}/query`, host).catch((err: any) => {
+    const hostData: any = await axios.post(`${path}/query`, host).catch((err: any) => {
         res.status(404);
         res.send({ message: err });
         return undefined;
@@ -127,7 +127,7 @@ const getData = async (id: any, res: any) => {
         "opts": { "orderBy": ["DESC", "publicEvents/startTime"] }
     }
 
-    const eventData = await axios.post(`${path.path}/query`, event).catch((err: any) => {
+    const eventData = await axios.post(`${path}/query`, event).catch((err: any) => {
         res.status(404);
         res.send({ message: err });
         return undefined;
@@ -135,7 +135,7 @@ const getData = async (id: any, res: any) => {
     return eventData;
 }
 
-export = {
+export {
     getEventByRoomId,
     roomInfo
 }

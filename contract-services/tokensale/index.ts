@@ -2,14 +2,14 @@
 import Web3 from "web3";
 import TokenSaleContract from '../abi/QuizeTokenSale.json'
 import BetteryTokenContract from '../abi/BTYmain.json'; // TODO rename
-import config from '../../config/networks';
+import { mainnet, goerli, mainnetID, mainId } from '../../config/networks';
 
 export default (app: any) => {
     // TODO
     app.post("/tokensale/info", async (req: any, res: any) => {
         let from = req.body.from;
-        let provider = from == "prod" ? config.mainnet : config.goerli;
-        let networkId: any = from == "prod" ? config.mainnetID : config.mainId;
+        let provider = from == "prod" ? mainnet : goerli;
+        let networkId: any = from == "prod" ? mainnetID : mainId;
         let keys = from == "prod" ? require("../keys/prod/privKey") : require("../keys/test/privKey");
 
         let tokenMarket = await tokenSale(provider, networkId, keys);

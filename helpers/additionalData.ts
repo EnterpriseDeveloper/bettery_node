@@ -1,5 +1,5 @@
 import axios from "axios";
-import path from "../config/path";
+import { path } from "../config/path";
 
 const getAdditionalData = async (events: any, res: any) => {
     for (let i = 0; i < events.length; i++) {
@@ -7,9 +7,9 @@ const getAdditionalData = async (events: any, res: any) => {
         let confComment = {
             "select": ["comments/comment", "comments/date"],
             "where": `comments/publicEventsId = ${Number(events[i].id)}`,
-            "opts": {"orderBy": ["DESC", "comments/date"] }
+            "opts": { "orderBy": ["DESC", "comments/date"] }
         }
-        let comments: any = await axios.post(path.path + "/query", confComment)
+        let comments: any = await axios.post(path + "/query", confComment)
             .catch((err) => {
                 console.log("DB error: " + err.response)
                 res.status(400);
@@ -28,6 +28,6 @@ const getAdditionalData = async (events: any, res: any) => {
     return events;
 }
 
-export = {
+export {
     getAdditionalData
 }

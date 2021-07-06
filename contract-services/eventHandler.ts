@@ -4,9 +4,18 @@ import PlayerPaymentContract from "./abi/PlayerPayment.json";
 
 import { webSoketInit, connectToNetwork } from "./contractInit";
 import { expertCalc } from './oracels/exprestCalc';
-import setAnswer from "../services/events/event_is_finish";
-import publicEvents from "./publicEvents/index";
-import playPaymentSentToDB from "./publicEvents/playerPayment/setPaymentToDB";
+import { eventEnd } from "../services/events/event_is_finish";
+import {
+    findCorrectAnswer,
+    payToCompanies,
+    payToExperts,
+    payToHost,
+    payToLosers,
+    payToPlayers,
+    payToRefferers,
+    reverted
+} from "./publicEvents/index";
+import { setToDB } from "./publicEvents/playerPayment/setPaymentToDB";
 import Web3 from "web3";
 
 let hasProviderEnded = false;
@@ -38,25 +47,7 @@ const loadHandler = async () => {
             loadHandler();
         }, 1000);
     });
-
-    // restar connection
-    // setTimeout(() => {
-    //     let interval = setInterval(() => {
-    //         checkConnection(web3, interval)
-    //     }, 1000)
-    // }, 5000)
 }
-
-// const checkConnection = (provider, interval) => {
-//     if (!provider.currentProvider.connected) {
-//         console.log("RELOAD: ", Math.floor(new Date().getTime() / 1000.0))
-//         clearInterval(interval);
-//         loadHandler();
-//         return;
-//     } else {
-//         return;
-//     }
-// }
 
 const publicEventsHandler = (publicEvent: any) => {
     publicEvent.events.calculateExpert(async (err: any, event: any) => {
@@ -72,7 +63,7 @@ const publicEventsHandler = (publicEvent: any) => {
         if (err) {
             errorDebug('Error from find сorrect answer events', err)
         } else {
-            publicEvents.findCorrectAnswer.findCorrectAnswer(event.returnValues);
+            findCorrectAnswer(event.returnValues);
         }
     })
 
@@ -81,7 +72,7 @@ const publicEventsHandler = (publicEvent: any) => {
             errorDebug('Error from reverted event', err)
         } else {
             console.log("event revertedEvent work")
-            publicEvents.reverted.reverted(event.returnValues)
+            reverted(event.returnValues)
         }
     })
 
@@ -93,7 +84,7 @@ const MiddlePayment = async (middlePayment: any) => {
         if (err) {
             errorDebug('Error from find pay to companies events', err)
         } else {
-            publicEvents.payToCompanies.payToCompanies(event.returnValues);
+            payToCompanies(event.returnValues);
         }
     })
 
@@ -101,7 +92,7 @@ const MiddlePayment = async (middlePayment: any) => {
         if (err) {
             errorDebug('Error from find pay to host events', err)
         } else {
-            publicEvents.payToHost.payToHost(event.returnValues);
+            payToHost(event.returnValues);
         }
     })
 
@@ -109,7 +100,7 @@ const MiddlePayment = async (middlePayment: any) => {
         if (err) {
             errorDebug('Error from find pay to expert events', err)
         } else {
-            publicEvents.payToExperts.payToExperts(event.returnValues);
+            payToExperts(event.returnValues);
         }
     })
 
@@ -117,7 +108,7 @@ const MiddlePayment = async (middlePayment: any) => {
         if (err) {
             errorDebug('Error from find pay to players events', err)
         } else {
-            publicEvents.payToPlayers.payToPlayers(event.returnValues);
+            payToPlayers(event.returnValues);
         }
     })
 
@@ -126,7 +117,7 @@ const MiddlePayment = async (middlePayment: any) => {
             errorDebug('Error from reverted event', err)
         } else {
             console.log("event revertedEvent work")
-            publicEvents.reverted.reverted(event.returnValues)
+            reverted(event.returnValues)
         }
     })
 }
@@ -136,7 +127,7 @@ const PlayerPayment = async (playerPayment: any) => {
         if (err) {
             errorDebug('Error from find pay to losers events', err)
         } else {
-            publicEvents.payToLosers.payToLosers(event.returnValues);
+            payToLosers(event.returnValues);
         }
     })
 
@@ -144,7 +135,7 @@ const PlayerPayment = async (playerPayment: any) => {
         if (err) {
             errorDebug('Error from find pay to refferers events', err)
         } else {
-            publicEvents.payToRefferers.payToRefferers(event.returnValues);
+            payToRefferers(event.returnValues);
         }
     })
 
@@ -153,8 +144,8 @@ const PlayerPayment = async (playerPayment: any) => {
             errorDebug('Error from event finish event', err)
         } else {
             console.log("event finish work")
-            await playPaymentSentToDB.setToDB(event.returnValues);
-            setAnswer.eventEnd(event.returnValues);
+            await setToDB(event.returnValues);
+            eventEnd(event.returnValues);
         }
     })
 
@@ -163,7 +154,7 @@ const PlayerPayment = async (playerPayment: any) => {
             errorDebug('Error from event finish event', err)
         } else {
             console.log("event minted finish work")
-            setAnswer.eventEnd(event.returnValues);
+            eventEnd(event.returnValues);
         }
     })
 }
@@ -175,6 +166,6 @@ const errorDebug = (from: any, err: any) => {
     }
 }
 
-export = {
+export {
     loadHandler
 }
