@@ -3,8 +3,7 @@ import PublicEventContract from "../abi/PublicEvents.json";
 import axios from "axios";
 import { path } from "../../config/path";
 import { getNonce } from "../nonce/nonce";
-import { gasPercent } from "../../config/limits";
-import { getGasPriceSafeLow } from "../gasPrice/getGasPrice";
+import { getGasPriceSafeLow, estimateGasLimit } from "../gasPrice/getGasPrice";
 
 const expertCalc = async (data: any) => {
     let id = data.id;
@@ -24,7 +23,7 @@ const expertCalc = async (data: any) => {
     try {
         let gasEstimate = await contract.methods.setActiveExpertsFromOracl(Number(expertsAmount), id).estimateGas();
         await contract.methods.setActiveExpertsFromOracl(Number(expertsAmount), id).send({
-            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gas: await estimateGasLimit(gasEstimate),
             gasPrice: await getGasPriceSafeLow(),
             nonce: await getNonce()
         });

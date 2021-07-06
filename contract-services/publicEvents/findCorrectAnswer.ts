@@ -1,8 +1,7 @@
 import MiddlePaymentContract from "../abi/MiddlePayment.json";
 import { init } from "../contractInit";
 import { getNonce } from "../nonce/nonce";
-import { getGasPriceSafeLow } from "../gasPrice/getGasPrice"
-import { gasPercent } from "../../config/limits"
+import { getGasPriceSafeLow, estimateGasLimit } from "../gasPrice/getGasPrice"
 
 const findCorrectAnswer = async (data: any) => {
     console.log("from findCorrectAnswer")
@@ -14,7 +13,7 @@ const findCorrectAnswer = async (data: any) => {
     try {
         let gasEstimate = await contract.methods.letsFindCorrectAnswer(id).estimateGas();
         await contract.methods.letsFindCorrectAnswer(id).send({
-            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gas: await estimateGasLimit(gasEstimate),
             gasPrice: await getGasPriceSafeLow(),
             nonce: await getNonce()
         });

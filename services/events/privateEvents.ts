@@ -7,8 +7,7 @@ import PrivateEvents from "../../contract-services/abi/PrivateEvents.json";
 import { getNonce } from "../../contract-services/nonce/nonce";
 import { uploadImage } from "../../helpers/helpers";
 import { getRoomColor } from "../rooms/getRoom";
-import { getGasPrice } from "../../contract-services/gasPrice/getGasPrice";
-import { gasPercent } from "../../config/limits"
+import { getGasPrice, estimateGasLimit } from "../../contract-services/gasPrice/getGasPrice";
 
 const createPrivateEvent = async (req: any, res: any) => {
     let allData = req.body;
@@ -92,7 +91,7 @@ const createPrivateEvent = async (req: any, res: any) => {
 
         let gasEstimate = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).estimateGas();
         let transaction = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).send({
-            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gas: await estimateGasLimit(gasEstimate),
             gasPrice: await getGasPrice(),
             nonce: await getNonce()
         });
@@ -134,7 +133,7 @@ const privParticipate = async (req: any, res: any) => {
             let contract = await init(pathContr, PrivateEvents)
             let gasEstimate = await contract.methods.setAnswer(eventId, answer, wallet).estimateGas();
             let transaction = await contract.methods.setAnswer(eventId, answer, wallet).send({
-                gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+                gas: await estimateGasLimit(gasEstimate),
                 gasPrice: await getGasPrice(),
                 nonce: await getNonce()
             });
@@ -192,7 +191,7 @@ const privValidate = async (req: any, res: any) => {
             let contract = await init(pathContr, PrivateEvents)
             let gasEstimate = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).estimateGas();
             let transaction = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).send({
-                gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+                gas: await estimateGasLimit(gasEstimate),
                 gasPrice: await getGasPrice(),
                 nonce: await getNonce()
             });

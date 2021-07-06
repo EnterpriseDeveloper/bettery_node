@@ -52,9 +52,18 @@ async function connectToNetwork(network: any, networkId: any, contract: any, net
     return new web3.eth.Contract(abi, address, { from: account });
 }
 
+async function getBlockGasLimit() {
+    let path = process.env.NODE_ENV;
+    let network = path == "production" ? maticMain : maticMumbaiHttps;
+    let web3 = new Web3(network);
+    var block = await web3.eth.getBlock("latest");
+    return Number((block.gasLimit / block.transactions.length).toFixed(0));
+}
+
 export {
     init,
     webSoketInit,
-    connectToNetwork
+    connectToNetwork,
+    getBlockGasLimit
 }
 

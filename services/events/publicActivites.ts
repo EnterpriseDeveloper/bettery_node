@@ -6,8 +6,7 @@ import { getUserReput } from "../../helpers/userData";
 import Web3 from "web3";
 import { getNonce } from "../../contract-services/nonce/nonce";
 import { minBetAmount } from "../../config/limits";
-import { getGasPrice } from "../../contract-services/gasPrice/getGasPrice";
-import { gasPercent } from "../../config/limits"
+import { getGasPrice, estimateGasLimit } from "../../contract-services/gasPrice/getGasPrice";
 
 const participate = async (req: any, res: any) => {
     let web3 = new Web3();
@@ -51,7 +50,7 @@ const participate = async (req: any, res: any) => {
             tokens,
             wallet
         ).send({
-            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gas: await estimateGasLimit(gasEstimate),
             gasPrice: await getGasPrice(),
             nonce: await getNonce()
         });
@@ -140,7 +139,7 @@ const validate = async (req: any, res: any) => {
             wallet,
             reputation
         ).send({
-            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gas: await estimateGasLimit(gasEstimate),
             gasPrice: await getGasPrice(),
             nonce: await getNonce()
         });

@@ -4,8 +4,7 @@ import axios from "axios";
 import { path } from "../../config/path";
 import Web3 from "web3";
 import { getNonce } from "../nonce/nonce";
-import { getGasPriceSafeLow } from "../gasPrice/getGasPrice"
-import { gasPercent } from "../../config/limits"
+import { getGasPriceSafeLow, estimateGasLimit } from "../gasPrice/getGasPrice"
 
 const payToRefferers = async (data: any) => {
     console.log("from payToRefferers")
@@ -46,7 +45,7 @@ const payToRefferers = async (data: any) => {
             payRefAmount[2],
             payComp
         ).send({
-            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gas: await estimateGasLimit(gasEstimate),
             gasPrice: await getGasPriceSafeLow(),
             nonce: await getNonce()
         });

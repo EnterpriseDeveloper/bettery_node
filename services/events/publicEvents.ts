@@ -11,8 +11,7 @@ import { init } from "../../contract-services/contractInit";
 import PublicEvents from "../../contract-services/abi/PublicEvents.json";
 import { getNonce } from "../../contract-services/nonce/nonce";
 import { uploadImage } from "../../helpers/helpers";
-import { getGasPrice } from "../../contract-services/gasPrice/getGasPrice";
-import { gasPercent } from "../../config/limits"
+import { getGasPrice, estimateGasLimit } from "../../contract-services/gasPrice/getGasPrice";
 
 const createEvent = async (req: any, res: any) => {
     req.body.host = req.body.dataFromRedis.id
@@ -51,7 +50,7 @@ const createEvent = async (req: any, res: any) => {
 
         let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).estimateGas();
         let transaction = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).send({
-            gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+            gas: await estimateGasLimit(gasEstimate),
             gasPrice: await getGasPrice(),
             nonce: await getNonce()
         });

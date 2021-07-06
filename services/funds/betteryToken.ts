@@ -3,9 +3,8 @@ import { path } from "../../config/path"
 import { init } from "../../contract-services/contractInit";
 import BET from "../../contract-services/abi/BET.json";
 import { getNonce } from "../../contract-services/nonce/nonce";
-import { getGasPrice } from "../../contract-services/gasPrice/getGasPrice";
+import { getGasPrice, estimateGasLimit } from "../../contract-services/gasPrice/getGasPrice";
 import Web3 from "web3";
-import { gasPercent } from "../../config/limits"
 
 const mintTokens = async (address: any, amount: any) => {
     let pathContr = process.env.NODE_ENV;
@@ -14,7 +13,7 @@ const mintTokens = async (address: any, amount: any) => {
     let amo = web3.utils.toWei(String(amount), "ether")
     let gasEstimate = await betteryContract.methods.mint(address, amo).estimateGas();
     return await betteryContract.methods.mint(address, amo).send({
-        gas: Number((((gasEstimate * gasPercent) / 100) + gasEstimate).toFixed(0)),
+        gas: await estimateGasLimit(gasEstimate),
         gasPrice: await getGasPrice(),
         nonce: await getNonce()
     });
