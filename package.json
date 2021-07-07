@@ -9,8 +9,10 @@
     "start_prod": "NODE_TEST=false NODE_ENV=production node build/server_prod.js",
     "forever": "NODE_TEST=false NODE_ENV=test nohup node server.js > output.log &",
     "forever_prod": "NODE_TEST=false NODE_ENV=production nohup node server_prod.js > outputData.log &",
-    "build": "webpack --mode=development --config webpack.config.js",
-    "build_prod": "webpack --mode=production --config webpack.production.config.js"
+    "build": "webpack --mode=development --config webpack.config.js && sudo npm run deploy",
+    "build_prod": "webpack --mode=production --config webpack.production.config.js && sudo npm run deploy_prod",
+    "deploy": "sudo scp -i ~/.ssh/bettery_dev.pem -r build/server.js ubuntu@13.212.14.124:/home/ubuntu/node",
+    "deploy_prod": "sudo scp -i ~/.ssh/bettery_dev.pem -r build/server_prod.js ubuntu@13.213.49.239:/home/ubuntu/node"
   },
   "engines": {
     "node": "v14.17.2"
