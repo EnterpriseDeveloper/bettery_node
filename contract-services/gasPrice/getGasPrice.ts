@@ -19,14 +19,15 @@ const getGasPriceSafeLow = async () => {
 }
 
 const estimateGasLimit = async (gas: number) => {
-    let gasBlock = 0;
+    let gasBlock: any = 0;
     let neededGas = Number((((gas * gasPercent) / 100) + gas).toFixed(0));
     do {
         gasBlock = await getBlockGasLimit();
-        if (gasBlock > neededGas) {
-            return gasBlock;
+        if (gasBlock > neededGas || gasBlock == "infinity") {
+            console.log("gas:", neededGas, gasBlock)
+            return neededGas;
         }
-    } while (neededGas > gasBlock);
+    } while (neededGas > gasBlock || gasBlock != "infinity");
 }
 
 const gas = async () => {
