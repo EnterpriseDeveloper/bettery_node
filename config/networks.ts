@@ -1,8 +1,8 @@
 import {infura} from "./key";
 
 // Matic main
-const maticMain = `https://angry-jepsen:aliens-swore-bagful-mulled-judge-hummus@nd-166-193-145.p2pify.com`;
-const matciMainWSS = `wss://angry-jepsen:aliens-swore-bagful-mulled-judge-hummus@ws-nd-166-193-145.p2pify.com`;
+const maticMain = `https://nd-938-667-448.p2pify.com/ccef2371bec24111575e4ca323a2ec7e`;
+const matciMainWSS = `wss://ws-nd-938-667-448.p2pify.com/ccef2371bec24111575e4ca323a2ec7e`;
 const maticMainId = 137;
 // Mumbai
 const maticMumbaiHttps = 'https://competent-panini:demise-sphere-refuse-spoils-down-fiber@nd-425-039-881.p2pify.com';
