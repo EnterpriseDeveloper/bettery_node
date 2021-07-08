@@ -64,7 +64,7 @@ const publicEventStructure = (data: any) => {
                 color: z['publicEvents/room'][0]['room/color'],
                 owner: z['publicEvents/room'][0]['room/owner']['_id'],
                 eventAmount: z['publicEvents/room'][0]['room/publicEventsId'].length
-            }
+            },
         }
     })
 }

@@ -3,6 +3,7 @@ import { getEventByRoomId, roomInfo } from './roomEvent';
 import { joinToRoom, leaveRoom } from './createRoom';
 import { subscribeToNotification, getNotificationByUserId, deleteNotifications, readNotification } from './notification';
 import checkToken from '../../middlewares/check-token';
+import userAnswerMiddleware from "../../middlewares/find-user-answer";
 
 
 export default function Rooms(app: any) {
@@ -12,7 +13,7 @@ export default function Rooms(app: any) {
     app.post("/room/validation", checkToken, async (req: any, res: any) => {
         roomValidation(req, res);
     })
-    app.post("/room/get_event_by_room_id", async (req: any, res: any) => {
+    app.post("/room/get_event_by_room_id",userAnswerMiddleware, async (req: any, res: any) => {
         getEventByRoomId(req, res);
     })
     app.post("/room/info", async (req: any, res: any) => {

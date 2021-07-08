@@ -2,12 +2,14 @@ import axios from 'axios';
 import { path } from '../../config/path';
 import { publicEventStructure } from '../../structure/event.struct';
 import { searchData } from '../../helpers/filter';
+import {getAdditionalData, getAnswers} from "../../helpers/additionalData";
 
 const getEventByRoomId = async (req: any, res: any) => {
     let id = req.body.id;
     let from = req.body.from;
     let to = req.body.to;
     let search = req.body.search != undefined ? req.body.search : '';
+    let userId = req.body.userId
 
     let eventData = await getData(id, res);
 
@@ -15,41 +17,21 @@ const getEventByRoomId = async (req: any, res: any) => {
 
         let roomEvent = publicEventStructure(eventData.data);
         let dataEvetns = search.length >= 1 ? searchData(roomEvent, search) : roomEvent;
+        let eventsAddit = await getAdditionalData(dataEvetns.slice(from, to), res)
 
+        let userAnswers = getAnswers(eventsAddit, userId) ? getAnswers(eventsAddit, userId) : {}
+
+        for (let i = 0; i < eventsAddit.length; i++) {
+            eventsAddit[i].usersAnswers = userAnswers[i];
+        }
         let events = {
             allAmountEvents: roomEvent.length,
             amount: dataEvetns.length,
-            events: await getCommentsAmount(dataEvetns.slice(from, to), res)
+            events: eventsAddit
         }
         res.status(200)
         res.send(events)
     }
-}
-
-const getCommentsAmount = async (events: any, res: any) => {
-    for (let i = 0; i < events.length; i++) {
-        let conf = {
-            "select": ["comments/comment", "comments/date"],
-            "where": `comments/publicEventsId = ${Number(events[i].id)}`,
-            "opts": { "orderBy": ["DESC", "comments/date"] }
-        }
-        let comments: any = await axios.post(path + "/query", conf)
-            .catch((err: any) => {
-                res.status(400);
-                res.send(err.response);
-                console.log("DB error: " + err.response)
-                return;
-            })
-
-        events[i].commentsAmount = comments.data.length
-        if (comments.data.length != 0) {
-            events[i].lastComment = comments.data[0]['comments/comment'];
-        } else {
-            events[i].lastComment = "null";
-        }
-    }
-
-    return events;
 }
 
 const roomInfo = async (req: any, res: any) => {

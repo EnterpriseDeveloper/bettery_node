@@ -5,7 +5,7 @@ import { getRoomColor } from "../rooms/getRoom";
 import { publicEventStructure } from '../../structure/event.struct';
 import { searchData } from '../../helpers/filter';
 import { trendingSorting, controversialSorting } from '../../helpers/sorting';
-import { getAdditionalData } from '../../helpers/additionalData';
+import { getAdditionalData, getAnswers } from '../../helpers/additionalData';
 import { sendNotificationToUser } from '../rooms/notification';
 import { init } from "../../contract-services/contractInit";
 import PublicEvents from "../../contract-services/abi/PublicEvents.json";
@@ -225,6 +225,7 @@ const getAll = async (req: any, res: any) => {
     let search = req.body.search != undefined ? req.body.search : '';
     let sort = req.body.sort != undefined ? req.body.sort : 'trending' // controversial 
     let finished = req.body.finished;
+    let userId = req.body.userId;
 
     let conf = {
         "select": ["*",
@@ -258,20 +259,29 @@ const getAll = async (req: any, res: any) => {
     switch (sort) {
         case 'trending':
             soringData = trendingSorting(dataEvetns);
-            sendResponceAllEvents(res, soringData, from, to, obj);
+            sendResponceAllEvents(res, soringData, from, to, obj, userId);
             break;
         case 'controversial':
             soringData = controversialSorting(dataEvetns);
-            sendResponceAllEvents(res, soringData, from, to, obj);
+            sendResponceAllEvents(res, soringData, from, to, obj, userId);
             break;
     }
 }
 
-const sendResponceAllEvents = async (res: any, dataEvetns: any, from: any, to: any, obj: any) => {
+const sendResponceAllEvents = async (res: any, dataEvetns: any, from: any, to: any, obj: any, userId: any) => {
+    let eventsAddit = await getAdditionalData(dataEvetns.slice(from, to), res)
+    let userAnswers = getAnswers(eventsAddit, userId) ? getAnswers(eventsAddit, userId) : {}
+
+        for (let i = 0; i < eventsAddit.length; i++) {
+            eventsAddit[i].usersAnswers = userAnswers[i];
+        }
+
+
+
     let events = {
         allAmountEvents: obj.length,
         amount: dataEvetns.length,
-        events: await getAdditionalData(dataEvetns.slice(from, to), res)
+        events: eventsAddit,
     }
     res.status(200)
     res.send(events)
