@@ -6,6 +6,7 @@ import eventLimitPrivate from '../../middlewares/eventLimitsPrivate'
 import eventLimitPublic from '../../middlewares/eventLimitsPublic'
 import { getEventData } from "./revert";
 import { findCorrectAnswer } from "../../contract-services/publicEvents/findCorrectAnswer"
+import userAnswerMiddleware from "../../middlewares/find-user-answer";
 import checkToken from '../../middlewares/check-token'
 
 export default function Events(app: any) {
@@ -17,7 +18,7 @@ export default function Events(app: any) {
         getById(req, res);
     })
 
-    app.post("/publicEvents/get_all", async (req: any, res: any) => {
+    app.post("/publicEvents/get_all",userAnswerMiddleware, async (req: any, res: any) => {
         getAll(req, res);
     })
 

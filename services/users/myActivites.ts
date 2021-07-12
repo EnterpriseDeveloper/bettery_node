@@ -2,7 +2,7 @@ import axios from "axios";
 import { path } from "../../config/path";
 import { publicEventStructure } from '../../structure/event.struct';
 import { searchData } from '../../helpers/filter';
-import { getAdditionalData } from '../../helpers/additionalData';
+import { getAdditionalData, getAnswers } from '../../helpers/additionalData';
 
 const getAllUserEvents = async (req: any, res: any) => {
     let eventData: any[] = [];
@@ -67,16 +67,21 @@ const getAllUserEvents = async (req: any, res: any) => {
         if (!finished) {
             dataEvetns = dataEvetns.filter((e: any) => { return e.finalAnswer === null })
         }
+        let eventsAddit = await getAdditionalData(dataEvetns.slice(from, to), res)
+        let userAnswers = getAnswers(eventsAddit, userId) ? getAnswers(eventsAddit, userId) : {}
+
+        for (let i = 0; i < eventsAddit.length; i++) {
+            eventsAddit[i].usersAnswers = userAnswers[i];
+        }
         let events = {
             allAmountEvents: obj.length,
             amount: dataEvetns.length,
-            events: await getAdditionalData(dataEvetns.slice(from, to), res)
+            events: eventsAddit
         }
         res.status(200)
         res.send(events)
     }
 }
-
 
 export {
     getAllUserEvents
