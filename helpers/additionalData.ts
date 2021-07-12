@@ -43,19 +43,25 @@ const getAnswers = (x: any, userId: any) => {
 
 const findAnswer = (data: any, userId: any) => {
     let findParticipiant = data.parcipiantAnswers != undefined ? data.parcipiantAnswers.findIndex((x: any) => { return Number(x.userId) == Number(userId) }) : - 1;
-    if (findParticipiant === -1) {
-        let findValidators = data.validatorsAnswers != undefined ? data.validatorsAnswers.findIndex((x: any) => { return Number(x.userId) == Number(userId) }) : -1;
+    let findValidators = data.validatorsAnswers != undefined ? data.validatorsAnswers.findIndex((x: any) => { return Number(x.userId) == Number(userId) }) : -1;
+    if (findParticipiant === -1 && findValidators != -1) {
         return {
             answer: findValidators != -1 ? data.validatorsAnswers[findValidators].answer : undefined,
             from: 'validator',
             amount: 0
         };
-    } else {
+    } else if (findParticipiant != -1 && findValidators === -1) {
         return {
             answer: data.parcipiantAnswers[findParticipiant].answer,
             from: 'participant',
             amount: data.parcipiantAnswers[findParticipiant].amount
         };
+    } else  {
+        return {
+            answer: undefined,
+            from: undefined,
+            amount: 0
+        }
     }
 }
 
