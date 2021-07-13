@@ -7,6 +7,7 @@ import { getBlockGasLimit } from '../contractInit';
 const getGasPrice = async () => {
     let data = await gas();
     let web3 = new Web3();
+    console.log("gas price fast: ", String(data.fast))
     let fast = web3.utils.toWei(String(data.fast), "gwei");
     return fast;
 }
@@ -14,6 +15,7 @@ const getGasPrice = async () => {
 const getGasPriceSafeLow = async () => {
     let data = await gas();
     let web3 = new Web3();
+    console.log("gas price fast: ", String(data.safeLow))
     let safeLow = web3.utils.toWei(String(data.safeLow), "gwei");
     return safeLow;
 }
