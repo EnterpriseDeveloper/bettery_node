@@ -150,6 +150,11 @@ const refInfo = async (req: any, res: any) => {
     let level_2 = listAtTheLevel(x.invited)
     let level_3 = listAtTheLevel(level_2)
 
+    fakeDateRemoveLater(level_1)
+    fakeDateRemoveLater(level_2)
+    fakeDateRemoveLater(level_3)
+
+
 let dataForSend = {
         level1: level_1.length,
         level2: !level_2 ? 0 : level_2.length,
@@ -157,7 +162,6 @@ let dataForSend = {
         usersInvited: x.invited
 }
     res.send(dataForSend)
-
 }
 
 const listAtTheLevel = (data: any) => {
@@ -172,6 +176,16 @@ const listAtTheLevel = (data: any) => {
         });
     }
     return arr
+}
+
+const fakeDateRemoveLater = (level: []) => {
+    if(level.length){
+        level.forEach((el: any)=>{
+            if(!el.registered){
+                el.registered = 1626261167
+            }
+        })
+    }
 }
 
 export {
