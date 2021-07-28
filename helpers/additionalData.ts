@@ -30,13 +30,17 @@ const getAdditionalData = async (events: any, res: any) => {
 
 const getAnswers = (x: any, userId: any) => {
     return x.map((data: any) => {
+        let findA = findAnswer(data, userId);
         return {
             event_id: data.id,
-            answer: findAnswer(data, userId).answer,
-            from: findAnswer(data, userId).from,
-            answered: findAnswer(data, userId).answer != undefined ? true : false,
-            amount: 0,
-            betAmount: findAnswer(data, userId).amount
+            answer: findA.answer,
+            from: findA.from,
+            answered: findA.answer != undefined ? true : false,
+            amount: 0, // TODO remove do not using
+            betAmount: findA.amount,
+            mintedToken: findA.mintedToken,
+            payToken: findA.payToken
+
         };
     });
 }
@@ -48,19 +52,25 @@ const findAnswer = (data: any, userId: any) => {
         return {
             answer: findValidators != -1 ? data.validatorsAnswers[findValidators].answer : undefined,
             from: 'validator',
-            amount: 0
+            amount: 0,
+            mintedToken: data.validatorsAnswers[findValidators].mintedToken == undefined ? 0 : data.validatorsAnswers[findValidators].mintedToken,
+            payToken: data.validatorsAnswers[findValidators].payToken == undefined ? 0 : data.validatorsAnswers[findValidators].payToken
         };
     } else if (findParticipiant != -1 && findValidators === -1) {
         return {
             answer: data.parcipiantAnswers[findParticipiant].answer,
             from: 'participant',
-            amount: data.parcipiantAnswers[findParticipiant].amount
+            amount: data.parcipiantAnswers[findParticipiant].amount,
+            mintedToken: data.parcipiantAnswers[findParticipiant].mintedToken == undefined ? 0 : data.parcipiantAnswers[findParticipiant].mintedToken,
+            payToken: data.parcipiantAnswers[findParticipiant].payToken == undefined ? 0 : data.parcipiantAnswers[findParticipiant].payToken
         };
-    } else  {
+    } else {
         return {
             answer: undefined,
             from: undefined,
-            amount: 0
+            amount: 0,
+            mintedToken: 0,
+            payToken: 0
         }
     }
 }
