@@ -122,11 +122,77 @@ const additionalInfo = async (req: any, res: any) => {
     res.send(user);
 }
 
+const refInfo = async (req: any, res: any) => {
+    let userId = req.body.dataFromRedis.id
+
+    let conf = {
+        "select": [
+            "invited", {
+                "invited": ["_id", "avatar", "nickName","registered", "invited", {
+                    "invited": ["_id", "avatar", "nickName","registered", "invited", {
+                        "invited": ["_id", "avatar", "nickName","registered", "invited"]
+                    }]
+                }]
+            }
+        ],
+        "from": userId
+    }
+
+    let data: any = await axios.post(path + "/query", conf).catch(err => {
+        res.status(400);
+        res.send(err.response.data.message);
+        return;
+    })
+
+    let x = data.data[0];
+
+    let level_1 = x && x.invited ? x.invited : []
+    let level_2 = listAtTheLevel(x.invited)
+    let level_3 = listAtTheLevel(level_2)
+
+    fakeDateRemoveLater(level_1)
+    fakeDateRemoveLater(level_2)
+    fakeDateRemoveLater(level_3)
+
+
+let dataForSend = {
+        level1: level_1.length,
+        level2: !level_2 ? 0 : level_2.length,
+        level3: !level_3 ? 0 : level_3.length,
+        usersInvited: x.invited
+}
+    res.send(dataForSend)
+}
+
+const listAtTheLevel = (data: any) => {
+    let arr: any = [];
+    if(data) {
+        data.map((el: any) => {
+            if(el.invited){
+                el.invited.map((el2: any)=>{
+                    arr.push(el2)
+                })
+            }
+        });
+    }
+    return arr
+}
+
+const fakeDateRemoveLater = (level: []) => {
+    if(level.length){
+        level.forEach((el: any)=>{
+            if(!el.registered){
+                el.registered = 1626261167
+            }
+        })
+    }
+}
 
 export {
     allUsers,
     getUserById,
     additionalInfo,
     updateNickname,
-    updatePublicEmail
+    updatePublicEmail,
+    refInfo
 }

@@ -31,6 +31,7 @@ const torusRegist = async (req: any, res: any) => {
             "nickName": req.body.nickName,
             "email": email,
             "wallet": wallet,
+            "registered": Math.floor(Date.now() / 1000),
             "avatar": req.body.avatar == "" ? 'https://api.bettery.io/image/avatar.png' : req.body.avatar,
             "verifier": req.body.verifier,
             "linkedAccounts": [verifierId]
