@@ -194,17 +194,17 @@ const getById = (req: any, res: any) => {
 
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-            { 'publicEvents/host': ["*"] },
-            { 'publicEvents/room': ["*"] }
+            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+            { 'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet'] },
+            { 'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId'] }
         ],
         "from": id
     }
 
     axios.post(path + "/query", conf).then((x) => {
         if (x.data.length !== 0) {
-            let obj = publicEventStructure([x.data[0]]); 
+            let obj = publicEventStructure([x.data[0]]);
             obj[0].usersAnswers = getAnswers(obj[0], userId);
             res.status(200)
             res.send(obj[0])
@@ -229,12 +229,13 @@ const getAll = async (req: any, res: any) => {
     let finished = req.body.finished;
     let userId = req.body.userId;
 
+    let o = Date.now();
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-            { 'publicEvents/host': ["*"] },
-            { 'publicEvents/room': ["*"] }
+            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+            { 'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet'] },
+            { 'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId'] }
         ],
         "from": "publicEvents"
     }
@@ -247,10 +248,14 @@ const getAll = async (req: any, res: any) => {
             return;
         })
 
+    let z = Date.now()
+    console.log(z - o)
+
     let obj = publicEventStructure(x.data)
 
     // filter
     let dataEvetns = search.length >= 1 ? searchData(obj, search) : obj;
+
 
     if (!finished) {
         dataEvetns = dataEvetns.filter((e: any) => { return e.finalAnswer === null && e.status.search("reverted") == -1 })
@@ -273,9 +278,9 @@ const getAll = async (req: any, res: any) => {
 const sendResponceAllEvents = async (res: any, dataEvetns: any, from: any, to: any, obj: any, userId: any) => {
     let eventsAddit = await getAdditionalData(dataEvetns.slice(from, to), res)
 
-        for (let i = 0; i < eventsAddit.length; i++) {
-            eventsAddit[i].usersAnswers = getAnswers(eventsAddit[i], userId);
-        }
+    for (let i = 0; i < eventsAddit.length; i++) {
+        eventsAddit[i].usersAnswers = getAnswers(eventsAddit[i], userId);
+    }
 
 
 
@@ -327,10 +332,10 @@ const getBetteryEvent = async (req: any, res: any) => {
 const getAllForTest = async (req: any, res: any) => {
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-            { 'publicEvents/host': ["*"] },
-            { 'publicEvents/room': ["*"] }
+            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+            { 'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet'] },
+            { 'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId'] }
         ],
         "from": "publicEvents"
     }

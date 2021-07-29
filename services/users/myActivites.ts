@@ -15,20 +15,22 @@ const getAllUserEvents = async (req: any, res: any) => {
     let config = {
         select: [
             {
-                "users/publicActivites": ["*", {
+                "users/publicActivites": [{
                     'publicActivites/eventId': ["*",
-                        { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-                        { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-                        { 'publicEvents/host': ["*"] },
-                        { 'publicEvents/room': ["*"] }]
+                        { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+                        { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+                        { 'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet'] },
+                        { 'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId'] }
+                    ]
                 }]
             },
             {
                 "users/hostPublicEvents": ["*",
-                    { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-                    { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
-                    { 'publicEvents/host': ["*"] },
-                    { 'publicEvents/room': ["*"] }]
+                    { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+                    { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+                    { 'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet'] },
+                    { 'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId'] }
+                ]
             }
         ],
         from: userId
