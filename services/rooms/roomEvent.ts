@@ -19,10 +19,8 @@ const getEventByRoomId = async (req: any, res: any) => {
         let dataEvetns = search.length >= 1 ? searchData(roomEvent, search) : roomEvent;
         let eventsAddit = await getAdditionalData(dataEvetns.slice(from, to), res)
 
-        let userAnswers = getAnswers(eventsAddit, userId) ? getAnswers(eventsAddit, userId) : {}
-
         for (let i = 0; i < eventsAddit.length; i++) {
-            eventsAddit[i].usersAnswers = userAnswers[i];
+            eventsAddit[i].usersAnswers = getAnswers(eventsAddit[i], userId);
         }
         let events = {
             allAmountEvents: roomEvent.length,

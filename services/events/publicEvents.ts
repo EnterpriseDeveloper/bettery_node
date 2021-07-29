@@ -190,6 +190,7 @@ const getRoomId = async (eventId: any, res: any) => {
 
 const getById = (req: any, res: any) => {
     let id = Number(req.body.id);
+    let userId = req.body.userId;
 
     let conf = {
         "select": ["*",
@@ -203,7 +204,8 @@ const getById = (req: any, res: any) => {
 
     axios.post(path + "/query", conf).then((x) => {
         if (x.data.length !== 0) {
-            let obj = publicEventStructure([x.data[0]]);
+            let obj = publicEventStructure([x.data[0]]); 
+            obj[0].usersAnswers = getAnswers(obj[0], userId);
             res.status(200)
             res.send(obj[0])
         } else {
@@ -270,10 +272,9 @@ const getAll = async (req: any, res: any) => {
 
 const sendResponceAllEvents = async (res: any, dataEvetns: any, from: any, to: any, obj: any, userId: any) => {
     let eventsAddit = await getAdditionalData(dataEvetns.slice(from, to), res)
-    let userAnswers = getAnswers(eventsAddit, userId) ? getAnswers(eventsAddit, userId) : {}
 
         for (let i = 0; i < eventsAddit.length; i++) {
-            eventsAddit[i].usersAnswers = userAnswers[i];
+            eventsAddit[i].usersAnswers = getAnswers(eventsAddit[i], userId);
         }
 
 

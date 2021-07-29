@@ -29,20 +29,18 @@ const getAdditionalData = async (events: any, res: any) => {
 }
 
 const getAnswers = (x: any, userId: any) => {
-    return x.map((data: any) => {
-        let findA = findAnswer(data, userId);
-        return {
-            event_id: data.id,
-            answer: findA.answer,
-            from: findA.from,
-            answered: findA.answer != undefined ? true : false,
-            amount: 0, // TODO remove do not using
-            betAmount: findA.amount,
-            mintedToken: findA.mintedToken,
-            payToken: findA.payToken
+    let findA = findAnswer(x, userId);
+    return {
+        event_id: x.id,
+        answer: findA.answer,
+        from: findA.from,
+        answered: findA.answer != undefined ? true : false,
+        amount: 0, // TODO remove do not using
+        betAmount: findA.amount,
+        mintedToken: findA.mintedToken,
+        payToken: findA.payToken
 
-        };
-    });
+    };
 }
 
 const findAnswer = (data: any, userId: any) => {
