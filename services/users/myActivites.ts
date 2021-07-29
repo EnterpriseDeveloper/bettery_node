@@ -68,10 +68,9 @@ const getAllUserEvents = async (req: any, res: any) => {
             dataEvetns = dataEvetns.filter((e: any) => { return e.finalAnswer === null })
         }
         let eventsAddit = await getAdditionalData(dataEvetns.slice(from, to), res)
-        let userAnswers = getAnswers(eventsAddit, userId) ? getAnswers(eventsAddit, userId) : {}
 
         for (let i = 0; i < eventsAddit.length; i++) {
-            eventsAddit[i].usersAnswers = userAnswers[i];
+            eventsAddit[i].usersAnswers = getAnswers(eventsAddit[i], userId);
         }
         let events = {
             allAmountEvents: obj.length,

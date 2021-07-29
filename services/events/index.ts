@@ -14,7 +14,7 @@ export default function Events(app: any) {
         createEvent(req, res);
     })
 
-    app.post("/publicEvents/get_by_id", async (req: any, res: any) => {
+    app.post("/publicEvents/get_by_id", userAnswerMiddleware, async (req: any, res: any) => {
         getById(req, res);
     })
 
