@@ -1,12 +1,25 @@
-const checkGoogleToken = (req: any, res: any, next: any) => {
-    try {
-        console.log(req.body);
-        const sessionToken = req.get('Authorization');
-        const accessToken = req.get('Cookies')
+import axios from "axios";
 
-        console.log(accessToken);
-        console.log('==============');
-        console.log(sessionToken);
+const checkIsTokenValid = async (req: any, res: any, next: any) => {
+    try {
+        const accessToken = req.body.accessToken
+        const loginPlatform = req.body.verifierId.split('|')
+
+        if(loginPlatform[0] === 'google-oauth2'){
+            await axios.get(`https://oauth2.googleapis.com/tokeninfo?access_token=${accessToken}`)
+            .then((res) => console.log(res.data))
+            .catch((err) => res.send(err).json('not valid token')) 
+
+        }
+
+
+        if(loginPlatform[0] === 'facebook'){
+            await axios.get(`https://graph.facebook.com/app?access_token=${accessToken}`)
+            .then((res) => console.log(res.data))
+            .catch((err) => res.send(err).json('not valid token'))
+
+        }
+        
         
         next()
     } catch (e) {
@@ -16,5 +29,5 @@ const checkGoogleToken = (req: any, res: any, next: any) => {
 }
 
 export {
-    checkGoogleToken
+    checkIsTokenValid
 }

@@ -3,7 +3,7 @@ import { torusRegist, autoLogin, logout } from "./torusRegist";
 import { getAllUserEvents } from "./myActivites";
 import { linkAccount } from "../../helpers/auth0/linkAccount";
 import authMiddleware from "../../middlewares/check-token";
-import { checkGoogleToken } from "../../middlewares/check-is-token-valid";
+import { checkIsTokenValid } from "../../middlewares/check-is-token-valid";
 
 export default function Users(app: any) {
     app.post("/user/getUserById", authMiddleware, async (req: any, res: any) => {
@@ -14,7 +14,7 @@ export default function Users(app: any) {
         allUsers(req, res);
     })
 
-    app.post("/user/torus_regist", checkGoogleToken, async (req: any, res: any) => {
+    app.post("/user/torus_regist", checkIsTokenValid, async (req: any, res: any) => {
         torusRegist(req, res)
     })
 
