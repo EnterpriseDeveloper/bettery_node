@@ -16,6 +16,7 @@ const payToRefferers = async (data: any) => {
     let getPlayers: any = await fetchDataFromDb(id);
 
     let mintedTokens = Number(getPlayers.data[0]["mintedTokens"]);
+    let finalAnswerNumber = Number(getPlayers.data[0]["finalAnswerNumber"]);
     let players = getPlayers.data[0]["publicEvents/parcipiantsAnswer"];
     const ref = letFindAllRef(players);
     let refAmount = getRefAmount(ref);
@@ -49,17 +50,21 @@ const payToRefferers = async (data: any) => {
             gasPrice: await getGasPriceSafeLow(),
             nonce: await getNonce()
         });
-
         // TODO add to db ref payments
     } catch (err) {
         console.log("err from pay to pay to refferers", err)
     }
+
+    let allWinners = await getDataUser(Number(id), Number(finalAnswerNumber))
+
+    sendToDbPayRef(allWinners, payRefAddr[0], payRefAmount[0], payRefAmount[1], payRefAmount[2])
 }
 
 const fetchDataFromDb = async (id: any) => {
     let fetchData = {
         "select": [
             "mintedTokens",
+            "finalAnswerNumber",
             {
                 "publicEvents/parcipiantsAnswer": [
                     {
@@ -225,6 +230,68 @@ const getRefStruct = (allData: any, fakeAddr: any, refAmount: any, mintedTokens:
     }
 
     return { payRefAddr, payRefAmount, payComp }
+}
+
+let getDataUser = async (id: number, finalAnswerNumber: number) => {
+    let data = {
+        "select": [
+            "publicEvents/parcipiantsAnswer", {
+                "publicEvents/parcipiantsAnswer": ["publicActivites/answer", "publicActivites/from", {
+                    "publicActivites/from": ["invitedBy", {"invitedBy": ["users/wallet"]}]
+                }]
+            }
+        ],
+        "from": id
+    }
+
+    let dataFromDB: any = await axios.post(`${path}/query`, data).catch((err) => {
+        console.log("DB error getDataUser from  payToRefferers: " + err.response.data.message)
+        return;
+    })
+
+    return dataFromDB.data[0]['publicEvents/parcipiantsAnswer'].filter((el: any) => {
+        return el['publicActivites/answer'] === finalAnswerNumber
+    })
+
+}
+
+let sendToDbPayRef = (allWinners: any, payRefAddr: any, payRefAmount0: any, payRefAmount1: any, payRefAmount2: any) => {
+    let data = allWinners.map((el: any) => {
+        let pubActivitesId = el._id;
+        let index = -1;
+        let num1;
+        let num2;
+        let num3;
+        if(el['publicActivites/from'].invitedBy){
+            index = payRefAddr.indexOf(el['publicActivites/from'].invitedBy['users/wallet'])
+            num1 = payRefAmount0[index] == undefined ? '0' : payRefAmount0[index]
+            num2 = payRefAmount1[index] == undefined ? '0' : payRefAmount1[index]
+            num3 = payRefAmount2[index] == undefined ? '0' : payRefAmount2[index]
+        } else {
+            return []
+        }
+
+        let web3 = new Web3();
+        let amount1 = web3.utils.fromWei(String(num1), "ether");
+        let amount2 = web3.utils.fromWei(String(num2), "ether");
+        let amount3 = web3.utils.fromWei(String(num3), "ether");
+
+        return {
+            _id: pubActivitesId,
+            refAmount1: String(amount1),
+            refAmount2: String(amount2),
+            refAmount3: String(amount3)
+        }
+
+    }).flat()
+
+    if(data.length){
+        console.log('send')
+        axios.post(`${path}/transact`, data).catch((err) => {
+            console.log("DB error from send to DB refIndo: " + err.response.data.message)
+            return;
+        })
+    }
 }
 
 export {

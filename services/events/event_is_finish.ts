@@ -7,6 +7,7 @@ const setCorrectAnswer = async (data: any) => {
     let finalAnswer = [{
         "_id": Number(data.id),
         "finalAnswerNumber": Number(data.correctAnswer),
+        "finishTime": Math.floor(new Date().getTime() / 1000),
         "mintedTokens": Number(data.tokens)
     }]
 

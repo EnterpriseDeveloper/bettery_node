@@ -1,4 +1,4 @@
-import { getUserById, allUsers, additionalInfo, updateNickname, updatePublicEmail, refInfo } from "./users";
+import { getUserById, allUsers, additionalInfo, updateNickname, updatePublicEmail, refInfo, refList } from "./users";
 import { torusRegist, autoLogin, logout } from "./torusRegist";
 import { getAllUserEvents } from "./myActivites";
 import { linkAccount } from "../../helpers/auth0/linkAccount";
@@ -53,5 +53,9 @@ export default function Users(app: any) {
 
     app.get("/user/ref_info", authMiddleware, async (req: any, res: any) => {
         await refInfo(req, res)
+    })
+
+    app.post("/user/ref_list", authMiddleware, async (req: any, res: any) => {
+        await refList(req, res)
     })
 }
