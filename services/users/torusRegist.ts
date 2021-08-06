@@ -5,7 +5,7 @@ import { path } from "../../config/path";
 import { mintTokens, transferToken } from "../funds/betteryToken";
 import { userStructure } from '../../structure/user.struct';
 import redis from '../../helpers/redis-helper';
-import { secretRedis } from '../../config/key';
+import { secretRedis, auth0Path } from '../../config/key';
 
 const torusRegist = async (req: any, res: any) => {
     let wallet = req.body.wallet;
@@ -174,6 +174,7 @@ const logout = async (req: any, res: any) => {
     let wallet = req.body.dataFromRedis.wallet;
     let accessToken = req.body.dataFromRedis.key[0].sessionKey;
     try {
+        // await axios.get(`${auth0Path}/v2/logout?client_id=112020710075413399693`)
         await redis.deleteFromRedis(wallet, accessToken)
         res.status(200)
         res.send({})
