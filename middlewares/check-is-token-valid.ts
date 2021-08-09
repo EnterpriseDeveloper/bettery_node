@@ -17,7 +17,6 @@ const checkIsTokenValid = async (req: any, res: any, next: any) => {
         const tokenDate = new Date(checkToken.updated_at);
 
         if(Date.now() - tokenDate.getTime() < 300000){
-
             if(checkToken.email && checkToken.email == req.body.email){              
                 next()
             } else if(!checkToken.email && checkToken.sub == req.body.verifierId){
