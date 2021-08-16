@@ -164,6 +164,104 @@ let dataForSend = {
     res.send(dataForSend)
 }
 
+const refList = async (req: any, res: any) => {
+    let from = req.body.from;
+    let to = req.body.to;
+    let userId = req.body.dataFromRedis.id
+
+    let config = {
+        "select": [
+            "invited", {
+                "invited": ["_id", "invited", "publicActivites", {
+                    "publicActivites": ["eventId", {
+                        "eventId": ["question","finalAnswerNumber", "finishTime", "room",{"room": ["name", "color"]}, "validatorsAnswer", {"validatorsAnswer": ["from"]}, "parcipiantsAnswer", {"parcipiantsAnswer": ["from", "refAmount1", "refAmount2", "refAmount3"]}]
+                    }],
+                    "invited": ["_id", "invited", "publicActivites", {
+                        "publicActivites": ["eventId",{
+                            "eventId": ["question","finalAnswerNumber", "finishTime", "room",{"room": ["name", "color"]}, "validatorsAnswer", {"validatorsAnswer": ["from"]}, "parcipiantsAnswer", {"parcipiantsAnswer": ["from", "refAmount1", "refAmount2", "refAmount3"]}]
+                        }],
+                        "invited": ["_id", "invited", "publicActivites", {
+                            "publicActivites": ["eventId", {
+                                "eventId": ["question","finalAnswerNumber", "finishTime", "room",{"room": ["name", "color"]}, "validatorsAnswer", {"validatorsAnswer": ["from"]}, "parcipiantsAnswer", {"parcipiantsAnswer": ["from", "refAmount1", "refAmount2", "refAmount3"]}]
+                            }]
+                        }]
+                    }]
+                }]
+            }
+        ],
+        "from": userId
+    }
+
+    let dataDB: any = await axios.post(path + "/query", config).catch(err => {
+        res.status(400);
+        res.send(err.response.data.message + 'refList');
+        return;
+    })
+    let x = dataDB.data[0];
+
+
+    let level_1 = x && x.invited ? x.invited : []
+    let level_2 = listAtTheLevel(x.invited)
+    let level_3 = listAtTheLevel(level_2)
+    let allLevel = [level_1, level_2, level_3].flat()
+
+    const idLevel_1 = [...level_1.map((el: any) => el._id)]
+    const idLevel_2 = [...level_2.map((el: any) => el._id)]
+    const idLevel_3 = [...level_3.map((el: any) => el._id)]
+
+    const idLevelArr = [idLevel_1, idLevel_2, idLevel_3]
+
+    let allUsers = [...idLevel_1, ...idLevel_2, ...idLevel_3]
+
+    let arrPubActivites = allLevel.map((el: any) => {
+        return el.publicActivites == undefined ? [] : el.publicActivites;
+    })
+    let allList = arrPubActivites.flat()
+
+    let arr = []
+    for (let i = 0; i < allList.length; i++) {
+        if(allList[i].eventId.finalAnswerNumber != undefined){
+            arr.push(allList[i].eventId)
+        }
+    }
+
+    let filterUnique = Array.from(new Set(arr.map(obj => JSON.stringify(obj)))).map(obj2 => JSON.parse(obj2));
+
+    addAdditionalData(filterUnique, allUsers, arr)
+    let forSend = {
+        totalBet: totalRefBET(filterUnique, 1, idLevelArr) + totalRefBET(filterUnique, 2, idLevelArr) + totalRefBET(filterUnique, 3, idLevelArr),
+        totalBet24: total24h(filterUnique, 1, idLevelArr) + total24h(filterUnique, 2, idLevelArr) + total24h(filterUnique, 3, idLevelArr),
+        eventsAmount: filterUnique.length,
+        data: filterUnique.slice(from, to)
+    }
+    res.send(forSend)
+}
+
+const addAdditionalData = ( filterUnique: any, allUsers: any, newAllList: any) => {
+
+    return filterUnique.map((el: any) => {
+        let count = 0
+
+        if(el && el.parcipiantsAnswer){
+            el.parcipiantsAnswer.map((o: any) => {
+                allUsers.includes(o.from._id) ? o.byMyRef = true : o.byMyRef = false
+            })
+        }
+
+        if(el && el.validatorsAnswer){
+            el.validatorsAnswer.map((o: any) => {
+                allUsers.includes(o.from._id) ? o.byMyRef = true : o.byMyRef = false
+            })
+        }
+
+        newAllList.map((el2: any) => {
+            el2._id == el._id ? count++ : count
+        })
+        el.allReferals = count
+    })
+}
+
+
 const listAtTheLevel = (data: any) => {
     let arr: any = [];
     if(data) {
@@ -177,6 +275,71 @@ const listAtTheLevel = (data: any) => {
     }
     return arr
 }
+
+const totalRefBET = (arr: any, param: number, arrId: any) => {
+    let total = 0;
+    for (let i = 0; i < arr.length; i++) {
+
+        if(arr[i].finalAnswerNumber !== undefined){
+            total = calculateTotal(arr[i].parcipiantsAnswer, param, total, arrId)
+        }
+
+    }
+    return total
+}
+
+const total24h = (arr: any, param: number, arrId: any) => {
+    let total24 = 0;
+    for (let i = 0; i < arr.length; i++) {
+
+        if(arr[i].finishTime && (Math.floor(Date.now() / 1000) - arr[i].finishTime) < 86400){
+            total24 = calculateTotal(arr[i].parcipiantsAnswer, param, total24, arrId)
+        }
+
+    }
+    return total24
+}
+
+const calculateTotal =  (arr: any, param: number, total: any, arrId: any) => {
+    for (let i = 0; i < arr.length; i++) {
+        const el= arr[i];
+        switch(param) {
+            case 1:
+                total = el.byMyRef && el.refAmount1 != undefined && findLevel(el.from._id, arrId) == 1 ?  total + Number(el.refAmount1) : total;
+                break;
+            case 2:
+                total = el.byMyRef && el.refAmount2 != undefined && findLevel(el.from._id, arrId) == 2 ?  total + Number(el.refAmount2) : total;
+                break;
+            case 3:
+                total = el.byMyRef && el.refAmount3 != undefined && findLevel(el.from._id, arrId) == 3 ?  total + Number(el.refAmount3) : total;
+                break;
+            default:
+                break;
+        }
+    }
+    return total
+}
+
+const findLevel = (id: any, arr: any) => {
+    let level = 0;
+    switch (true){
+
+        case arr[0].includes(id):
+            level = 1
+            break;
+        case arr[1].includes(id):
+            level = 2
+            break;
+        case arr[2].includes(id):
+            level = 3
+            break;
+        default:
+            break;
+    }
+
+    return level
+}
+
 
 const fakeDateRemoveLater = (level: []) => {
     if(level.length){
@@ -194,5 +357,6 @@ export {
     additionalInfo,
     updateNickname,
     updatePublicEmail,
-    refInfo
+    refInfo,
+    refList
 }
