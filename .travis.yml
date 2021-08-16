@@ -1,0 +1,9 @@
+language: node_js
+node_js:
+  - 14.17.2
+
+services:
+  - docker
+
+script:
+  - docker-compose up

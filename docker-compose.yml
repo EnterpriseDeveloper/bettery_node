@@ -1,0 +1,15 @@
+version: "3.7"
+
+services: 
+
+  redis:
+    image: redis
+    restart: on-failure
+    ports: 
+      - 6379:6379
+
+  app:
+    build: .
+    restart: on-failure
+    ports: 
+      - 80:80
