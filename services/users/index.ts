@@ -1,5 +1,5 @@
 import { getUserById, allUsers, additionalInfo, updateNickname, updatePublicEmail, refInfo, refList } from "./users";
-import { torusRegist, autoLogin, logout } from "./torusRegist";
+import { torusRegist, authLogin, authRegister, autoLogin, logout } from "./torusRegist";
 import { getAllUserEvents } from "./myActivites";
 import { linkAccount } from "../../helpers/auth0/linkAccount";
 import authMiddleware from "../../middlewares/check-token";
@@ -13,8 +13,16 @@ export default function Users(app: any) {
         allUsers(req, res);
     })
 
-    app.post("/user/torus_regist", async (req: any, res: any) => {
-        torusRegist(req, res)
+    // app.post("/user/torus_regist", async (req: any, res: any) => {
+    //     torusRegist(req, res)
+    // })
+    // todo middleware checkTokenVerify
+    app.post("/user/auth0_login", async (req: any, res: any) => {
+        authLogin(req, res)
+    })
+
+    app.post("/user/auth0_register", async (req: any, res: any) => {
+        authRegister(req, res)
     })
 
     app.post("/user/event_activites", async (req: any, res: any) => {

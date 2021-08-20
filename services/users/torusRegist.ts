@@ -7,6 +7,148 @@ import { userStructure } from '../../structure/user.struct';
 import redis from '../../helpers/redis-helper';
 import { secretRedis } from '../../config/key';
 
+const authLogin = async (req: any, res: any) => {
+    let email = req.body.data.idTokenPayload.email;
+    let nickName = req.body.data.idTokenPayload.nickname;
+    let pubKeyFromLS = req.body.pubKey;
+    let verifierId = getVerifier(req.body.data.idTokenPayload.sub); //! todo need check
+
+    let findEmail = {
+        "select": ["_id", "users/nickName", "users/email", "users/wallet", "users/avatar", "users/verifier", "users/linkedAccounts"],
+        "from": email ? ["users/email", email] : ["users/nickName", nickName]
+    }
+    let user: any = await axios.post(`${path}/query`, findEmail)
+        .catch((err) => {
+            console.log('err')
+            res.status(400);
+            res.send(err.response.data.message);
+            return;
+        })
+    if (user.data.length === 0 ) {
+        res.send()
+    } else {
+        //todo check pubKeyFromLS vs pubKeyFromLS from DB
+        if(user.data.wallet != pubKeyFromLS || !pubKeyFromLS){ //? not valid
+            res.send({walletVerif : 'failure'})
+        }
+        if(user.data.wallet == pubKeyFromLS){ //? valid
+
+            let wallet = pubKeyFromLS
+
+            //todo send user data
+
+            let userStruct = userStructure(user.data);
+            if (userStruct[0].linkedAccounts.length != 0 &&
+                !userStruct[0].linkedAccounts.includes(verifierId)) {
+                //check if account exist return error
+                let data = {
+                    email: userStruct[0].email,
+                    linkedAccounts: userStruct[0].linkedAccounts
+                }
+                res.status(302);
+                res.send(data)
+            } else {
+                // move token from old account to new
+                let update;
+                if (userStruct[0].wallet != wallet) {
+                    await transferToken(userStruct[0].wallet, wallet);
+                    userStruct[0].wallet = wallet;
+                    update = [{
+                        "_id": userStruct[0]._id,
+                        "wallet": wallet,
+                        "linkedAccounts": [verifierId]
+                    }]
+                } else {
+                    // update link account
+                    update = [{
+                        "_id": userStruct[0]._id,
+                        "linkedAccounts": [verifierId]
+                    }]
+                }
+
+                await axios.post(`${path}/transact`, update).catch((err) => {
+                    console.log(err)
+                    res.status(400);
+                    res.send(err.response.data.message);
+                    return;
+                })
+                let dataToRedis = redis.redisDataStructure(userStruct, req)
+
+                userStruct[0].sessionToken = dataRedisSend(userStruct[0].wallet, dataToRedis)
+                userStruct[0].accessToken = req.body.accessToken
+                userStruct[0].walletVerif = 'success'
+
+                res.status(200);
+                res.send(userStruct[0]);
+            }
+
+        }
+    }
+}
+const authRegister = async (req: any, res: any) => {
+    let wallet = req.body.wallet;
+    let email = req.body.email;
+    let nickName = req.body.nickName;
+    let verifierId = getVerifier(req.body.verifierId);
+
+    let refId = req.body.refId;
+
+    let data: any = [{
+        "_id": "users$newUser",
+        "nickName": nickName,
+        "email": email,
+        "wallet": wallet,
+        "registered": Math.floor(Date.now() / 1000),
+        "avatar": req.body.avatar == "" ? 'https://api.bettery.io/image/avatar.png' : req.body.avatar,
+        "verifier": req.body.verifierId,
+        "linkedAccounts": [verifierId]
+    }]
+
+    if (!isNaN(refId)) {
+        let findByref = await checkUserById(refId, res);
+        if (findByref) {
+            data[0].invitedBy = Number(refId),
+                data.push({
+                    "_id": Number(refId),
+                    "invited": ["users$newUser"]
+                })
+        }
+    }
+    let x: any = await axios.post(`${path}/transact`, data).catch((err) => {
+        res.status(400);
+        res.send(err.response.data.message);
+        return;
+    })
+
+    // await mintTokens(wallet, 10); //todo уточнити чи буде працювати
+    // // TODO add session token from Redis
+    const dataFromRedis = [{
+        email: email ? email : 'undefined',
+        wallet: req.body.wallet,
+        _id: x.data.tempids['users$newUser'],
+    }]
+    let dataToRedis = redis.redisDataStructure(dataFromRedis, req)
+
+    console.log(wallet)
+    console.log(dataToRedis)
+
+    let sessionToken = dataRedisSend(String(wallet), dataToRedis)
+
+    res.status(200);
+    res.send({
+        _id: x.data.tempids['users$newUser'],
+        nickName: req.body.nickName,
+        email: email,
+        wallet: req.body.wallet,
+        avatar: req.body.avatar,
+        verifierId: req.body.verifierId,
+        sessionToken: sessionToken,
+        accessToken: req.body.accessToken
+    })
+}
+
+
+
 const torusRegist = async (req: any, res: any) => {
     let wallet = req.body.wallet;
     let refId = req.body.refId;
@@ -207,6 +349,8 @@ const dataRedisSend = (wallet: any, dataToRedis: any) => {
 
 export {
     torusRegist,
+    authLogin,
+    authRegister,
     autoLogin,
     logout
 }
