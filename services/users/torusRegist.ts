@@ -2,7 +2,7 @@ import axios from "axios";
 import crypto from 'crypto-js';
 import { path } from "../../config/path";
 
-import { mintTokens, transferToken } from "../funds/betteryToken";
+import { mintTokens } from "../funds/betteryToken";
 import { userStructure } from '../../structure/user.struct';
 import redis from '../../helpers/redis-helper';
 import { secretRedis } from '../../config/key';
@@ -48,31 +48,6 @@ const authLogin = async (req: any, res: any) => {
                 res.status(302);
                 res.send(data)
             } else {
-                // I don't remember why I did it MAX
-                // move token from old account to new
-                // let update;
-                // if (userStruct[0].wallet != wallet) {
-                //     await transferToken(userStruct[0].wallet, wallet);
-                //     userStruct[0].wallet = wallet;
-                //     update = [{
-                //         "_id": userStruct[0]._id,
-                //         "wallet": wallet,
-                //         "linkedAccounts": [verifierId]
-                //     }]
-                // } else {
-                //     // update link account
-                //     update = [{
-                //         "_id": userStruct[0]._id,
-                //         "linkedAccounts": [verifierId]
-                //     }]
-                // }
-
-                // await axios.post(`${path}/transact`, update).catch((err) => {
-                //     console.log(err)
-                //     res.status(400);
-                //     res.send(err.response.data.message);
-                //     return;
-                // })
                 let dataToRedis = redis.redisDataStructure(userStruct, req)
 
                 userStruct[0].sessionToken = dataRedisSend(userStruct[0].wallet, dataToRedis)
@@ -121,12 +96,14 @@ const authRegister = async (req: any, res: any) => {
         return;
     })
 
-    // await mintTokens(wallet, 10); //todo уточнити чи буде працювати
+    let userID = x.data.tempids['users$newUser']
+
+     await mintTokens(wallet, 10, userID); 
     // // TODO add session token from Redis
     const dataFromRedis = [{
         email: email ? email : 'undefined',
         wallet: req.body.wallet,
-        _id: x.data.tempids['users$newUser'],
+        _id: userID,
     }]
     let dataToRedis = redis.redisDataStructure(dataFromRedis, req)
 
@@ -196,7 +173,7 @@ const torusRegist = async (req: any, res: any) => {
             res.send(err.response.data.message);
             return;
         })
-        await mintTokens(wallet, 10);
+     //   await mintTokens(wallet, 10);
         // TODO add session token from Redis
         const dataFromRedis = [{
             email: email ? email : 'undefined',
@@ -232,30 +209,6 @@ const torusRegist = async (req: any, res: any) => {
             res.status(302);
             res.send(data)
         } else {
-            // move token from old account to new
-            let update;
-            if (userStruct[0].wallet != wallet) {
-                await transferToken(userStruct[0].wallet, wallet);
-                userStruct[0].wallet = wallet;
-                update = [{
-                    "_id": userStruct[0]._id,
-                    "wallet": wallet,
-                    "linkedAccounts": [verifierId]
-                }]
-            } else {
-                // update link account
-                update = [{
-                    "_id": userStruct[0]._id,
-                    "linkedAccounts": [verifierId]
-                }]
-            }
-
-            await axios.post(`${path}/transact`, update).catch((err) => {
-                console.log(err)
-                res.status(400);
-                res.send(err.response.data.message);
-                return;
-            })
             let dataToRedis = redis.redisDataStructure(userStruct, req)
 
             userStruct[0].sessionToken = dataRedisSend(userStruct[0].wallet, dataToRedis)
