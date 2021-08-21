@@ -48,30 +48,31 @@ const authLogin = async (req: any, res: any) => {
                 res.status(302);
                 res.send(data)
             } else {
+                // I don't remember why I did it MAX
                 // move token from old account to new
-                let update;
-                if (userStruct[0].wallet != wallet) {
-                    await transferToken(userStruct[0].wallet, wallet);
-                    userStruct[0].wallet = wallet;
-                    update = [{
-                        "_id": userStruct[0]._id,
-                        "wallet": wallet,
-                        "linkedAccounts": [verifierId]
-                    }]
-                } else {
-                    // update link account
-                    update = [{
-                        "_id": userStruct[0]._id,
-                        "linkedAccounts": [verifierId]
-                    }]
-                }
+                // let update;
+                // if (userStruct[0].wallet != wallet) {
+                //     await transferToken(userStruct[0].wallet, wallet);
+                //     userStruct[0].wallet = wallet;
+                //     update = [{
+                //         "_id": userStruct[0]._id,
+                //         "wallet": wallet,
+                //         "linkedAccounts": [verifierId]
+                //     }]
+                // } else {
+                //     // update link account
+                //     update = [{
+                //         "_id": userStruct[0]._id,
+                //         "linkedAccounts": [verifierId]
+                //     }]
+                // }
 
-                await axios.post(`${path}/transact`, update).catch((err) => {
-                    console.log(err)
-                    res.status(400);
-                    res.send(err.response.data.message);
-                    return;
-                })
+                // await axios.post(`${path}/transact`, update).catch((err) => {
+                //     console.log(err)
+                //     res.status(400);
+                //     res.send(err.response.data.message);
+                //     return;
+                // })
                 let dataToRedis = redis.redisDataStructure(userStruct, req)
 
                 userStruct[0].sessionToken = dataRedisSend(userStruct[0].wallet, dataToRedis)
