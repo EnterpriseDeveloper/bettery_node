@@ -21,7 +21,6 @@ const mintTokens = async (resiever: string, amount: number, userId: number) => {
         amount: [],
         gas: "1000000",
     };
-    console.log(address, [msg], fee, memonic)
     try{
         return await client.signAndBroadcast(address, [msg], fee, memonic);
     }catch(err){

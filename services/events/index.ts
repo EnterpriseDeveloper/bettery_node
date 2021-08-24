@@ -1,4 +1,4 @@
-import { createEvent, getById, getAll, getAllForTest, getBetteryEvent } from "./publicEvents";
+import { createEvent, getById, getAll, getAllForTest, getBetteryEvent, createEventID, deleteEvent} from "./publicEvents";
 import { createPrivateEvent, privGetById, privParticipate, privValidate } from "./privateEvents";
 import { getAllHashtags } from "./hashtags";
 import { participate, validate } from "./publicActivites";
@@ -10,6 +10,14 @@ import userAnswerMiddleware from "../../middlewares/find-user-answer";
 import checkToken from '../../middlewares/check-token'
 
 export default function Events(app: any) {
+    app.get("/publicEvents/create_event_id", checkToken, eventLimitPublic, async (req: any, res: any) => {
+        createEventID(req, res);
+    })
+
+    app.post("/publicEvents/delete_event_id", checkToken, async (req:any, res: any) =>{
+        deleteEvent(req, res);
+    })
+
     app.post("/publicEvents/createEvent", checkToken, eventLimitPublic, async (req: any, res: any) => {
         createEvent(req, res);
     })
