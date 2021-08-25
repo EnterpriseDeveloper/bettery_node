@@ -1,11 +1,6 @@
 import axios from "axios";
 import { path } from "../../config/path";
-import { init } from "../../contract-services/contractInit";
-import PublicEvents from "../../contract-services/abi/PublicEvents.json";
-import { getUserReput } from "../../helpers/userData";
-import { getNonce } from "../../contract-services/nonce/nonce";
 import { minBetAmount } from "../../config/limits";
-import { getGasPrice, estimateGasLimit } from "../../contract-services/gasPrice/getGasPrice";
 
 const participate = async (req: any, res: any) => {
     let setAnswer = []
@@ -77,6 +72,8 @@ const validate = async (req: any, res: any) => {
 
     let eventId = Number(req.body.event_id);
     let from = Number(req.body.dataFromRedis.id)
+    let reputation = req.body.reputation
+    let transactionHash = req.body.transactionHash
 
     let answer = Number(req.body.answer);
     if (eventId == undefined ||
@@ -87,72 +84,44 @@ const validate = async (req: any, res: any) => {
         return;
     }
 
-    try {
-        let reputation = await getUserReput(from, res)
-        let wallet = req.body.dataFromRedis.wallet;
-        let pathContr = process.env.NODE_ENV;
-        let contract = await init(pathContr, PublicEvents)
-
-        let gasEstimate = await contract.methods.setValidator(
-            eventId,
-            answer,
-            wallet,
-            reputation
-        ).estimateGas();
-        let transaction = await contract.methods.setValidator(
-            eventId,
-            answer,
-            wallet,
-            reputation
-        ).send({
-            gas: await estimateGasLimit(gasEstimate),
-            gasPrice: await getGasPrice(),
-            nonce: await getNonce()
-        });
-        if (transaction) {
-            // add to the publicActivites table
-            let publicActivites = {
-                _id: "publicActivites$act1",
-                from: from,
-                answer: answer,
-                role: "validator",
-                date: Math.floor(Date.now() / 1000),
-                transactionHash: transaction.transactionHash,
-                // currencyType: currencyType, TODO remove from DB Shema
-                eventId: eventId,
-                amount: 0,
-                expertReput: reputation
-            }
-            setAnswer.push(publicActivites);
-
-            // increace quntity of publicActivites in event table
-            let event = {
-                _id: eventId,
-                "validatorsAnswer": ["publicActivites$act1"],
-            }
-            setAnswer.push(event)
-
-            let user = {
-                _id: from,
-                publicActivites: ["publicActivites$act1"],
-            }
-            setAnswer.push(user)
-
-            await axios.post(`${path}/transact`, setAnswer).catch((err) => {
-                res.status(400);
-                res.send(err.response.data.message);
-                console.log("DB error: " + err.response.data.message)
-                return;
-            })
-
-            res.status(200);
-            res.send({ done: "ok" });
-        }
-    } catch (err) {
-        console.log(err.message);
-        res.status(400);
-        res.send(err.message);
+    // add to the publicActivites table
+    let publicActivites = {
+        _id: "publicActivites$act1",
+        from: from,
+        answer: answer,
+        role: "validator",
+        date: Math.floor(Date.now() / 1000),
+        transactionHash: transactionHash,
+        // currencyType: currencyType, TODO remove from DB Shema
+        eventId: eventId,
+        amount: 0,
+        expertReput: reputation
     }
+    setAnswer.push(publicActivites);
+
+    // increace quntity of publicActivites in event table
+    let event = {
+        _id: eventId,
+        "validatorsAnswer": ["publicActivites$act1"],
+    }
+    setAnswer.push(event)
+
+    let user = {
+        _id: from,
+        publicActivites: ["publicActivites$act1"],
+    }
+    setAnswer.push(user)
+
+    await axios.post(`${path}/transact`, setAnswer).catch((err) => {
+        res.status(400);
+        res.send(err.response.data.message);
+        console.log("DB error: " + err.response.data.message)
+        return;
+    })
+
+    res.status(200);
+    res.send({ done: "ok" });
+
 }
 
 
