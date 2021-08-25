@@ -4,7 +4,6 @@ const app = express();
 import fs from 'fs';
 import { refundBot } from './bot/refundBot';
 import { loadHandler } from "./contract-services/eventHandler";
-import { nonceInit } from "./contract-services/nonce/nonce";
 import https from 'https';
 import http from 'http';
 import comments from './services/comments/index';
@@ -68,7 +67,6 @@ import TokenSale from './contract-services/tokensale';
 TokenSale(app);
 
 httpServer.listen(80, async () => {
-    await nonceInit();
     await loadHandler();
     setInterval(() => {
         refundBot();

@@ -27,8 +27,8 @@ const getTokens = async (req: any, res: any) => {
             bty = bet.amount
         }
 
-        let betToken = bet ? Number(web3.utils.fromWei(bet, "ether")) : 0
-        let btyToken = bty ? Number(web3.utils.fromWei(bty, "ether")) : 0
+        let betToken = bet ? Number(Number(web3.utils.fromWei(bet, "ether")).toFixed(2)) : 0
+        let btyToken = bty ? Number(Number(web3.utils.fromWei(bty, "ether")).toFixed(2)) : 0
 
         let data = [{
             "_id": Number(req.body.dataFromRedis.id),
