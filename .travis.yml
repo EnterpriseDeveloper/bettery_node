@@ -7,3 +7,22 @@ services:
 
 script:
   - docker-compose up
+  - docker cp ~/node/keys bettery_app:~/app/
+
+deploy:
+  # - provider: ec2
+  #   app: "Bettery_prod"
+  #   access_key_id: $AWSAccessKeyId
+  #   secret_access_key: $AWSSecretKey
+  #   region: ap-southeast-1a
+  #   on:
+  #     branch: master
+
+  - provider: es2
+    app: "Bettery_dev"
+    access_key_id: $AWSAccessKeyId
+    secret_access_key: $AWSSecretKey
+    region: ap-southeast-1b
+    on:
+      branch: validate-tokens
+
