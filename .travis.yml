@@ -10,19 +10,12 @@ script:
   - docker cp ~/node/keys bettery_app:~/app/
 
 deploy:
-  # - provider: ec2
-  #   app: "Bettery_prod"
-  #   access_key_id: $AWSAccessKeyId
-  #   secret_access_key: $AWSSecretKey
-  #   region: ap-southeast-1a
-  #   on:
-  #     branch: master
-
   - provider: codedeploy
-    app: "Bettery_dev"
+    application: Bettery_dev
     access_key_id: $AWSAccessKeyId
     secret_access_key: $AWSSecretKey
     region: ap-southeast-1b
+    deployment_group: launch-wizard-2
     on:
       branch: validate-tokens
 
