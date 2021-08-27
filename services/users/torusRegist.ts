@@ -8,10 +8,11 @@ import redis from '../../helpers/redis-helper';
 import { secretRedis } from '../../config/key';
 
 const authLogin = async (req: any, res: any) => {
-    let email = req.body.data.idTokenPayload.email;
-    let nickName = req.body.data.idTokenPayload.nickname;
+    console.log(req.body, 'req body')
+    let email = req.body.email;
+    let nickName = req.body.nickname;
     let pubKeyFromLS = req.body.pubKey;
-    let verifierId = getVerifier(req.body.data.idTokenPayload.sub); //! todo need check
+    let verifierId = getVerifier(req.body.verifierId);
 
     let findEmail = {
         "select": ["_id", "users/nickName", "users/email", "users/wallet", "users/avatar", "users/verifier", "users/linkedAccounts"],
@@ -19,7 +20,6 @@ const authLogin = async (req: any, res: any) => {
     }
     let user: any = await axios.post(`${path}/query`, findEmail)
         .catch((err) => {
-            console.log('err')
             res.status(400);
             res.send(err.response.data.message);
             return;
@@ -27,11 +27,12 @@ const authLogin = async (req: any, res: any) => {
     if (user.data.length === 0 ) {
         res.send()
     } else {
-        //todo check pubKeyFromLS vs pubKeyFromLS from DB
-        if(user.data.wallet != pubKeyFromLS || !pubKeyFromLS){ //? not valid
-            res.send({walletVerif : 'failure'})
+        !pubKeyFromLS ? pubKeyFromLS = req.body.pubKeyActual : false;
+
+        if(user.data[0]['users/wallet'] != pubKeyFromLS || !pubKeyFromLS){ //? not valid
+            res.send({walletVerif : 'failure', wallet: user.data[0]['users/wallet'] })
         }
-        if(user.data.wallet == pubKeyFromLS){ //? valid
+        if(user.data[0]['users/wallet'] == pubKeyFromLS){ //? valid
 
             let wallet = pubKeyFromLS
 
@@ -104,11 +105,9 @@ const authRegister = async (req: any, res: any) => {
         email: email ? email : 'undefined',
         wallet: req.body.wallet,
         _id: userID,
+        typeOfLogin: req.body.verifierId
     }]
     let dataToRedis = redis.redisDataStructure(dataFromRedis, req)
-
-    console.log(wallet)
-    console.log(dataToRedis)
 
     let sessionToken = dataRedisSend(String(wallet), dataToRedis)
 
