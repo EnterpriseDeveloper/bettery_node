@@ -54,6 +54,7 @@
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.14.7",
     "@babel/runtime": "^7.14.6",
+    "@tendermint/types": "^0.1.2",
     "@types/redis": "^2.8.30",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",

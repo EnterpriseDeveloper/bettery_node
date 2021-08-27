@@ -3,7 +3,7 @@ import bodyParser from 'body-parser'
 const app = express();
 import fs from 'fs';
 import { refundBot } from './bot/refundBot';
-import { loadHandler } from "./contract-services/eventHandler";
+import { loadHandler } from "./contract-services/events";
 import https from 'https';
 import http from 'http';
 import comments from './services/comments/index';

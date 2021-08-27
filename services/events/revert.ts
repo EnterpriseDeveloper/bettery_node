@@ -56,6 +56,7 @@ const revertEvent = async (eventId: any, participant: any, purpose: any) => {
     if (participant !== undefined) {
         let path = process.env.NODE_ENV
         let betteryContract = await init(path, MPContr)
+        // TODO refund bot rewrite
         try {
             const gasEstimate = await betteryContract.methods.revertedPayment(eventId, purpose).estimateGas();
             let nonce = await getNonce();
