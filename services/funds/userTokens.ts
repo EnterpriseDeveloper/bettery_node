@@ -1,5 +1,5 @@
 import axios from "axios";
-import { path } from "../../config/path";
+import { path, demonAPI } from "../../config/path";
 import Web3 from "web3";
 
 const getTokens = async (req: any, res: any) => {
@@ -7,7 +7,7 @@ const getTokens = async (req: any, res: any) => {
     
     if (req.body.dataFromRedis.id && wallet) {
 
-        let balance: any = await axios.get(`http://localhost:1317/cosmos/bank/v1beta1/balances/${wallet}`).catch((err)=>{
+        let balance: any = await axios.get(`${demonAPI}:1317/cosmos/bank/v1beta1/balances/${wallet}`).catch((err)=>{
             console.log(balance)
             res.status(400);
             res.send(err.response);
