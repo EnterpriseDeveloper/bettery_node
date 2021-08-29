@@ -1,5 +1,9 @@
 const { RpcClient } = require('tendermint');
 import { demon, testDemon } from "../config/key";
+import {
+    findCorrectAnswer,
+    reverted
+} from "./publicEvents/index";
 
 function loadHandler() {
     const demonPath = process.env.NODE_ENV == "production" ? demon : testDemon;
@@ -15,8 +19,8 @@ function pubEventReverted(demonPath: string) {
         if (err) {
             console.log("pubEvents reverted", err)
         }
-        console.log("test pub event reverted")
-        console.log(event);
+        let data = JSON.parse(event.TxResult.result.log)
+        reverted(data[0]);
     })
 }
 
