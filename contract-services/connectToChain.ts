@@ -1,11 +1,13 @@
 import { DirectSecp256k1HdWallet, Registry } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { MsgCreateMintBet } from "./funds/tx";
+import {MsgCreateFihishPubEvent} from './publicEvents/tx';
 import { demonAPI } from "../config/path";
 
 
 const types = [
-    ["/VoroshilovMax.bettery.funds.MsgCreateMintBet", MsgCreateMintBet]
+    ["/VoroshilovMax.bettery.funds.MsgCreateMintBet", MsgCreateMintBet],
+    ["/VoroshilovMax.bettery.publicevents.MsgCreateFihishPubEvent", MsgCreateFihishPubEvent]
   ];
 
 const registry = new Registry(<any>types);
@@ -13,7 +15,7 @@ const registry = new Registry(<any>types);
 
 const connectToSign = async () => {
    // let memonic = "ceiling million ecology bronze estate actress talk cargo few stamp steak foster vessel excuse outdoor maid desert usual slot together mobile alley sight hammer"
-   let memonic = "zero sign extend retreat want tuition rookie volume knock knee hover one panda able panel cancel injury motion theory give team post rabbit salt"
+   let memonic = "group december pool crowd damage spy federal affair void drill pupil ceiling token novel bar patrol fabric true charge follow wrong cloth topic syrup"
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
         memonic
     );
