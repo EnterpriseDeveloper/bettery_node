@@ -208,8 +208,6 @@ const getAll = async (req: any, res: any) => {
     let sort = req.body.sort != undefined ? req.body.sort : 'trending' // controversial 
     let finished = req.body.finished;
     let userId = req.body.userId;
-
-    let o = Date.now();
     let conf = {
         "select": ["*",
             { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
@@ -227,9 +225,6 @@ const getAll = async (req: any, res: any) => {
             console.log("DB error: " + err.response.data.message)
             return;
         })
-
-    let z = Date.now()
-    console.log(z - o)
 
     let obj = publicEventStructure(x.data)
 

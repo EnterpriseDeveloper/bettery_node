@@ -8,7 +8,6 @@ import redis from '../../helpers/redis-helper';
 import { secretRedis } from '../../config/key';
 
 const authLogin = async (req: any, res: any) => {
-    console.log(req.body, 'req body')
     let email = req.body.email;
     let nickName = req.body.nickname;
     let pubKeyFromLS = req.body.pubKey;
