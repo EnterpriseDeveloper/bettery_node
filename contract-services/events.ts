@@ -30,8 +30,8 @@ function pubLetsFinishEvent(demonPath: string) {
         if (err) {
             console.log("pubEvents reverted", err)
         }
-        console.log("test pub event calculate expert")
-        console.log(event);
+        let data = JSON.parse(event.TxResult.result.log)
+        findCorrectAnswer(data);
     })
 }
 

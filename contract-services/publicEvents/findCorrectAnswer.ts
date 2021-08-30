@@ -1,9 +1,17 @@
 import {connectToSign} from '../../contract-services/connectToChain'
+let send: number = 0;
 
 const findCorrectAnswer = async (data: any) => {
     console.log("from findCorrectAnswer")
-    console.log(data);
-    let id = data.id
+    let eventData = data.events.find((x: any)=>{return x.type == "pub.event"})
+    console.log(eventData);
+    let id = eventData.attributes.find((x: any)=>{return x.key == "id"})
+    if(Number(id.value) != send){
+        sendToBlockChain(Number(id.value))
+    }
+}
+
+const sendToBlockChain = async (id: number) =>{
     let { memonic, address, client } = await connectToSign()
 
     const msg = {
@@ -17,8 +25,6 @@ const findCorrectAnswer = async (data: any) => {
         amount: [],
         gas: "1000000",
     };
-
-    console.log(msg)
     try{
         let tx =  await client.signAndBroadcast(address, [msg], fee, memonic);
         console.log(tx);
@@ -26,9 +32,9 @@ const findCorrectAnswer = async (data: any) => {
         console.log(err)
     }
 }
-setTimeout(()=>{
-    findCorrectAnswer({id: 422212465065989})
-},5000)
+// setTimeout(()=>{
+//     sendToBlockChain(422212465065989)
+// },5000)
 
 
 
