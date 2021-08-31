@@ -2,7 +2,8 @@ const { RpcClient } = require('tendermint');
 import { demon, testDemon } from "../config/key";
 import {
     findCorrectAnswer,
-    reverted
+    reverted,
+    expertCalc
 } from "./publicEvents/index";
 
 function loadHandler() {
@@ -31,7 +32,7 @@ function pubLetsFinishEvent(demonPath: string) {
             console.log("pubEvents reverted", err)
         }
         let data = JSON.parse(event.TxResult.result.log)
-        findCorrectAnswer(data);
+        findCorrectAnswer(data[0]);
     })
 }
 
@@ -41,8 +42,8 @@ function pubEventCalcExpert(demonPath: string) {
         if (err) {
             console.log("pubEvents reverted", err)
         }
-        console.log("test pub event calculate expert")
-        console.log(event);
+        let data = JSON.parse(event.TxResult.result.log)
+        expertCalc(data[0])
     })
 }
 

@@ -6,6 +6,7 @@ import { payToLosers } from "./playerPayment/payToLosers";
 import { payToPlayers } from "./playerPayment/payToPlayers";
 import { payToRefferers } from "./payToRefferers";
 import { reverted } from "./reverted";
+import { expertCalc } from "./exprestCalc";
 
 export {
     findCorrectAnswer,
@@ -15,5 +16,6 @@ export {
     payToLosers,
     payToPlayers,
     payToRefferers,
-    reverted
+    reverted,
+    expertCalc
 }

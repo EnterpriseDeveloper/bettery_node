@@ -3,7 +3,7 @@ import MiddlePaymentContract from "./abi/MiddlePayment.json";
 import PlayerPaymentContract from "./abi/PlayerPayment.json";
 
 import { webSoketInit, connectToNetwork } from "./contractInit";
-import { expertCalc } from './oracels/exprestCalc';
+//import { expertCalc } from './oracels/exprestCalc';
 import { eventEnd } from "../services/events/event_is_finish";
 import {
     findCorrectAnswer,
@@ -50,14 +50,14 @@ const loadHandler = async () => {
 }
 
 const publicEventsHandler = (publicEvent: any) => {
-    publicEvent.events.calculateExpert(async (err: any, event: any) => {
-        if (err) {
-            errorDebug('Error from calculate expert events', err)
-        } else {
-            console.log("event calculateExpert work")
-            expertCalc(event.returnValues);
-        }
-    })
+    // publicEvent.events.calculateExpert(async (err: any, event: any) => {
+    //     if (err) {
+    //         errorDebug('Error from calculate expert events', err)
+    //     } else {
+    //         console.log("event calculateExpert work")
+    //         expertCalc(event.returnValues);
+    //     }
+    // })
 
     publicEvent.events.findCorrectAnswer(async (err: any, event: any) => {
         if (err) {
