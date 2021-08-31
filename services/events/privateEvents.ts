@@ -9,12 +9,54 @@ import { uploadImage } from "../../helpers/helpers";
 import { getRoomColor } from "../rooms/getRoom";
 import { getGasPrice, estimateGasLimit } from "../../contract-services/gasPrice/getGasPrice";
 
+const createPrivateEventID = async (req: any, res: any) => {
+    let createEventID = [{
+        _id: "privateEvents$newEvents",
+        status: 'id created',
+    }]
+    const eventData: any = await axios.post(`${path}/transact`, createEventID)
+        .catch((err) => {
+            console.log("DB error: " + err.response.data.message)
+            res.status(400);
+            res.send(err.response.data.message);
+            return
+        })
+
+    let id = eventData.data.tempids["privateEvents$newEvents"];
+    res.status(200);
+    res.send({ id: id });
+}
+
+const deletePrivateEvent = (req: any, res: any) => { //? same as in publicEvents
+    // TODO check status before deleting
+    let id = req.body.id
+    let removeEvent = [{
+        _id: id,
+        _action: 'delete',
+    }]
+    axios.post(`${path}/transact`, removeEvent)
+        .catch((err) => {
+            console.log("DB error: " + err.response.data.message)
+            res.status(400);
+            res.send(err.response.data.message);
+            return
+        })
+    res.status(200)
+    res.send({ "status": "ok" })
+}
+
+
+
+//!===========================================
+
+
 const createPrivateEvent = async (req: any, res: any) => {
     let allData = req.body;
     allData.host = allData.dataFromRedis.id
     let wallet = allData.dataFromRedis.wallet
     delete allData.dataFromRedis
-    let id = "privateEvents$newEvents";
+    // let id = "privateEvents$newEvents";
+    let id = req.body._id
     allData.status = "deployed";
     allData._id = id;
     allData.finalAnswer = '';
@@ -85,18 +127,7 @@ const createPrivateEvent = async (req: any, res: any) => {
     let endTime = req.body.endTime;
     let questionQuantity = req.body.answers.length;
 
-    try {
-        let pathContr = process.env.NODE_ENV
-        let contract = await init(pathContr, PrivateEvents)
-
-        let gasEstimate = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).estimateGas();
-        let transaction = await contract.methods.createEvent(eventId, startTime, endTime, questionQuantity, wallet).send({
-            gas: await estimateGasLimit(gasEstimate),
-            gasPrice: await getGasPrice(),
-            nonce: await getNonce()
-        });
-        if (transaction) {
-            let transactionHash = transaction.transactionHash;
+            let transactionHash = req.body.transactionHash;
 
             // ADD transaction
             let transactionData = [{
@@ -111,12 +142,6 @@ const createPrivateEvent = async (req: any, res: any) => {
             })
 
             res.status(200).send({ id: eventId });
-        }
-    } catch (err) {
-        console.log(err.message)
-        res.status(400);
-        res.send(err.message);
-    }
 }
 
 const privParticipate = async (req: any, res: any) => {
@@ -127,25 +152,13 @@ const privParticipate = async (req: any, res: any) => {
         res.status(400);
         res.send({ "error": "structure is incorrect" });
     } else {
-        try {
-            let wallet = req.body.dataFromRedis.wallet
-            let pathContr = process.env.NODE_ENV
-            let contract = await init(pathContr, PrivateEvents)
-            let gasEstimate = await contract.methods.setAnswer(eventId, answer, wallet).estimateGas();
-            let transaction = await contract.methods.setAnswer(eventId, answer, wallet).send({
-                gas: await estimateGasLimit(gasEstimate),
-                gasPrice: await getGasPrice(),
-                nonce: await getNonce()
-            });
-
-            if (transaction) {
                 // private action structure
                 let data: any = [{
                     _id: 'privateActivites$newEvents',
                     eventId: eventId,
                     date: Math.floor(Date.now() / 1000),
                     answer: answer,
-                    transactionHash: transaction.transactionHash,
+                    transactionHash: req.body.transactionHash,
                     from: from,
                     role: "participate"
                 }]
@@ -167,12 +180,6 @@ const privParticipate = async (req: any, res: any) => {
                 })
                 res.status(200);
                 res.send({ done: "ok" });
-            }
-        } catch (err) {
-            console.log(err.message)
-            res.status(400);
-            res.send(err.message);
-        }
     }
 }
 
@@ -185,25 +192,13 @@ const privValidate = async (req: any, res: any) => {
         res.status(400);
         res.send({ "error": "structure is incorrect" });
     } else {
-        try {
-            let wallet = req.body.dataFromRedis.wallet;
-            let pathContr = process.env.NODE_ENV;
-            let contract = await init(pathContr, PrivateEvents)
-            let gasEstimate = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).estimateGas();
-            let transaction = await contract.methods.setCorrectAnswer(eventId, answerNumber, wallet).send({
-                gas: await estimateGasLimit(gasEstimate),
-                gasPrice: await getGasPrice(),
-                nonce: await getNonce()
-            });
-
-            if (transaction) {
                 // private action structure
                 let data: any = [{
                     _id: 'privateActivites$newEvents',
                     eventId: eventId,
                     date: Math.floor(Date.now() / 1000),
                     answer: answerNumber,
-                    transactionHash: transaction.transactionHash,
+                    transactionHash: req.body.transactionHash,
                     from: from,
                     role: "validate"
                 }]
@@ -227,12 +222,6 @@ const privValidate = async (req: any, res: any) => {
                     res.send(err.response.data.message);
                     console.log("DB error: " + err.response.data.message)
                 })
-            }
-        } catch (err) {
-            console.log(err.message);
-            res.status(400);
-            res.send(err.message);
-        }
     }
 }
 
@@ -274,5 +263,7 @@ export {
     createPrivateEvent,
     privGetById,
     privParticipate,
-    privValidate
+    privValidate,
+    createPrivateEventID,
+    deletePrivateEvent
 }
