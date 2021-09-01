@@ -13,6 +13,8 @@ deploy:
   - provider: codedeploy
     application: bettery_dev_app
     deployment_group: bettery_dev_deployment_group
+    key: latest/bettery_dev_app.zip
+    bundle_type: zip
     access_key_id: $AWSAccessKeyId
     secret_access_key: $AWSSecretKey
     region: ap-southeast-1b
