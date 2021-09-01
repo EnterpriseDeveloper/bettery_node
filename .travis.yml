@@ -15,8 +15,8 @@ deploy:
     deployment_group: bettery_dev_deployment_group
     key: latest/bettery_dev_app.zip
     bundle_type: zip
-    access_key_id: $AWSAccessKeyId
-    secret_access_key: $AWSSecretKey
+    access_key_id: $AccessKeyId
+    secret_access_key: $SecretAccessKey
     region: ap-southeast-1b
     on:
       branch: validate-tokens
