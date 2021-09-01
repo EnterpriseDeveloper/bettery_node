@@ -11,11 +11,11 @@ script:
 
 deploy:
   - provider: codedeploy
-    application: Bettery_dev
+    application: bettery_dev_app
+    deployment_group: bettery_dev_deployment_group
     access_key_id: $AWSAccessKeyId
     secret_access_key: $AWSSecretKey
     region: ap-southeast-1b
-    deployment_group: launch-wizard-2
     on:
       branch: validate-tokens
 
