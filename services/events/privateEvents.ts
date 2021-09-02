@@ -1,13 +1,9 @@
 import axios from "axios";
-import { path } from "../../config/path";
-import { createRoom } from '../rooms/createRoom';
-import { privateEventStructure } from '../../structure/event.struct';
-import { init } from "../../contract-services/contractInit";
-import PrivateEvents from "../../contract-services/abi/PrivateEvents.json";
-import { getNonce } from "../../contract-services/nonce/nonce";
-import { uploadImage } from "../../helpers/helpers";
-import { getRoomColor } from "../rooms/getRoom";
-import { getGasPrice, estimateGasLimit } from "../../contract-services/gasPrice/getGasPrice";
+import {path} from "../../config/path";
+import {createRoom} from '../rooms/createRoom';
+import {privateEventStructure} from '../../structure/event.struct';
+import {uploadImage} from "../../helpers/helpers";
+import {getRoomColor} from "../rooms/getRoom";
 
 const createPrivateEventID = async (req: any, res: any) => {
     let createEventID = [{
@@ -45,17 +41,10 @@ const deletePrivateEvent = (req: any, res: any) => { //? same as in publicEvents
     res.send({ "status": "ok" })
 }
 
-
-
-//!===========================================
-
-
 const createPrivateEvent = async (req: any, res: any) => {
     let allData = req.body;
     allData.host = allData.dataFromRedis.id
-    let wallet = allData.dataFromRedis.wallet
     delete allData.dataFromRedis
-    // let id = "privateEvents$newEvents";
     let id = req.body._id
     allData.status = "deployed";
     allData._id = id;
@@ -77,7 +66,6 @@ const createPrivateEvent = async (req: any, res: any) => {
             allData.thumColor = await getRoomColor(allData.roomId);
         }
     }
-
 
     delete allData.prodDev;
     let data;
@@ -121,27 +109,20 @@ const createPrivateEvent = async (req: any, res: any) => {
             res.status(400);
             res.send(err.response.data.message);
         })
-
-    let eventId = eventData.data.tempids['privateEvents$newEvents']
-    let startTime = req.body.startTime;
-    let endTime = req.body.endTime;
-    let questionQuantity = req.body.answers.length;
-
             let transactionHash = req.body.transactionHash;
 
             // ADD transaction
             let transactionData = [{
-                _id: eventId,
+                _id: id,
                 transactionHash: transactionHash,
             }]
-
-            await axios.post(`${path}/transact`, transactionData).catch((err: any) => {
+    await axios.post(`${path}/transact`, transactionData).catch((err: any) => {
                 console.log("DB error: " + err.response.data.message)
                 res.status(400);
                 res.send(err.response.data.message);
             })
 
-            res.status(200).send({ id: eventId });
+            res.status(200).send({ id: id });
 }
 
 const privParticipate = async (req: any, res: any) => {
