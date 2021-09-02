@@ -5,7 +5,7 @@ node_js:
 services:
   - docker
 
-after_deploy:
+script:
   - docker-compose up
   - docker cp ~/node/keys bettery_app:~/app/
 
