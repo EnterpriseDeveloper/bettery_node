@@ -13,12 +13,11 @@ deploy:
   - provider: codedeploy
     application: bettery_dev_app
     deployment_group: bettery_dev_deployment_group
-    # key: latest.zip
-    # bundle_type: zip
-    revision_type: github 
+    key: latest.zip
+    bundle_type: zip
     access_key_id: $AccessKeyId
     secret_access_key: $SecretAccessKey
-    region: ap-southeast-1b
+    region: ap-southeast-1
     on:
       branch: validate-tokens
 
