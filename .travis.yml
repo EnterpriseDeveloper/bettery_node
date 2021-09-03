@@ -5,12 +5,9 @@ node_js:
 services:
   - docker
 
-script:
-  # - docker-compose up
-  - docker build -t bettery_img .
-# after_deploy:
-#   - docker run --name bettery_app -i -t bettery_img
-#   - docker cp ~/node/keys bettery_app:~/app/
+after_deploy:
+  - docker-compose up
+  - docker cp ~/node/keys bettery_app:~/app/
 
 deploy:
   - provider: codedeploy
