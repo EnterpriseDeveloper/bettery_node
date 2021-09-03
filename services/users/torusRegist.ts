@@ -124,100 +124,6 @@ const authRegister = async (req: any, res: any) => {
 }
 
 
-
-const torusRegist = async (req: any, res: any) => {
-    let wallet = req.body.wallet;
-    let refId = req.body.refId;
-    let email = req.body.email;
-    let verifierId = getVerifier(req.body.verifierId);
-
-    let findEmail = {
-        "select": ["_id", "users/nickName", "users/email", "users/wallet", "users/avatar", "users/verifier", "users/linkedAccounts"],
-        "from": email ? ["users/email", email] : ["users/wallet", req.body.wallet]
-    }
-
-    let user: any = await axios.post(`${path}/query`, findEmail)
-        .catch((err) => {
-            res.status(400);
-            res.send(err.response.data.message);
-            return;
-        })
-
-    if (user.data.length === 0) {
-        let data: any = [{
-            "_id": "users$newUser",
-            "nickName": req.body.nickName,
-            "email": email,
-            "wallet": wallet,
-            "registered": Math.floor(Date.now() / 1000),
-            "avatar": req.body.avatar == "" ? 'https://api.bettery.io/image/avatar.png' : req.body.avatar,
-            "verifier": req.body.verifier,
-            "linkedAccounts": [verifierId]
-        }]
-
-        if (!isNaN(refId)) {
-            let findByref = await checkUserById(refId, res);
-            if (findByref) {
-                data[0].invitedBy = Number(refId),
-                    data.push({
-                        "_id": Number(refId),
-                        "invited": ["users$newUser"]
-                    })
-            }
-        }
-
-        let x: any = await axios.post(`${path}/transact`, data).catch((err) => {
-            res.status(400);
-            res.send(err.response.data.message);
-            return;
-        })
-     //   await mintTokens(wallet, 10);
-        // TODO add session token from Redis
-        const dataFromRedis = [{
-            email: email ? email : 'undefined',
-            wallet: req.body.wallet,
-            _id: x.data.tempids['users$newUser'],
-            typeOfLogin: req.body.verifier
-        }]
-        let dataToRedis = redis.redisDataStructure(dataFromRedis, req)
-
-        let sessionToken = dataRedisSend(req.body.wallet, dataToRedis)
-
-        res.status(200);
-        res.send({
-            _id: x.data.tempids['users$newUser'],
-            nickName: req.body.nickName,
-            email: email,
-            wallet: req.body.wallet,
-            avatar: req.body.avatar,
-            verifier: req.body.verifier,
-            sessionToken: sessionToken,
-            accessToken: req.body.accessToken
-        })
-
-    } else {
-        let userStruct = userStructure(user.data);
-        if (userStruct[0].linkedAccounts.length != 0 &&
-            !userStruct[0].linkedAccounts.includes(verifierId)) {
-            //check if account exist return error
-            let data = {
-                email: userStruct[0].email,
-                linkedAccounts: userStruct[0].linkedAccounts
-            }
-            res.status(302);
-            res.send(data)
-        } else {
-            let dataToRedis = redis.redisDataStructure(userStruct, req)
-
-            userStruct[0].sessionToken = dataRedisSend(userStruct[0].wallet, dataToRedis)
-            userStruct[0].accessToken = req.body.accessToken
-
-            res.status(200);
-            res.send(userStruct[0]);
-        }
-    }
-}
-
 const getVerifier = (x: any) => {
     if (x.search("google-oauth2") != -1) {
         return "google";
@@ -300,7 +206,6 @@ const dataRedisSend = (wallet: any, dataToRedis: any) => {
 }
 
 export {
-    torusRegist,
     authLogin,
     authRegister,
     autoLogin,
