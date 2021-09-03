@@ -70,7 +70,12 @@ const publicEventStructure = (data: any) => {
 }
 
 const privateEventStructure = (data: any) => {
-    return data.map((z: any) => {
+    return data.filter((x: any) => {
+        if (x['privateEvents/status'] == "id created") {
+            return false;
+        }
+        return true;
+    }).map((z: any) => {
         return {
             winner: z['privateEvents/winner'],
             loser: z['privateEvents/loser'],

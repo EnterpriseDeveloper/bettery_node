@@ -1,5 +1,12 @@
 import { createEvent, getById, getAll, getAllForTest, getBetteryEvent, createEventID, deleteEvent} from "./publicEvents";
-import { createPrivateEvent, privGetById, privParticipate, privValidate } from "./privateEvents";
+import {
+    createPrivateEvent,
+    createPrivateEventID,
+    deletePrivateEvent,
+    privGetById,
+    privParticipate,
+    privValidate
+} from "./privateEvents";
 import { getAllHashtags } from "./hashtags";
 import { participate, validate } from "./publicActivites";
 import eventLimitPrivate from '../../middlewares/eventLimitsPrivate'
@@ -77,5 +84,13 @@ export default function Events(app: any) {
         await findCorrectAnswer(data);
         res.status(200);
         res.send({ status: "OK" });
+    })
+
+    app.get("/privateEvents/create_event_id", checkToken, eventLimitPublic, async (req: any, res: any) => {
+        await createPrivateEventID(req, res);
+    })
+
+    app.post("/privateEvents/delete_event_id", checkToken, async (req:any, res: any) =>{
+        deletePrivateEvent(req, res);
     })
 }

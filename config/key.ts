@@ -12,8 +12,8 @@ const secretRedisForAllKey = "kdXBlciBzZWNyZXQgd";
 const auth0Path = "https://bettery.us.auth0.com";
 const auth0ClientId = "by3kXEWyBmVBWrAxrd5fVE97HRAQf1Wk";
 const auth0Secret = "uyXFkmokkGIJp4Wx9DngoBUkyarBXzUQ_9-hEGXCibIx8v5R6WuyYLz3fI6udHGe";
-//const testDemon = "54.255.226.141";
-const testDemon = "localhost";
+const testDemon = "54.255.226.141";
+// const testDemon = "localhost";
 const demon = "TODO";
 
 export {
