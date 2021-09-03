@@ -32,10 +32,6 @@ const sendToBlockChain = async (id: number) =>{
         console.log(err)
     }
 }
-// setTimeout(()=>{
-//     sendToBlockChain(422212465065991)
-// },5000)
-
 
 
 export {
