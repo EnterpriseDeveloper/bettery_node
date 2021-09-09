@@ -13,7 +13,3 @@ pipelines:
           services:
           - docker
 
-definitions:
-    services:
-        docker:
-            image: docker/compose:1.25.4
