@@ -1,5 +1,8 @@
 image: node:14.17.2
 
+options: 
+  docker: true
+
 pipelines:
   branches:
     validate-tockens:
@@ -7,8 +10,7 @@ pipelines:
           script:
             - docker-compose -v
             - docker-compose up
-          services:
-          - docker
+          
 
 definitions:
     services:
