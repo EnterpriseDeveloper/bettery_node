@@ -32,7 +32,7 @@ const payToRefferers = async (data: any) => {
             refTwoAmount: payRefAmount[1],
             refThreeAddr: payRefAddr[2],
             refThreeAmount: payRefAmount[2],
-            payComp
+            payToComp: payComp
         }
     };
     const fee = {
