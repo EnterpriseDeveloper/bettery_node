@@ -8,6 +8,12 @@ pipelines:
     validate-tockens:
       - step:
           script:
-            - apt update
-            - apt install docker.io
+            - docker-compose -v
             - docker-compose up
+          services:
+          - docker
+
+definitions:
+    services:
+        docker:
+            image: docker/compose:1.25.4
