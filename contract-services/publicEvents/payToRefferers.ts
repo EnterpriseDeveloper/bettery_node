@@ -1,18 +1,13 @@
-import PlayerPaymentContract from "../abi/PlayerPayment.json";
-import { init } from "../contractInit";
 import axios from "axios";
 import { path } from "../../config/path";
 import Web3 from "web3";
-import { getNonce } from "../nonce/nonce";
-import { getGasPriceSafeLow, estimateGasLimit } from "../gasPrice/getGasPrice"
+import { connectToSign } from '../connectToChain'
 
 const payToRefferers = async (data: any) => {
     console.log("from payToRefferers")
     console.log(data);
 
     let id = data.id;
-    let path = process.env.NODE_ENV
-    let contract = await init(path, PlayerPaymentContract);
     let getPlayers: any = await fetchDataFromDb(id);
 
     let mintedTokens = Number(getPlayers.data[0]["mintedTokens"]);
@@ -20,44 +15,41 @@ const payToRefferers = async (data: any) => {
     let players = getPlayers.data[0]["publicEvents/parcipiantsAnswer"];
     const ref = letFindAllRef(players);
     let refAmount = getRefAmount(ref);
-    let contrPercet = await getPercentFromContract(contract)
+    let contrPercet = await getPercentFromContract()
     let allData = calcTokens(ref, refAmount, mintedTokens, contrPercet);
-    let fakeAddr = await contract.methods.fakeAddr().call();
-    let { payRefAddr, payRefAmount, payComp } = getRefStruct(allData, fakeAddr, refAmount, mintedTokens, contrPercet);
+    let { payRefAddr, payRefAmount, payComp } = getRefStruct(allData, "none", refAmount, mintedTokens, contrPercet);
 
+    let { memonic, address, client } = await connectToSign()
+
+    const msg = {
+        typeUrl: "/VoroshilovMax.bettery.funds.MsgCreateMintBet",
+        value: {
+            creator: address,
+            pubId: id,
+            refOneAddr: payRefAddr[0],
+            refOneAmount: payRefAmount[0],
+            refTwoAddr: payRefAddr[1],
+            refTwoAmount: payRefAmount[1],
+            refThreeAddr: payRefAddr[2],
+            refThreeAmount: payRefAmount[2],
+            payComp
+        }
+    };
+    const fee = {
+        amount: [],
+        gas: "1000000",
+    };
     try {
-        let gasEstimate = await contract.methods.payToReff(
-            id,
-            payRefAddr[0],
-            payRefAmount[0],
-            payRefAddr[1],
-            payRefAmount[1],
-            payRefAddr[2],
-            payRefAmount[2],
-            payComp
-        ).estimateGas();
-        await contract.methods.payToReff(
-            id,
-            payRefAddr[0],
-            payRefAmount[0],
-            payRefAddr[1],
-            payRefAmount[1],
-            payRefAddr[2],
-            payRefAmount[2],
-            payComp
-        ).send({
-            gas: await estimateGasLimit(gasEstimate),
-            gasPrice: await getGasPriceSafeLow(),
-            nonce: await getNonce()
-        });
-        // TODO add to db ref payments
+        // TODO test
+        let tx = await client.signAndBroadcast(address, [msg], fee, memonic);
+        console.log("FROM PAY TO REF")
+        console.log(tx);
+        
+        let allWinners = await getDataUser(Number(id), Number(finalAnswerNumber))
+        sendToDbPayRef(allWinners, payRefAddr[0], payRefAmount[0], payRefAmount[1], payRefAmount[2])
     } catch (err) {
-        console.log("err from pay to pay to refferers", err)
+        console.log(err)
     }
-
-    let allWinners = await getDataUser(Number(id), Number(finalAnswerNumber))
-
-    sendToDbPayRef(allWinners, payRefAddr[0], payRefAmount[0], payRefAmount[1], payRefAmount[2])
 }
 
 const fetchDataFromDb = async (id: any) => {
@@ -172,11 +164,12 @@ const calcTokens = (allData: any, refAmount: any, mintedTokens: any, percent: an
     })
 }
 
-const getPercentFromContract = async (contract: any) => {
+const getPercentFromContract = async () => {
+    // TODO get percent from blockchain
     let percent = [];
-    percent[0] = Number(await contract.methods.firstRefer().call());
-    percent[1] = Number(await contract.methods.secontRefer().call());
-    percent[2] = Number(await contract.methods.thirdRefer().call());
+    percent[0] = Number(4);
+    percent[1] = Number(4);
+    percent[2] = Number(2);
     return percent;
 }
 
@@ -237,7 +230,7 @@ let getDataUser = async (id: number, finalAnswerNumber: number) => {
         "select": [
             "publicEvents/parcipiantsAnswer", {
                 "publicEvents/parcipiantsAnswer": ["publicActivites/answer", "publicActivites/from", {
-                    "publicActivites/from": ["invitedBy", {"invitedBy": ["users/wallet"]}]
+                    "publicActivites/from": ["invitedBy", { "invitedBy": ["users/wallet"] }]
                 }]
             }
         ],
@@ -255,6 +248,7 @@ let getDataUser = async (id: number, finalAnswerNumber: number) => {
 
 }
 
+// TODO ask about ref ANDREY Sohrin
 let sendToDbPayRef = (allWinners: any, payRefAddr: any, payRefAmount0: any, payRefAmount1: any, payRefAmount2: any) => {
     let data = allWinners.map((el: any) => {
         let pubActivitesId = el._id;
@@ -262,7 +256,7 @@ let sendToDbPayRef = (allWinners: any, payRefAddr: any, payRefAmount0: any, payR
         let num1;
         let num2;
         let num3;
-        if(el['publicActivites/from'].invitedBy){
+        if (el['publicActivites/from'].invitedBy) {
             index = payRefAddr.indexOf(el['publicActivites/from'].invitedBy['users/wallet'])
             num1 = payRefAmount0[index] == undefined ? '0' : payRefAmount0[index]
             num2 = payRefAmount1[index] == undefined ? '0' : payRefAmount1[index]
@@ -285,8 +279,7 @@ let sendToDbPayRef = (allWinners: any, payRefAddr: any, payRefAmount0: any, payR
 
     }).flat()
 
-    if(data.length){
-        console.log('send')
+    if (data.length) {
         axios.post(`${path}/transact`, data).catch((err) => {
             console.log("DB error from send to DB refIndo: " + err.response.data.message)
             return;

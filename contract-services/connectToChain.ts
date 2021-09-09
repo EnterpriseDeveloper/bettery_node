@@ -1,13 +1,14 @@
 import { DirectSecp256k1HdWallet, Registry } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { MsgCreateMintBet } from "./funds/tx";
-import {MsgCreateFihishPubEvent} from './publicEvents/tx';
+import {MsgCreateFihishPubEvent, MsgCreateRefPubEvents} from './publicEvents/tx';
 import { demonAPI } from "../config/path";
 
 
 const types = [
     ["/VoroshilovMax.bettery.funds.MsgCreateMintBet", MsgCreateMintBet],
-    ["/VoroshilovMax.bettery.publicevents.MsgCreateFihishPubEvent", MsgCreateFihishPubEvent]
+    ["/VoroshilovMax.bettery.publicevents.MsgCreateFihishPubEvent", MsgCreateFihishPubEvent],
+    ["/VoroshilovMax.bettery.publicevents.MsgCreateRefPubEvents", MsgCreateRefPubEvents]
   ];
 
 const registry = new Registry(<any>types);

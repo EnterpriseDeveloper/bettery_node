@@ -6,6 +6,22 @@ import * as Long from 'long'
 export const protobufPackage = 'VoroshilovMax.bettery.publicevents'
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgCreateRefPubEvents {
+  creator: string
+  pubId: number
+  refOneAddr: string[]
+  refOneAmount: string[]
+  refTwoAddr: string[]
+  refTwoAmount: string[]
+  refThreeAddr: string[]
+  refThreeAmount: string[]
+  payToComp: string
+}
+
+export interface MsgCreateRefPubEventsResponse {
+  id: number
+}
+
 export interface MsgCreateFihishPubEvent {
   creator: string
   pubId: number
@@ -51,6 +67,304 @@ export interface MsgCreateCreatePubEvents {
 
 export interface MsgCreateCreatePubEventsResponse {
   id: number
+}
+
+const baseMsgCreateRefPubEvents: object = {
+  creator: '',
+  pubId: 0,
+  refOneAddr: '',
+  refOneAmount: '',
+  refTwoAddr: '',
+  refTwoAmount: '',
+  refThreeAddr: '',
+  refThreeAmount: '',
+  payToComp: ''
+}
+
+export const MsgCreateRefPubEvents = {
+  encode(message: MsgCreateRefPubEvents, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== '') {
+      writer.uint32(10).string(message.creator)
+    }
+    if (message.pubId !== 0) {
+      writer.uint32(16).uint64(message.pubId)
+    }
+    for (const v of message.refOneAddr) {
+      writer.uint32(26).string(v!)
+    }
+    for (const v of message.refOneAmount) {
+      writer.uint32(34).string(v!)
+    }
+    for (const v of message.refTwoAddr) {
+      writer.uint32(42).string(v!)
+    }
+    for (const v of message.refTwoAmount) {
+      writer.uint32(50).string(v!)
+    }
+    for (const v of message.refThreeAddr) {
+      writer.uint32(58).string(v!)
+    }
+    for (const v of message.refThreeAmount) {
+      writer.uint32(66).string(v!)
+    }
+    if (message.payToComp !== '') {
+      writer.uint32(74).string(message.payToComp)
+    }
+    return writer
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgCreateRefPubEvents {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = { ...baseMsgCreateRefPubEvents } as MsgCreateRefPubEvents
+    message.refOneAddr = []
+    message.refOneAmount = []
+    message.refTwoAddr = []
+    message.refTwoAmount = []
+    message.refThreeAddr = []
+    message.refThreeAmount = []
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string()
+          break
+        case 2:
+          message.pubId = longToNumber(reader.uint64() as Long)
+          break
+        case 3:
+          message.refOneAddr.push(reader.string())
+          break
+        case 4:
+          message.refOneAmount.push(reader.string())
+          break
+        case 5:
+          message.refTwoAddr.push(reader.string())
+          break
+        case 6:
+          message.refTwoAmount.push(reader.string())
+          break
+        case 7:
+          message.refThreeAddr.push(reader.string())
+          break
+        case 8:
+          message.refThreeAmount.push(reader.string())
+          break
+        case 9:
+          message.payToComp = reader.string()
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MsgCreateRefPubEvents {
+    const message = { ...baseMsgCreateRefPubEvents } as MsgCreateRefPubEvents
+    message.refOneAddr = []
+    message.refOneAmount = []
+    message.refTwoAddr = []
+    message.refTwoAmount = []
+    message.refThreeAddr = []
+    message.refThreeAmount = []
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator)
+    } else {
+      message.creator = ''
+    }
+    if (object.pubId !== undefined && object.pubId !== null) {
+      message.pubId = Number(object.pubId)
+    } else {
+      message.pubId = 0
+    }
+    if (object.refOneAddr !== undefined && object.refOneAddr !== null) {
+      for (const e of object.refOneAddr) {
+        message.refOneAddr.push(String(e))
+      }
+    }
+    if (object.refOneAmount !== undefined && object.refOneAmount !== null) {
+      for (const e of object.refOneAmount) {
+        message.refOneAmount.push(String(e))
+      }
+    }
+    if (object.refTwoAddr !== undefined && object.refTwoAddr !== null) {
+      for (const e of object.refTwoAddr) {
+        message.refTwoAddr.push(String(e))
+      }
+    }
+    if (object.refTwoAmount !== undefined && object.refTwoAmount !== null) {
+      for (const e of object.refTwoAmount) {
+        message.refTwoAmount.push(String(e))
+      }
+    }
+    if (object.refThreeAddr !== undefined && object.refThreeAddr !== null) {
+      for (const e of object.refThreeAddr) {
+        message.refThreeAddr.push(String(e))
+      }
+    }
+    if (object.refThreeAmount !== undefined && object.refThreeAmount !== null) {
+      for (const e of object.refThreeAmount) {
+        message.refThreeAmount.push(String(e))
+      }
+    }
+    if (object.payToComp !== undefined && object.payToComp !== null) {
+      message.payToComp = String(object.payToComp)
+    } else {
+      message.payToComp = ''
+    }
+    return message
+  },
+
+  toJSON(message: MsgCreateRefPubEvents): unknown {
+    const obj: any = {}
+    message.creator !== undefined && (obj.creator = message.creator)
+    message.pubId !== undefined && (obj.pubId = message.pubId)
+    if (message.refOneAddr) {
+      obj.refOneAddr = message.refOneAddr.map((e) => e)
+    } else {
+      obj.refOneAddr = []
+    }
+    if (message.refOneAmount) {
+      obj.refOneAmount = message.refOneAmount.map((e) => e)
+    } else {
+      obj.refOneAmount = []
+    }
+    if (message.refTwoAddr) {
+      obj.refTwoAddr = message.refTwoAddr.map((e) => e)
+    } else {
+      obj.refTwoAddr = []
+    }
+    if (message.refTwoAmount) {
+      obj.refTwoAmount = message.refTwoAmount.map((e) => e)
+    } else {
+      obj.refTwoAmount = []
+    }
+    if (message.refThreeAddr) {
+      obj.refThreeAddr = message.refThreeAddr.map((e) => e)
+    } else {
+      obj.refThreeAddr = []
+    }
+    if (message.refThreeAmount) {
+      obj.refThreeAmount = message.refThreeAmount.map((e) => e)
+    } else {
+      obj.refThreeAmount = []
+    }
+    message.payToComp !== undefined && (obj.payToComp = message.payToComp)
+    return obj
+  },
+
+  fromPartial(object: DeepPartial<MsgCreateRefPubEvents>): MsgCreateRefPubEvents {
+    const message = { ...baseMsgCreateRefPubEvents } as MsgCreateRefPubEvents
+    message.refOneAddr = []
+    message.refOneAmount = []
+    message.refTwoAddr = []
+    message.refTwoAmount = []
+    message.refThreeAddr = []
+    message.refThreeAmount = []
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator
+    } else {
+      message.creator = ''
+    }
+    if (object.pubId !== undefined && object.pubId !== null) {
+      message.pubId = object.pubId
+    } else {
+      message.pubId = 0
+    }
+    if (object.refOneAddr !== undefined && object.refOneAddr !== null) {
+      for (const e of object.refOneAddr) {
+        message.refOneAddr.push(e)
+      }
+    }
+    if (object.refOneAmount !== undefined && object.refOneAmount !== null) {
+      for (const e of object.refOneAmount) {
+        message.refOneAmount.push(e)
+      }
+    }
+    if (object.refTwoAddr !== undefined && object.refTwoAddr !== null) {
+      for (const e of object.refTwoAddr) {
+        message.refTwoAddr.push(e)
+      }
+    }
+    if (object.refTwoAmount !== undefined && object.refTwoAmount !== null) {
+      for (const e of object.refTwoAmount) {
+        message.refTwoAmount.push(e)
+      }
+    }
+    if (object.refThreeAddr !== undefined && object.refThreeAddr !== null) {
+      for (const e of object.refThreeAddr) {
+        message.refThreeAddr.push(e)
+      }
+    }
+    if (object.refThreeAmount !== undefined && object.refThreeAmount !== null) {
+      for (const e of object.refThreeAmount) {
+        message.refThreeAmount.push(e)
+      }
+    }
+    if (object.payToComp !== undefined && object.payToComp !== null) {
+      message.payToComp = object.payToComp
+    } else {
+      message.payToComp = ''
+    }
+    return message
+  }
+}
+
+const baseMsgCreateRefPubEventsResponse: object = { id: 0 }
+
+export const MsgCreateRefPubEventsResponse = {
+  encode(message: MsgCreateRefPubEventsResponse, writer: Writer = Writer.create()): Writer {
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id)
+    }
+    return writer
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgCreateRefPubEventsResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = { ...baseMsgCreateRefPubEventsResponse } as MsgCreateRefPubEventsResponse
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.id = longToNumber(reader.uint64() as Long)
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MsgCreateRefPubEventsResponse {
+    const message = { ...baseMsgCreateRefPubEventsResponse } as MsgCreateRefPubEventsResponse
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Number(object.id)
+    } else {
+      message.id = 0
+    }
+    return message
+  },
+
+  toJSON(message: MsgCreateRefPubEventsResponse): unknown {
+    const obj: any = {}
+    message.id !== undefined && (obj.id = message.id)
+    return obj
+  },
+
+  fromPartial(object: DeepPartial<MsgCreateRefPubEventsResponse>): MsgCreateRefPubEventsResponse {
+    const message = { ...baseMsgCreateRefPubEventsResponse } as MsgCreateRefPubEventsResponse
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id
+    } else {
+      message.id = 0
+    }
+    return message
+  }
 }
 
 const baseMsgCreateFihishPubEvent: object = { creator: '', pubId: 0 }
@@ -768,6 +1082,7 @@ export const MsgCreateCreatePubEventsResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  CreateRefPubEvents(request: MsgCreateRefPubEvents): Promise<MsgCreateRefPubEventsResponse>
   CreateFihishPubEvent(request: MsgCreateFihishPubEvent): Promise<MsgCreateFihishPubEventResponse>
   CreateValidPubEvents(request: MsgCreateValidPubEvents): Promise<MsgCreateValidPubEventsResponse>
   CreatePartPubEvents(request: MsgCreatePartPubEvents): Promise<MsgCreatePartPubEventsResponse>
@@ -779,6 +1094,12 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc
   }
+  CreateRefPubEvents(request: MsgCreateRefPubEvents): Promise<MsgCreateRefPubEventsResponse> {
+    const data = MsgCreateRefPubEvents.encode(request).finish()
+    const promise = this.rpc.request('VoroshilovMax.bettery.publicevents.Msg', 'CreateRefPubEvents', data)
+    return promise.then((data) => MsgCreateRefPubEventsResponse.decode(new Reader(data)))
+  }
+
   CreateFihishPubEvent(request: MsgCreateFihishPubEvent): Promise<MsgCreateFihishPubEventResponse> {
     const data = MsgCreateFihishPubEvent.encode(request).finish()
     const promise = this.rpc.request('VoroshilovMax.bettery.publicevents.Msg', 'CreateFihishPubEvent', data)
@@ -840,3 +1161,4 @@ if (util.Long !== Long) {
   util.Long = Long as any
   configure()
 }
+
