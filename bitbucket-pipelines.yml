@@ -8,9 +8,7 @@ pipelines:
             - docker
           caches:
             - docker
-          script:
-            - npx jest
-            
+          script:           
             - docker-compose up
             - docker cp ~/node/keys bettery_app:~/app/
         
