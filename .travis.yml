@@ -1,23 +1,27 @@
-language: node_js
-node_js:
-  - 14.17.2
+# language: node_js
+# node_js:
+#   - 14.17.2
 
-services:
-  - docker
+# services:
+#   - docker
 
-after_deploy:
-  - docker-compose up
-  - docker cp ~/node/keys bettery_app:~/app/
+# # script:
+#   # - docker-compose up
+#   # - docker build -t bettery_img .
+# after_deploy:
+# #   - docker run --name bettery_app -i -t bettery_img
+#   - docker-compose up
+#   - docker cp ~/node/keys bettery_app:~/app/
 
-deploy:
-  - provider: codedeploy
-    application: bettery_dev_app
-    deployment_group: bettery_dev_deployment_group
-    key: latest.zip
-    bundle_type: zip
-    access_key_id: $AccessKeyId
-    secret_access_key: $SecretAccessKey
-    region: ap-southeast-1
-    on:
-      branch: validate-tokens
+# deploy:
+#   - provider: codedeploy
+#     application: bettery_dev_app
+#     deployment_group: bettery_dev_deployment_group
+#     key: latest.zip
+#     bundle_type: zip
+#     access_key_id: $AccessKeyId
+#     secret_access_key: $SecretAccessKey
+#     region: ap-southeast-1
+#     on:
+#       branch: validate-tokens
 

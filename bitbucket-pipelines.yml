@@ -1,18 +1,16 @@
 image: docker/compose:1.25.4
 
-options: 
-  docker: true
-
 pipelines:
   branches:
     validate-tockens:
       - step:
-          script:
-            - docker-compose -v
-            - docker-compose up
-          
-
-# definitions:
-#     services:
-#         docker:
-#             image: docker/compose:1.25.4
+        services:
+          - docker
+        caches:
+          - docker
+        script:
+          - npx jest
+            
+          - docker-compose up
+          - docker cp ~/node/keys bettery_app:~/app/
+        
