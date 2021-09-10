@@ -4,10 +4,13 @@ pipelines:
   branches:
     validate-tockens:
       - step:
-        services:
-          - docker
-        script:
-          - npx jest
-          - docker-compose up
-          - docker cp ~/node/keys bettery_app:~/app/
+          services:
+            - docker
+          caches:
+            - docker
+          script:
+            - npx jest
+            
+            - docker-compose up
+            - docker cp ~/node/keys bettery_app:~/app/
         
