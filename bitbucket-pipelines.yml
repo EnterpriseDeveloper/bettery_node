@@ -10,7 +10,6 @@ pipelines:
           - docker
         script:
           - npx jest
-            
           - docker-compose up
           - docker cp ~/node/keys bettery_app:~/app/
         
