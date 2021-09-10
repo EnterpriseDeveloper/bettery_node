@@ -3,6 +3,7 @@ image: docker/compose:1.25.4
 pipelines:
   branches:
     validate-tockens:
+
       - step:
           services:
             - docker
@@ -11,4 +12,18 @@ pipelines:
           script:           
             - docker-compose up
             - docker cp ~/node/keys bettery_app:~/app/
+
+      - step:
+          script:
+            - pipe: atlassian/aws-code-deploy:0.2.10
+              variables:
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+                COMMAND: 'deploy'
+                APPLICATION_NAME: $APPLICATION_NAME
+                ZIP_FILE: 'myapp.zip'
+                DEPLOYMENT_GROUP: $DEPLOYMENT_GROUP_NAME
+                WAIT: 'true'
+                S3_BUCKET: $S3_BUCKET
         
