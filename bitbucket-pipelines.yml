@@ -1,15 +1,10 @@
 image: docker/compose:1.25.4
 
--options: 
-  docker: true
-
 pipelines:
   branches:
     validate-tockens:
       - step:
         services:
-          - docker
-        caches:
           - docker
         script:
           - npx jest
