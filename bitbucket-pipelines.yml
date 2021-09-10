@@ -1,4 +1,4 @@
-image: node:14.17.2
+image: docker/compose:1.25.4
 
 options: 
   docker: true
@@ -12,7 +12,7 @@ pipelines:
             - docker-compose up
           
 
-definitions:
-    services:
-        docker:
-            image: docker/compose:1.25.4
+# definitions:
+#     services:
+#         docker:
+#             image: docker/compose:1.25.4
