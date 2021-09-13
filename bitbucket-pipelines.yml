@@ -5,15 +5,6 @@ pipelines:
     validate-tockens:
 
       - step:
-          services:
-            - docker
-          caches:
-            - docker
-          script:           
-            - docker-compose up
-            - docker cp ~/node/keys bettery_app:~/app/
-
-      - step:
           script:
             - pipe: atlassian/aws-code-deploy:0.2.10
               variables:
@@ -26,4 +17,12 @@ pipelines:
                 DEPLOYMENT_GROUP: $DEPLOYMENT_GROUP_NAME
                 WAIT: 'true'
                 S3_BUCKET: $S3_BUCKET
-        
+
+      - step:
+          services:
+            - docker
+          caches:
+            - docker
+          script:           
+            - docker-compose up
+            - docker cp ~/node/keys bettery_app:~/app/        
