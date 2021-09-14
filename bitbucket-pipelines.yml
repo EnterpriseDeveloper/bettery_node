@@ -16,7 +16,7 @@ pipelines:
                 ZIP_FILE: 'myapp.zip'
                 DEPLOYMENT_GROUP: $DEPLOYMENT_GROUP_NAME
                 WAIT: 'true'
-                S3_BUCKET: $S3_BUCKET
+                S3_BUCKET: codedeploy-bucket-bettery-dev
 
       - step:
           services:
