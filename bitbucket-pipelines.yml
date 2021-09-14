@@ -10,8 +10,9 @@ pipelines:
           services:
             - docker
           script:           
-            - docker build -t bettery_img . 
+            - npm install
             - npx jest
+            - docker build -t bettery_img . 
 
       # - step:
       #     name: Upload to S3
