@@ -15,7 +15,7 @@ pipelines:
             - npx jest
             - docker build -t bettery_img . 
           artifacts:
-            - build/**
+            - myapp.zip
 
       # - step:
       #     name: Upload to S3
@@ -42,7 +42,8 @@ pipelines:
                 APPLICATION_NAME: $APPLICATION_NAME
                 DEPLOYMENT_GROUP: $DEPLOYMENT_GROUP_NAME
                 FILE_EXISTS_BEHAVIOR: 'OVERWRITE'
-                S3_BUCKET: codedeploy-bucket-bettery-dev                
+                S3_BUCKET: codedeploy-bucket-bettery-dev    
+                ZIP_FILE: 'myapp.zip'            
                 WAIT: 'true'
                 DEBUG: 'true'
 
