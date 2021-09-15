@@ -22,13 +22,13 @@ pipelines:
           script:
             - pipe: atlassian/aws-s3-deploy:0.3.2
               variables:
-                AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-                AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-                AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
                 COMMAND: 'upload'
-                APPLICATION_NAME: ${APPLICATION_NAME}
+                APPLICATION_NAME: $APPLICATION_NAME
                 S3_BUCKET: codedeploy-bucket-bettery-dev
-                LOCAL_PATH: '$ {BITBUCKET_CLONE_DIR}'
+                LOCAL_PATH: $BITBUCKET_CLONE_DIR
                 ZIP_FILE: 'myapp.zip'          
 
       - step:
