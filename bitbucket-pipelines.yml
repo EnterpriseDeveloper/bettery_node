@@ -19,6 +19,7 @@ pipelines:
 
       - step:
           name: Upload to S3
+          image: node:14.17.2
           script:
             - node archive.js
             - pipe: atlassian/aws-code-deploy:0.4.0
