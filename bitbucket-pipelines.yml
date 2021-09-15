@@ -14,8 +14,8 @@ pipelines:
             - npm install
             - npx jest
             - docker build -t bettery_img . 
-          # artifacts:
-          #   - myapp.zip
+          artifacts:
+            - myapp.zip
 
       - step:
           name: Upload to S3
