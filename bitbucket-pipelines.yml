@@ -17,18 +17,19 @@ pipelines:
           artifacts:
             - myapp.zip
 
-      # - step:
-      #     name: Upload to S3
-      #     script:
-      #       - pipe: atlassian/aws-s3-deploy:0.3.2
-      #         variables:
-      #           AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      #           AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      #           AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
-      #           COMMAND: 'upload'
-      #           APPLICATION_NAME: ${APPLICATION_NAME}
-                # S3_BUCKET: codedeploy-bucket-bettery-dev
-      #           LOCAL_PATH: "build"
+      - step:
+          name: Upload to S3
+          script:
+            - pipe: atlassian/aws-s3-deploy:0.3.2
+              variables:
+                AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+                AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+                AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+                COMMAND: 'upload'
+                APPLICATION_NAME: ${APPLICATION_NAME}
+                S3_BUCKET: codedeploy-bucket-bettery-dev
+                # LOCAL_PATH: "build"
+                ZIP_FILE: 'myapp.zip'          
 
       - step:
           name: Deploy with CodeDeploy
@@ -41,9 +42,6 @@ pipelines:
                 COMMAND: 'deploy'
                 APPLICATION_NAME: $APPLICATION_NAME
                 DEPLOYMENT_GROUP: $DEPLOYMENT_GROUP_NAME
-                FILE_EXISTS_BEHAVIOR: 'OVERWRITE'
-                S3_BUCKET: codedeploy-bucket-bettery-dev    
-                ZIP_FILE: 'myapp.zip'            
                 WAIT: 'true'
                 DEBUG: 'true'
 
