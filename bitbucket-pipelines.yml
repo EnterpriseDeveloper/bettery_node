@@ -28,7 +28,7 @@ pipelines:
                 COMMAND: 'upload'
                 APPLICATION_NAME: ${APPLICATION_NAME}
                 S3_BUCKET: codedeploy-bucket-bettery-dev
-                LOCAL_PATH: "./build"
+                LOCAL_PATH: "build"
 
       # - step:
       #     name: Deploy with CodeDeploy
