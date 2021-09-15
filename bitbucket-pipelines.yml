@@ -43,6 +43,7 @@ pipelines:
                 DEPLOYMENT_GROUP: $DEPLOYMENT_GROUP_NAME
                 FILE_EXISTS_BEHAVIOR: 'OVERWRITE'
                 WAIT: 'true'
+                DEBUG: 'true'
 
       # - step:
           # services:
