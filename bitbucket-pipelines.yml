@@ -31,9 +31,9 @@ pipelines:
                 LOCAL_PATH: $BITBUCKET_CLONE_DIR
                 COMMAND: 'upload'
 
-      - step:
-          name: Deploy with CodeDeploy
-          script:
+      # - step:
+      #     name: Deploy with CodeDeploy
+      #     script:
             - pipe: atlassian/aws-code-deploy:0.4.0
               variables:
                 AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
