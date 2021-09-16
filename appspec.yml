@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 
 files:
-  - source: myapp.zip
+  - source: bettery-app.zip
     destination: /app
 
 # hooks:
