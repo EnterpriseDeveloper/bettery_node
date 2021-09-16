@@ -14,8 +14,8 @@ pipelines:
             - npm install
             - npx jest
             - docker build -t bettery_img . 
-          artifacts:
-            - myapp.zip
+          # artifacts:
+          #   - myapp.zip
 
       - step:
           name: Upload to S3 and codedeploy
@@ -28,7 +28,7 @@ pipelines:
                 APPLICATION_NAME: $APPLICATION_NAME
                 ZIP_FILE: 'myapp.zip'
                 S3_BUCKET: codedeploy-bucket-bettery-dev
-                LOCAL_PATH: $BITBUCKET_CLONE_DIR
+                # LOCAL_PATH: $BITBUCKET_CLONE_DIR
                 COMMAND: 'upload'
 
       # - step:
