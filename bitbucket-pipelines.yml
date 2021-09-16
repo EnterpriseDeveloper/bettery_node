@@ -9,11 +9,11 @@ pipelines:
           image: node:14.17.2
           script:
           services:
-            - docker
+            # - docker
           script:           
             - npm install
             - npx jest
-            - docker build -t bettery_img . 
+            # - docker build -t bettery_img . 
           artifacts:
             - myapp.zip
 
@@ -30,6 +30,7 @@ pipelines:
                 S3_BUCKET: codedeploy-bucket-bettery-dev
                 LOCAL_PATH: $BITBUCKET_CLONE_DIR
                 COMMAND: 'upload'
+                VERSION_LABEL: 'bettery-app'
 
       - step:
           name: Deploy with CodeDeploy
@@ -43,9 +44,7 @@ pipelines:
                 DEPLOYMENT_GROUP: $DEPLOYMENT_GROUP_NAME
                 S3_BUCKET: codedeploy-bucket-bettery-dev
                 COMMAND: 'deploy'
-                WAIT: 'true'
                 DEBUG: 'true'
-                IGNORE_APPLICATION_STOP_FAILURES: 'true'
                 FILE_EXISTS_BEHAVIOR: 'OVERWRITE'
 
       # - step:
