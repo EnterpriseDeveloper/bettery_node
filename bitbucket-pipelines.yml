@@ -46,6 +46,7 @@ pipelines:
                 COMMAND: 'deploy'
                 DEBUG: 'true'
                 FILE_EXISTS_BEHAVIOR: 'OVERWRITE'
+                VERSION_LABEL: 'bettery-app'                
 
       # - step:
           # services:
