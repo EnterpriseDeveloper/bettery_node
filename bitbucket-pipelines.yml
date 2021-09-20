@@ -7,9 +7,6 @@ pipelines:
       - step:
           name: Build and upload to S3
           image: node:14.17.2
-          script:
-          services:
-            - docker
           script:           
             - npm install
             - npx jest
