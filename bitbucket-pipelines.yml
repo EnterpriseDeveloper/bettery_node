@@ -5,21 +5,15 @@ pipelines:
     validate-tockens:
 
       - step:
-          name: Build
+          name: Build and upload to S3
           image: node:14.17.2
           script:
           services:
-            # - docker
+            - docker
           script:           
             - npm install
             - npx jest
-            # - docker build -t bettery_img . 
-          # artifacts:
-          #   - myapp.zip
-
-      - step:
-          name: Upload to S3 and codedeploy
-          script:
+            - docker build -t bettery_img . 
             - pipe: atlassian/aws-code-deploy:0.4.0
               variables:
                 AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
@@ -28,9 +22,7 @@ pipelines:
                 APPLICATION_NAME: $APPLICATION_NAME
                 ZIP_FILE: 'bettery-app.zip'
                 S3_BUCKET: codedeploy-bucket-bettery-dev
-                # LOCAL_PATH: $BITBUCKET_CLONE_DIR
                 COMMAND: 'upload'
-                # VERSION_LABEL: 'bettery-app'
 
       - step:
           name: Deploy with CodeDeploy
@@ -46,7 +38,6 @@ pipelines:
                 COMMAND: 'deploy'
                 DEBUG: 'true'
                 FILE_EXISTS_BEHAVIOR: 'OVERWRITE'
-                # VERSION_LABEL: 'bettery-app'                
 
       # - step:
           # services:

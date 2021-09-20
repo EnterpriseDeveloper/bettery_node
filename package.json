@@ -12,7 +12,8 @@
     "build": "webpack --mode=development --config webpack.config.js && sudo npm run deploy",
     "build_prod": "webpack --mode=production --config webpack.production.config.js && sudo npm run deploy_prod",
     "deploy": "sudo scp -i ~/.ssh/bettery_dev.pem -r build/server.js ubuntu@13.212.14.124:/home/ubuntu/node",
-    "deploy_prod": "sudo scp -i ~/.ssh/bettery_dev.pem -r build/server_prod.js ubuntu@13.213.49.239:/home/ubuntu/node"
+    "deploy_prod": "sudo scp -i ~/.ssh/bettery_dev.pem -r build/server_prod.js ubuntu@13.213.49.239:/home/ubuntu/node",
+    "archive": "node archive.js"
   },
   "engines": {
     "node": "v14.17.2"
@@ -27,6 +28,7 @@
     "@truffle/hdwallet-provider": "^1.4.1",
     "@types/crypto-js": "^4.0.1",
     "@types/express": "^4.17.12",
+    "archiver": "^5.3.0",
     "async-mutex": "^0.3.1",
     "aws-sdk": "^2.939.0",
     "axios": "^0.21.1",
