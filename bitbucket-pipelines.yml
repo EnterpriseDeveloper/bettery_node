@@ -11,6 +11,7 @@ pipelines:
             - npm install
             - npx jest
             - docker build -t bettery_img . 
+            - npm run archive
             - pipe: atlassian/aws-code-deploy:0.4.0
               variables:
                 AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
