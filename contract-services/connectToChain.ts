@@ -14,8 +14,7 @@ const registry = new Registry(<any>types);
 
 
 const connectToSign = async () => {
-   let memonic = "ceiling million ecology bronze estate actress talk cargo few stamp steak foster vessel excuse outdoor maid desert usual slot together mobile alley sight hammer"
-   // let memonic = "husband occur dune grocery boss holiday plate mother book pudding forest gas blossom relax frame version sure law beef leopard color enable report guess"
+   let memonic = "arctic peace position sustain vibrant segment clever danger vessel fit ridge job fire drive seat cash angry false once hobby rice monitor awful oppose"
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
         memonic
     );

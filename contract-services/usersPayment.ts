@@ -2,58 +2,7 @@ import axios from "axios";
 import {path} from "../config/path";
 import Web3 from "web3";
 
-// let fakeData = {
-//         TxResult: {
-//             height: '670502',
-//             tx: 'CpoCCnYKOy9Wb3Jvc2hpbG92TWF4LmJldHRlcnkucHVibGljZXZlbnRzLk1zZ0NyZWF0ZUZpaGlzaFB1YkV2ZW50EjcKLWNvc21vczE1cXMydHU5OTkzeGUybjI2bnZ3MDBtbTN1bnV4MzY2NWV5bmVndBC5gICAgIBgEp8BY2VpbGluZyBtaWxsaW9uIGVjb2xvZ3kgYnJvbnplIGVzdGF0ZSBhY3RyZXNzIHRhbGsgY2FyZ28gZmV3IHN0YW1wIHN0ZWFrIGZvc3RlciB2ZXNzZWwgZXhjdXNlIG91dGRvb3IgbWFpZCBkZXNlcnQgdXN1YWwgc2xvdCB0b2dldGhlciBtb2JpbGUgYWxsZXkgc2lnaHQgaGFtbWVyElkKUQpGCh8vY29zbW9zLmNyeXB0by5zZWNwMjU2azEuUHViS2V5EiMKIQIQ7oOs3jQICeN+gVLvDbHpovDMe7aBtxlEdJgWwQvWmhIECgIIARiuARIEEMCEPRpACFlVXQ0SC4QEAHfQCq6QNLMtq3purCxgGS/nxIGU3icZgIuDogq/XY1PDtZgj1MiMKm586EuBR708g9ROymw2A==',
-//             result: {
-//                 data: 'CiAKFENyZWF0ZUZpaGlzaFB1YkV2ZW50EggIuYCAgICAYA==',
-//                 log: '[{"events":[{"type":"message","attributes":[{"key":"action","value":"CreateFihishPubEvent"},{"key":"sender","value":"cosmos1ch9mdxl5nh0kx8yursdhz7ew84fwp4e37r9p7e"},{"key":"sender","value":"cosmos1ch9mdxl5nh0kx8yursdhz7ew84fwp4e37r9p7e"},{"key":"sender","value":"cosmos1ch9mdxl5nh0kx8yursdhz7ew84fwp4e37r9p7e"}]},{"type":"pub.event","attributes":[{"key":"finished","value":"true"},{"key":"minted","value":"false"},{"key":"id","value":"422212465066041"}]},{"type":"transfer","attributes":[{"key":"recipient","value":"cosmos1e5c0j2uh56qesguwxptq99flm0zrkkvppmgmgt"},{"key":"sender","value":"cosmos1ch9mdxl5nh0kx8yursdhz7ew84fwp4e37r9p7e"},{"key":"amount","value":"80000000000000000bet"},{"key":"recipient","value":"cosmos1jpealvn5weclseydk9s8dg9r4luav822z3k6v4"},{"key":"sender","value":"cosmos1ch9mdxl5nh0kx8yursdhz7ew84fwp4e37r9p7e"},{"key":"amount","value":"120000000000000000bet"},{"key":"recipient","value":"cosmos1e5c0j2uh56qesguwxptq99flm0zrkkvppmgmgt"},{"key":"sender","value":"cosmos1ch9mdxl5nh0kx8yursdhz7ew84fwp4e37r9p7e"},{"key":"amount","value":"2800000000000000000bet"}]}]}]',
-//                 gas_wanted: '1000000',
-//                 gas_used: '560780',
-//                 events: [Array]
-//             }
-//         }
-//     }
-
-//     let fakeDB = [
-//         {
-//             "_id": 422212465066041,
-//             "publicEvents/host": {
-//                 "_id": 351843720888324,
-//                 "users/wallet": "cosmos1e5c0j2uh56qesguwxptq99flm0zrkkvppmgmgt"
-//             },
-//             "publicEvents/parcipiantsAnswer": [
-//                 {
-//                     "_id": 369435906932933,
-//                     "publicActivites/amount": 1,
-//                     "publicActivites/from": {
-//                         "_id": 351843720888325,
-//                         "users/wallet": "cosmos198ut9jtl5s9lyz9ndc90h3cj7z2xl6fumkqkhd"
-//                     }
-//                 },
-//                 {
-//                     "_id": 369435906932935,
-//                     "publicActivites/amount": 1,
-//                     "publicActivites/from": {
-//                         "_id": 351843720888322,
-//                         "users/wallet": "cosmos1fdjjfaj5ecevrqm4q6xs0ehmqgvgdzcywd3t2e"
-//                     }
-//                 }
-//             ],
-//             "publicEvents/validatorsAnswer": [
-//                 {
-//                     "_id": 369435906932940,
-//                     "publicActivites/from": {
-//                         "_id": 351843720888320,
-//                         "users/wallet": "cosmos1jpealvn5weclseydk9s8dg9r4luav822z3k6v4"
-//                     }
-//                 }
-//             ]
-//         }
-// ]
-
-    const usersPayment = async (data: any) => {
+const usersPayment = async (data: any) => {
 
     let {eventId, isMinted, dataForPayments} = getNeededData(data)
 
@@ -69,45 +18,41 @@ import Web3 from "web3";
                 "publicEvents/parcipiantsAnswer", {"publicEvents/parcipiantsAnswer": ["publicActivites/amount", "publicActivites/from", {"publicActivites/from": ["users/wallet"]}]}
 
             ],
-            "from": eventId //! 422212465066041
+            "from": Number(eventId) //! 422212465065992
         }
+
+        console.log(eventId, 'eventId')
         let dataFromDb: any = await axios.post(`${path}/query`, params).catch(err => {
             console.error("DB error in 'usersPayment': " + err.response.data.message)
             return
         })
 
-        // dataFromDb.data = fakeDB
+        let participants = dataFromDb.data[0]['publicEvents/parcipiantsAnswer']; //? === all participants
+        let validators = dataFromDb.data[0]['publicEvents/validatorsAnswer']; //? === all validators
+        let hostWallet = dataFromDb.data[0]['publicEvents/host']['users/wallet'] //? === host wallet
 
-        let participants = dataFromDb.data[0]['publicEvents/parcipiantsAnswer'];
-        let validators = dataFromDb.data[0]['publicEvents/validatorsAnswer'];
-        let hostWallet = dataFromDb.data[0]['publicEvents/host']['users/wallet']
+        dataForPayments = arrayRestructuring(dataForPayments) // ? make[] = [[],[],[]]
 
-        dataForPayments = arrayRestructuring(dataForPayments) // ? ділю масив на подмасиви по 3
+        let dataForSend: any;
 
-        if (isMinted == 'false') {
-            console.log('not minted')
-            let dataForSend: any;
-            const partcPayment = preparationForSending(participants, dataForPayments, eventId, hostWallet);
-            const validatorsPayment = preparationForSending(validators, dataForPayments, eventId, hostWallet);
+        const partcPayment = testSending(participants, dataForPayments, eventId, hostWallet, isMinted)
+        const validatorsPayment = testSending(validators, dataForPayments, eventId, hostWallet, isMinted)
 
-            dataForSend = partcPayment.concat(validatorsPayment)
+        dataForSend = partcPayment.concat(validatorsPayment)
 
-            const {isPartc, isValidators} = checkHost(participants, validators, hostWallet)
-            console.log(isPartc.length, isValidators.length )
+        const {isPartc, isValidators} = checkHost(participants, validators, hostWallet)
 
-            if(!isPartc.length && !isValidators.length){
-                let hostData = dataForPayments.filter((o: any)=>{return o[0].key == 'recipient' && o[0].value == hostWallet})
-                let web3 = new Web3();
-                dataForSend.push({
-                    '_id': eventId,
-                    'payHostAmount': web3.utils.fromWei(String(hostData[0][2].value.replace(/[a-zа-яё]/gi, '')), 'ether'),
-                })
-            }
-            console.log(dataForSend, 'dataForSend')
+        if (!isPartc.length && !isValidators.length) {
+            let hostData = dataForPayments.filter((o: any) => {
+                return o[0].key == 'recipient' && o[0].value == hostWallet
+            })
+            let web3 = new Web3();
+            dataForSend.push({
+                '_id': Number(eventId),
+                'payHostAmount': web3.utils.fromWei(String(hostData[0][2].value.replace(/[a-zа-яё]/gi, '')), 'ether'),
+            })
         }
-        if (isMinted == 'true') {
-            console.log('minted')
-        }
+        sendToDB(dataForSend)
     }
 
 
@@ -120,52 +65,78 @@ const findQuantity = (arr: any, wallet: string) => {
     return all.length
 }
 
-
-let preparationForSending = (partc: any, data: any, eventId: any, hostWallet: string) => {
+const testSending = (partc: any, data: any, eventId: any, hostWallet: string, isMinted: string) => {
     let web3 = new Web3();
-
     let arr: any = []
-    partc.map((el: any)=>{
+    // todo sort only winner
+    partc.map((el: any) => {
         let wallet = el['publicActivites/from']['users/wallet']
+        let amount = el['publicActivites/amount']
 
         let howMany = findQuantity(data, wallet)
-        let sortData = data.filter((o: any) =>{
-            if(o[0].key == 'recipient' && o[0].value == wallet){
+        let sortData = data.filter((o: any) => {
+            if (o[0].key == 'recipient' && o[0].value == wallet) {
                 return o
             }
         })
 
-        if(howMany == 2){
+        if (wallet == hostWallet) {
+            let pay1: any, pay0: any
+            let minted: any = undefined
+
+
+            if (isMinted == 'true') {
+                console.log('isMinted true')
+                // pay1 = sortData[1] == undefined ? undefined : web3.utils.fromWei(String(sortData[2][2].value.replace(/[a-zа-яё]/gi, '')), 'ether');
+                // pay0 = sortData[0] == undefined ? undefined : web3.utils.fromWei(String(sortData[1][2].value.replace(/[a-zа-яё]/gi, '')), 'ether');
+                // minted = sortData[0] == undefined ? undefined : web3.utils.fromWei(String(sortData[0][2].value.replace(/[a-zа-яё]/gi, '')), 'ether');
+            }
+            if (isMinted == 'false') {
+                console.log('isMinted false')
+                pay1 = sortData[1] == undefined ? undefined : web3.utils.fromWei(String(sortData[1][2].value.replace(/[a-zа-яё]/gi, '')), 'ether');
+                pay0 = sortData[0] == undefined ? undefined : web3.utils.fromWei(String(sortData[0][2].value.replace(/[a-zа-яё]/gi, '')), 'ether');
+            }
+
+
+            if (pay1 == undefined) {
+                arr.push({
+                    '_id': Number(eventId),
+                    'payHostAmount': pay0
+                })
+            }
+            if (pay1 !== undefined && pay0 !== undefined) {
+                let payToken = pay1
+                let payHost = pay0
+                arr.push({
+                    '_id': Number(el._id),
+                    "mintedToken": 0,
+                    "payToken": payToken,
+                    "premiumToken": 0 //todo premiumToken
+                }, {
+                    '_id': Number(eventId),
+                    'payHostAmount': payHost
+                })
+            }
+        }
+
+        if (wallet !== hostWallet) {
+            let pay1: any, minted: any
+            if (isMinted == 'false') {
+                pay1 = sortData[0] == undefined ? 0 : web3.utils.fromWei(String(sortData[0][2].value.replace(/[a-zа-яё]/gi, '')), 'ether');
+                minted = false
+            }
+            if(isMinted == 'true'){
+                minted = sortData[0] == undefined ? 0 : web3.utils.fromWei(String(sortData[0][2].value.replace(/[a-zа-яё]/gi, '')), 'ether');
+                pay1 = sortData[0] == undefined ? 0 : web3.utils.fromWei(String(sortData[1][2].value.replace(/[a-zа-яё]/gi, '')), 'ether');
+            }
             arr.push({
                 '_id': Number(el._id),
-                "mintedToken": 0,
-                "payToken": web3.utils.fromWei(String(sortData[1][2].value.replace(/[a-zа-яё]/gi, '')), 'ether'),
+                "mintedToken": minted ? minted : 0,
+                "payToken": pay1,
                 "premiumToken": 0 //todo premiumToken
-            }, {
-                '_id': Number(eventId),
-                'payHostAmount': web3.utils.fromWei(String(sortData[0][2].value.replace(/[a-zа-яё]/gi, '')), 'ether')
             })
         }
-
-        if(howMany == 1 && wallet == hostWallet){
-            arr.push({
-                '_id': Number(eventId),
-                'payHostAmount': web3.utils.fromWei(String(sortData[0][2].value.replace(/[a-zа-яё]/gi, '')), 'ether')
-            })
-        }
-
-        if(howMany == 1 && wallet != hostWallet){
-            arr.push({
-                '_id': Number(el._id),
-                "mintedToken": 0,
-                "payToken": web3.utils.fromWei(String(sortData[0][2].value.replace(/[a-zа-яё]/gi, '')), 'ether'),
-                "premiumToken": 0 //todo premiumToke
-            })
-        }
-
-
     })
-
     return arr
 }
 
@@ -212,32 +183,18 @@ const arrayRestructuring = (arr: Array<any>) => {
     return subarray;
 }
 
-// const letsMarkTheHost = (arr: any, wallet: string) => {
-//
-//     console.log(arr)
-//
-//     return arr.map((el: any) => {
-//         if(el.key == 'recipient' && el.value == wallet){
-//             el.host = true
-//             return el
-//         }else {
-//             return el
-//         }
-//     })
-// }
 
 const checkHost = (partc: any, validators: any, hostWallet: any) => {
     let isPartc = partc.filter((el: any) => {
-        return  el["publicActivites/from"]["users/wallet"] == hostWallet
+        return el["publicActivites/from"]["users/wallet"] == hostWallet
     })
     let isValidators = validators.filter((el: any) => {
-        return  el["publicActivites/from"]["users/wallet"] == hostWallet
+        return el["publicActivites/from"]["users/wallet"] == hostWallet
     })
 
-    return { isPartc, isValidators }
+    return {isPartc, isValidators}
 }
 
-// usersPayment(fakeData)
 export {
     usersPayment
 }
