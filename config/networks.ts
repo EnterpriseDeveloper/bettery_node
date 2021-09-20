@@ -1,14 +1,14 @@
 import {infura} from "./key";
 
 // Matic main
-const maticMain = `https://nd-166-193-145.p2pify.com/2f7e02c8a0c734ceacc688cd604521bc`;
-const matciMainWSS = `wss://ws-nd-166-193-145.p2pify.com/2f7e02c8a0c734ceacc688cd604521bc`;
+const maticMain = `https://nd-824-962-939.p2pify.com/4bb25b82152d41fa5ce04b919fd13786`;
+const matciMainWSS = `wss://ws-nd-824-962-939.p2pify.com/4bb25b82152d41fa5ce04b919fd13786`;
 const maticMainId = 137;
-// Mumbai
+// Mumbai test network
 const maticMumbaiHttps = 'https://competent-panini:demise-sphere-refuse-spoils-down-fiber@nd-425-039-881.p2pify.com';
 const maticMumbaiWSS = 'wss://competent-panini:demise-sphere-refuse-spoils-down-fiber@ws-nd-425-039-881.p2pify.com';
 const maticMumbaiId = 80001;
-// Goerli
+// Goerli test network
 const goerli = `https://goerli.infura.io/v3/${infura}`;
 const mainId = 5;
 // Main Ether
