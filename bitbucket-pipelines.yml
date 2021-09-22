@@ -9,8 +9,8 @@ pipelines:
           image: node:14.17.2
           script:           
             - npm install
-            - npx jest
-            - docker build -t bettery_img . 
+            # - npx jest
+            # - docker build -t bettery_img . 
             - npm run archive
             - pipe: atlassian/aws-code-deploy:0.4.0
               variables:
