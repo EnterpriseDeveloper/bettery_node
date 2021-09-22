@@ -9,8 +9,7 @@ pipelines:
           image: node:14.17.2
           script:           
             - npm install
-            # - npx jest
-            # - docker build -t bettery_img . 
+            - npx jest
             - npm run archive
             - pipe: atlassian/aws-code-deploy:0.4.0
               variables:
@@ -43,5 +42,5 @@ pipelines:
           # caches:
           #   - docker
           # script:           
-          #   - docker-compose up
-          #   - docker cp ~/node/keys bettery_app:~/app/        
+            # - cp -r /home/ubuntu/node/keys /home/ubuntu/app/
+            # - docker-compose up
