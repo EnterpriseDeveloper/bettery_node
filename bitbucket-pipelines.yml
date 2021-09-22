@@ -36,11 +36,3 @@ pipelines:
                 DEBUG: 'true'
                 FILE_EXISTS_BEHAVIOR: 'OVERWRITE'
 
-      # - step:
-          # services:
-          #   - docker
-          # caches:
-          #   - docker
-          # script:           
-            # - cp -r /home/ubuntu/node/keys /home/ubuntu/app/
-            # - docker-compose up
