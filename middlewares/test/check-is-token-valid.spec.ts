@@ -14,8 +14,7 @@ describe('Test checkIsTokenValid middleware', () => {
     });
 
     test('with not valid token', async () => {
-        // const expectedResponse = { "error": "not valid token" };
-        const expectedResponse = { "qwer": 0 };
+        const expectedResponse = { "error": "not valid token" };
 
 
         const mockRequest = {
