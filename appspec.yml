@@ -2,8 +2,8 @@ version: 0.0
 os: linux
 
 files:
-  - source: ./
-    destination: ~/app
+  - source: /
+    destination: /app
 file_exists_behavior: OVERWRITE
 
 # hooks:
