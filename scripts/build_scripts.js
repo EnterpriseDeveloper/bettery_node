@@ -1,6 +1,8 @@
 const fs = require("fs");
 const archiver = require("archiver");
-const path = require("path")
+const path = require("path");
+
+console.log(process.cwd());
 
 
 const copyRecursiveSync = function (src, dest) {
@@ -19,19 +21,19 @@ const copyRecursiveSync = function (src, dest) {
 };
 
 
-const filesArray = fs.readdirSync(__dirname)
-fs.mkdirSync(`${__dirname}/archive`, err => console.log(err));
+const filesArray = fs.readdirSync(process.cwd())
+fs.mkdirSync(`${process.cwd()}/archive`, err => console.log(err));
 for (item of filesArray){
   if (item !== "node_modules"){
-    const src = `${__dirname}/${item}`
-    const dest = `${__dirname}/archive/${item}`
+    const src = `${process.cwd()}/${item}`
+    const dest = `${process.cwd()}/archive/${item}`
     copyRecursiveSync(src, dest)
   }
 }
 
 
 
-const output = fs.createWriteStream(__dirname + "/bettery-app.zip");
+const output = fs.createWriteStream(process.cwd() + "/bettery-app.zip");
 const archive = archiver("zip", {
   zlib: { level: 9 } 
 });
