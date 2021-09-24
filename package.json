@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "NODE_TEST=true NODE_ENV=test nodemon",
-    "start": "NODE_TEST=false NODE_ENV=test node build/server.js",
+    "start": "webpack --mode=development --config webpack.config.js && NODE_TEST=false NODE_ENV=test node build/server.js",
     "start_prod": "NODE_TEST=false NODE_ENV=production node build/server_prod.js",
     "forever": "NODE_TEST=false NODE_ENV=test nohup node server.js > output.log &",
     "forever_prod": "NODE_TEST=false NODE_ENV=production nohup node server_prod.js > outputData.log &",
