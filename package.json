@@ -13,7 +13,7 @@
     "build_prod": "webpack --mode=production --config webpack.production.config.js && sudo npm run deploy_prod",
     "deploy": "sudo scp -i ~/.ssh/bettery_dev.pem -r build/server.js ubuntu@13.212.14.124:/home/ubuntu/node",
     "deploy_prod": "sudo scp -i ~/.ssh/bettery_dev.pem -r build/server_prod.js ubuntu@13.213.49.239:/home/ubuntu/node",
-    "archive": "node scripts/build_scripts.js"
+    "archive": "node build_scripts/zip_project.js"
   },
   "engines": {
     "node": "v14.17.2"

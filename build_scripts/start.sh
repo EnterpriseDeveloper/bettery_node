@@ -1,4 +1,5 @@
 #!/bin/bash
 
 cp -r /home/ubuntu/node/keys /home/ubuntu/app/
-# docker-compose up
+cd /home/ubuntu/app/
+sudo docker-compose up
