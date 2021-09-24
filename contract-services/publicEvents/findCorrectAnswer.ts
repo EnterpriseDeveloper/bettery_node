@@ -1,10 +1,9 @@
 import {connectToSign} from '../../contract-services/connectToChain'
-let send: number = 0;
 
+let send: number = 0;
 const findCorrectAnswer = async (data: any) => {
-    console.log("from findCorrectAnswer")
     let eventData = data.events.find((x: any)=>{return x.type == "pub.event"})
-    console.log(eventData);
+    console.log("from findCorrectAnswer", eventData);
     let id = eventData.attributes.find((x: any)=>{return x.key == "id"})
     if(Number(id.value) != send){
         sendToBlockChain(Number(id.value))
