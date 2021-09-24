@@ -1,4 +1,4 @@
-image: docker/compose:1.25.4
+image: node:14.17.2
 
 pipelines:
   branches:
@@ -6,7 +6,6 @@ pipelines:
 
       - step:
           name: Build and upload to S3
-          image: node:14.17.2
           script:           
             - npm install
             - npx jest
@@ -35,4 +34,5 @@ pipelines:
                 COMMAND: 'deploy'
                 DEBUG: 'true'
                 FILE_EXISTS_BEHAVIOR: 'OVERWRITE'
-
+          services:
+            - docker
