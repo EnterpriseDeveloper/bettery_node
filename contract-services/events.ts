@@ -3,8 +3,10 @@ import { demon, testDemon } from "../config/key";
 import {
     findCorrectAnswer,
     reverted,
-    expertCalc
+    expertCalc,
 } from "./publicEvents/index";
+
+import { usersPayment } from '../contract-services/usersPayment'
 
 function loadHandler() {
     const demonPath = process.env.NODE_ENV == "production" ? demon : testDemon;
@@ -49,14 +51,16 @@ function pubEventCalcExpert(demonPath: string) {
     })
 }
 
-function pubEventFinished(demonPath: string) {
+async function pubEventFinished(demonPath: string) {
     let client = RpcClient(`ws://${demonPath}:26657/websocket`);
     client.subscribe({ "query": "pub.event.finished = \'true\'" }, (event: any, err: any) => {
         if (err) {
             console.log("pubEvents finished", err)
         }
         console.log("test pub event finished")
-        console.log(event);
+        console.log(event)
+
+        usersPayment(event)
     })
 }
 
