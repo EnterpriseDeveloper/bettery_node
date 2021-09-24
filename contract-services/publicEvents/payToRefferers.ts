@@ -3,11 +3,10 @@ import { path } from "../../config/path";
 import Web3 from "web3";
 import { connectToSign } from '../connectToChain'
 
-const payToRefferers = async (data: any) => {
+const payToRefferers = async (id: any) => {
     console.log("from payToRefferers")
-    console.log(data);
+    console.log(id);
 
-    let id = data.id;
     let getPlayers: any = await fetchDataFromDb(id);
 
     let mintedTokens = Number(getPlayers.data[0]["mintedTokens"]);

@@ -1,24 +1,27 @@
 import axios from "axios";
-import {path} from "../config/path";
+import { path } from "../../config/path";
 import Web3 from "web3";
-import {expReputationCalc} from "./expertReputation"
+import { expReputationCalc } from "./expertReputation"
+import {payToRefferers} from './payToRefferers';
 
+let send: number = 0;
 const usersPayment = async (data: any) => {
-    let {eventId, isMinted, dataForPayments, correctAnswer} = getNeededData(data)
+    let { eventId, isMinted, dataForPayments, correctAnswer } = getNeededData(data)
 
-    if (eventId) {
+    if (eventId && send != eventId) {
+        send = eventId;
         let params = {
             "select": [
-                "publicEvents/host", {"publicEvents/host": ["users/wallet"]},
+                "publicEvents/host", { "publicEvents/host": ["users/wallet"] },
                 "publicEvents/validatorsAnswer",
                 {
                     "publicEvents/validatorsAnswer":
-                        ["publicActivites/from", {"publicActivites/from": ["users/wallet", "users/expertReputPoins"]}, "publicActivites/answer"]
+                        ["publicActivites/from", { "publicActivites/from": ["users/wallet", "users/expertReputPoins"] }, "publicActivites/answer"]
                 },
-                "publicEvents/parcipiantsAnswer", {"publicEvents/parcipiantsAnswer": ["publicActivites/amount", "publicActivites/from", {"publicActivites/from": ["users/wallet"]}, "publicActivites/answer"]}
+                "publicEvents/parcipiantsAnswer", { "publicEvents/parcipiantsAnswer": ["publicActivites/amount", "publicActivites/from", { "publicActivites/from": ["users/wallet"] }, "publicActivites/answer"] }
 
             ],
-            "from":Number(eventId)
+            "from": Number(eventId)
         }
 
         let dataFromDb: any = await axios.post(`${path}/query`, params).catch(err => {
@@ -39,7 +42,7 @@ const usersPayment = async (data: any) => {
 
         dataForSend = partcPayment.concat(validatorsPayment)
 
-        const {isPartc, isValidators} = checkHost(participants, validators, hostWallet)
+        const { isPartc, isValidators } = checkHost(participants, validators, hostWallet)
 
         if (!isPartc.length && !isValidators.length) {
             let web3 = new Web3();
@@ -47,13 +50,13 @@ const usersPayment = async (data: any) => {
                 return o[0].key == 'recipient' && o[0].value == hostWallet
             })
 
-            if(isMinted == 'false') {
+            if (isMinted == 'false') {
                 dataForSend.push({
                     '_id': Number(eventId),
                     'payHostAmount': web3.utils.fromWei(String(hostData[0][2].value.replace(/[a-zа-яё]/gi, '')), 'ether'),
                 })
             }
-            if(isMinted == 'true'){
+            if (isMinted == 'true') {
                 dataForSend.push({
                     '_id': Number(eventId),
                     'payHostAmount': web3.utils.fromWei(String(hostData[1][2].value.replace(/[a-zа-яё]/gi, '')), 'ether'),
@@ -63,7 +66,9 @@ const usersPayment = async (data: any) => {
         }
 
         const expRepSend = expReputationCalc(validators, Number(correctAnswer))
-        sendToDB(dataForSend.concat(expRepSend.forSendReputation))
+        sendToDB(dataForSend.concat(expRepSend.forSendReputation), eventId)
+    } else {
+        console.log("DUBLICATE EVENT", eventId)
     }
 
 
@@ -92,15 +97,15 @@ const packingForSending = (partc: any, data: any, eventId: any, hostWallet: stri
                 pay0 = sortData[1] == undefined ? undefined : web3.utils.fromWei(String(sortData[1][2].value.replace(/[a-zа-яё]/gi, '')), 'ether');
                 minted = sortData[0] == undefined ? undefined : web3.utils.fromWei(String(sortData[0][2].value.replace(/[a-zа-яё]/gi, '')), 'ether');
 
-                if(Number(correctAnswer) === Number(answer)) {
+                if (Number(correctAnswer) === Number(answer)) {
                     pay2 = sortData[3] == undefined ? undefined : web3.utils.fromWei(String(sortData[3][2].value.replace(/[a-zа-яё]/gi, '')), 'ether');
                 }
 
                 arr.push({
-                        '_id': Number(eventId),
-                        'payHostAmount': pay0,
-                        'mintedHostAmount': minted
-                    },
+                    '_id': Number(eventId),
+                    'payHostAmount': pay0,
+                    'mintedHostAmount': minted
+                },
                     {
                         '_id': Number(el._id),
                         "mintedToken": pay1,
@@ -184,11 +189,15 @@ const getNeededData = (data: any) => {
     }
 }
 
-const sendToDB = (params: any) => {
+const sendToDB = (params: any, eventId: any) => {
     axios.post(path + '/transact', params).catch(err => {
         console.log('error in usersPayment: ' + err.response.statusText)
     })
     console.log("usersPayment: data sent successfully")
+    // lets pay to refferalls
+    payToRefferers(eventId)
+
+
 }
 
 const arrayRestructuring = (arr: Array<any>) => {
@@ -211,7 +220,7 @@ const checkHost = (partc: any, validators: any, hostWallet: any) => {
         return el["publicActivites/from"]["users/wallet"] == hostWallet
     })
 
-    return {isPartc, isValidators}
+    return { isPartc, isValidators }
 }
 
 export {

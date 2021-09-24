@@ -6,7 +6,7 @@ import {
     expertCalc,
 } from "./publicEvents/index";
 
-import { usersPayment } from '../contract-services/usersPayment'
+import { usersPayment } from './publicEvents/usersPayment'
 
 function loadHandler() {
     const demonPath = process.env.NODE_ENV == "production" ? demon : testDemon;
@@ -36,7 +36,7 @@ function pubLetsFinishEvent(demonPath: string) {
         let data = JSON.parse(event.TxResult.result.log)
         setTimeout(() => {
             findCorrectAnswer(data[0]);
-        }, 5000)
+        }, 3000)
     })
 }
 

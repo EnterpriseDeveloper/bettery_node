@@ -2,7 +2,6 @@ import axios from "axios";
 import { path } from "../../config/path";
 
 var send: number = 0;
-
 const expertCalc = async (data: any) => {
     let eventData = data.events.find((x: any) => { return x.type == "pub.event" })
     console.log("from expertCalc", eventData)
