@@ -3,10 +3,11 @@ import { path } from "../../config/path";
 import Web3 from "web3";
 import { expReputationCalc } from "./expertReputation"
 import {payToRefferers} from './payToRefferers';
+import { setCorrectAnswer, eventEnd } from '../../services/events/event_is_finish';
 
 let send: number = 0;
 const usersPayment = async (data: any) => {
-    let { eventId, isMinted, dataForPayments, correctAnswer } = getNeededData(data)
+    let { eventId, isMinted, dataForPayments, correctAnswer, mintedTokens } = getNeededData(data)
 
     if (eventId && send != eventId) {
         send = eventId;
@@ -29,11 +30,11 @@ const usersPayment = async (data: any) => {
             return
         })
 
-        let participants = dataFromDb.data[0]['publicEvents/parcipiantsAnswer']; //? === all participants
-        let validators = dataFromDb.data[0]['publicEvents/validatorsAnswer']; //? === all validators
-        let hostWallet = dataFromDb.data[0]['publicEvents/host']['users/wallet'] //? === host wallet
+        let participants = dataFromDb.data[0]['publicEvents/parcipiantsAnswer'];
+        let validators = dataFromDb.data[0]['publicEvents/validatorsAnswer'];
+        let hostWallet = dataFromDb.data[0]['publicEvents/host']['users/wallet']
 
-        dataForPayments = arrayRestructuring(dataForPayments) // ? make[] = [[],[],[]]
+        dataForPayments = arrayRestructuring(dataForPayments);
 
         let dataForSend: any;
 
@@ -66,7 +67,15 @@ const usersPayment = async (data: any) => {
         }
 
         const expRepSend = expReputationCalc(validators, Number(correctAnswer))
-        sendToDB(dataForSend.concat(expRepSend.forSendReputation), eventId)
+        let web3 = new Web3();
+        mintedTokens = web3.utils.fromWei(String(mintedTokens), 'ether');
+
+        let dataForCorrectAnswer = {
+            id: eventId,
+            correctAnswer: correctAnswer,
+            tokens: mintedTokens
+        }
+        await sendToDB(dataForSend.concat(expRepSend.forSendReputation), eventId, dataForCorrectAnswer)
     } else {
         console.log("DUBLICATE EVENT", eventId)
     }
@@ -181,23 +190,33 @@ const getNeededData = (data: any) => {
         return x['key'] == 'answerIndex'
     })['value']
 
+
+    let letFindMint = () => {
+        const token = eventDetails["attributes"].find((x: any) => {
+            return x['key'] == 'mintedTokens'
+        })
+        return !token ?  0 : token['value']
+    }
+    const mintedTokens = letFindMint()
+
     return {
         eventId,
         isMinted,
         dataForPayments,
-        correctAnswer
+        correctAnswer,
+        mintedTokens
     }
 }
 
-const sendToDB = (params: any, eventId: any) => {
+const sendToDB = async (params: any, eventId: any, dataForCorrectAnswer: any) => {
     axios.post(path + '/transact', params).catch(err => {
         console.log('error in usersPayment: ' + err.response.statusText)
     })
     console.log("usersPayment: data sent successfully")
+    await setCorrectAnswer(dataForCorrectAnswer)
+    await eventEnd({id: dataForCorrectAnswer.id})
     // lets pay to refferalls
-    payToRefferers(eventId)
-
-
+    await payToRefferers(eventId)
 }
 
 const arrayRestructuring = (arr: Array<any>) => {
