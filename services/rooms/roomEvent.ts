@@ -96,6 +96,7 @@ const getHostData = async (id: any, res: any) => {
 }
 
 const getData = async (id: any, res: any) => {
+    // TODO symplify query
     let event = {
         "select": ["*",
             { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },

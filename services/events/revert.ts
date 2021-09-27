@@ -1,8 +1,5 @@
-import { init } from "../../contract-services/contractInit";
-import MPContr from "../../contract-services/abi/MiddlePayment.json";
 import axios from "axios";
 import { path } from "../../config/path";
-import { getNonce } from "../../contract-services/nonce/nonce";
 
 const getEventData = async (req: any, res: any) => {
     let id = Number(req.body.id);
@@ -42,33 +39,35 @@ const getEventData = async (req: any, res: any) => {
 }
 
 const revertEvent = async (eventId: any, participant: any, purpose: any) => {
-    let revert = [{
-        "_id": eventId,
-        "status": `reverted: ${purpose}`,
-        "eventEnd": Math.floor(new Date().getTime() / 1000.0)
-    }]
+    // TODO
+    // let revert = [{
+    //     "_id": eventId,
+    //     "status": `reverted: ${purpose}`,
+    //     "eventEnd": Math.floor(new Date().getTime() / 1000.0)
+    // }]
 
-    await axios.post(`${path}/transact`, revert).catch((err: any) => {
-        console.log(err);
-        return;
-    })
+    // await axios.post(`${path}/transact`, revert).catch((err: any) => {
+    //     console.log(err);
+    //     return;
+    // })
 
-    if (participant !== undefined) {
-        let path = process.env.NODE_ENV
-        let betteryContract = await init(path, MPContr)
-        try {
-            const gasEstimate = await betteryContract.methods.revertedPayment(eventId, purpose).estimateGas();
-            let nonce = await getNonce();
-            await betteryContract.methods.revertedPayment(eventId, purpose).send({
-                gas: gasEstimate * 2,
-                gasPrice: 0,
-                nonce: nonce
-            });
-        } catch (err) {
-            console.log("error from refund Bot")
-            console.log(err)
-        }
-    }
+    // if (participant !== undefined) {
+    //     let path = process.env.NODE_ENV
+    //     let betteryContract = await init(path, MPContr)
+    //     // TODO refund bot rewrite
+    //     try {
+    //         const gasEstimate = await betteryContract.methods.revertedPayment(eventId, purpose).estimateGas();
+    //         let nonce = await getNonce();
+    //         await betteryContract.methods.revertedPayment(eventId, purpose).send({
+    //             gas: gasEstimate * 2,
+    //             gasPrice: 0,
+    //             nonce: nonce
+    //         });
+    //     } catch (err) {
+    //         console.log("error from refund Bot")
+    //         console.log(err)
+    //     }
+    // }
 }
 
 export {

@@ -7,7 +7,7 @@ export default async (req: any, res: any, next: any) => {
     let prodDev = req.body.prodDev
 
     let query = {
-        "select": ["*"],
+        "select": ['privateEvents/finalAnswer'],
         "where": `privateEvents/host = ${Number(userID)}`,
         "from": "privateEvents"
     }

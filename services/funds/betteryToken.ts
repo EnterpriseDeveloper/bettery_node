@@ -1,22 +1,31 @@
 import axios from 'axios';
 import { path } from "../../config/path"
-import { init } from "../../contract-services/contractInit";
-import BET from "../../contract-services/abi/BET.json";
-import { getNonce } from "../../contract-services/nonce/nonce";
-import { getGasPrice, estimateGasLimit } from "../../contract-services/gasPrice/getGasPrice";
 import Web3 from "web3";
+import {connectToSign} from '../../contract-services/connectToChain'
 
-const mintTokens = async (address: any, amount: any) => {
-    let pathContr = process.env.NODE_ENV;
-    let betteryContract = await init(pathContr, BET)
+const mintTokens = async (resiever: string, amount: number, userId: number) => {
     let web3 = new Web3();
-    let amo = web3.utils.toWei(String(amount), "ether")
-    let gasEstimate = await betteryContract.methods.mint(address, amo).estimateGas();
-    return await betteryContract.methods.mint(address, amo).send({
-        gas: await estimateGasLimit(gasEstimate),
-        gasPrice: await getGasPrice(),
-        nonce: await getNonce()
-    });
+    let token = web3.utils.toWei(String(amount), "ether");
+    let { memonic, address, client } = await connectToSign()
+
+    const msg = {
+        typeUrl: "/VoroshilovMax.bettery.funds.MsgCreateMintBet",
+        value: {
+            creator: address,
+            reciever: resiever,   
+            amount: token,
+            userId: userId,
+        }
+    };
+    const fee = {
+        amount: [],
+        gas: "1000000",
+    };
+    try{
+        return await client.signAndBroadcast(address, [msg], fee, memonic);
+    }catch(err){
+        console.log(err)
+    }
 }
 
 const getBTYToken = async (req: any, res: any) => {
@@ -33,7 +42,8 @@ const getBTYToken = async (req: any, res: any) => {
         if (getWallet) {
             if (getWallet.data.length != 0) {
                 let wallet = getWallet.data[0].wallet;
-                let data = await mintTokens(wallet, 10)
+                let id = getWallet.data[0]["_id"]
+                let data = await mintTokens(wallet, 10, id)
                 res.status(200);
                 res.send(data);
             } else {
@@ -47,20 +57,7 @@ const getBTYToken = async (req: any, res: any) => {
     }
 }
 
-const transferToken = async (oldWallet: any, newWallet: any) => {
-    let pathContr = process.env.NODE_ENV;
-    let betteryContract = await init(pathContr, BET);
-    let amount = await betteryContract.methods.balanceOf(oldWallet).call();
-    if (amount != "0") {
-        let web3 = new Web3();
-        amount = web3.utils.fromWei(amount, "ether");
-        return await mintTokens(newWallet, amount);
-    } else {
-        return;
-    }
-}
 export {
     mintTokens,
-    getBTYToken,
-    transferToken
+    getBTYToken
 }
