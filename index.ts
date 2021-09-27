@@ -11,11 +11,11 @@ import comments from './services/comments/index';
 
 if (process.env.NODE_TEST == 'false') {
 
-    let key = "../keys/key.pem",
-        cert = "../keys/star_bettery_io.crt",
-        ca1 = "../keys/DigiCertCA.crt",
-        ca2 = "../keys/My_CA_Bundle.crt",
-        ca3 = "../keys/TrustedRoot.crt";
+    let key = "./keys/key.pem",
+        cert = "./keys/star_bettery_io.crt",
+        ca1 = "./keys/DigiCertCA.crt",
+        ca2 = "./keys/My_CA_Bundle.crt",
+        ca3 = "./keys/TrustedRoot.crt";
 
     var credentials = {
         key: fs.readFileSync(key, 'utf8'),
