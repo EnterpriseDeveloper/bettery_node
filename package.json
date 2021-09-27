@@ -5,14 +5,15 @@
   "main": "index.ts",
   "scripts": {
     "dev": "NODE_TEST=true NODE_ENV=test nodemon",
-    "start": "NODE_TEST=false NODE_ENV=test node build/server.js",
-    "start_prod": "NODE_TEST=false NODE_ENV=production node build/server_prod.js",
+    "start": "webpack --mode=development --config webpack.config.js && NODE_TEST=false NODE_ENV=test node server.js",
+    "start_prod": "NODE_TEST=false NODE_ENV=production node server_prod.js",
     "forever": "NODE_TEST=false NODE_ENV=test nohup node server.js > output.log &",
     "forever_prod": "NODE_TEST=false NODE_ENV=production nohup node server_prod.js > outputData.log &",
     "build": "webpack --mode=development --config webpack.config.js && sudo npm run deploy",
     "build_prod": "webpack --mode=production --config webpack.production.config.js && sudo npm run deploy_prod",
-    "deploy": "sudo scp -i ~/.ssh/bettery_dev.pem -r build/server.js ubuntu@13.212.14.124:/home/ubuntu/node",
-    "deploy_prod": "sudo scp -i ~/.ssh/bettery_dev.pem -r build/server_prod.js ubuntu@13.213.49.239:/home/ubuntu/node"
+    "deploy": "sudo scp -i ~/.ssh/bettery_dev.pem -r server.js ubuntu@13.212.14.124:/home/ubuntu/node",
+    "deploy_prod": "sudo scp -i ~/.ssh/bettery_dev.pem -r server_prod.js ubuntu@13.213.49.239:/home/ubuntu/node",
+    "archive": "node build_scripts/zip_project.js"
   },
   "engines": {
     "node": "v14.17.2"
@@ -29,6 +30,7 @@
     "@truffle/hdwallet-provider": "^1.4.1",
     "@types/crypto-js": "^4.0.1",
     "@types/express": "^4.17.12",
+    "archiver": "^5.3.0",
     "async-mutex": "^0.3.1",
     "aws-sdk": "^2.939.0",
     "axios": "^0.21.1",
@@ -55,6 +57,7 @@
     "@babel/preset-env": "^7.14.7",
     "@babel/runtime": "^7.14.6",
     "@tendermint/types": "^0.1.2",
+    "@types/jest": "^26.0.24",
     "@types/redis": "^2.8.30",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
@@ -64,6 +67,8 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "crypto-js": "^4.0.0",
+    "jest": "^27.0.6",
+    "ts-jest": "^27.0.4",
     "webpack": "^5.42.1",
     "webpack-cli": "^4.7.2",
     "webpack-node-externals": "^3.0.0"

@@ -3,6 +3,7 @@ import { authLogin, authRegister, autoLogin, logout } from "./torusRegist";
 import { getAllUserEvents } from "./myActivites";
 import { linkAccount } from "../../helpers/auth0/linkAccount";
 import authMiddleware from "../../middlewares/check-token";
+import { checkIsTokenValid } from "../../middlewares/check-is-token-valid";
 
 export default function Users(app: any) {
     app.post("/user/getUserById", authMiddleware, async (req: any, res: any) => {

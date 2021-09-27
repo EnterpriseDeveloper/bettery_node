@@ -5,7 +5,7 @@ import { path } from "../../config/path";
 import { mintTokens } from "../funds/betteryToken";
 import { userStructure } from '../../structure/user.struct';
 import redis from '../../helpers/redis-helper';
-import { secretRedis } from '../../config/key';
+import { secretRedis, auth0Path } from '../../config/key';
 
 const authLogin = async (req: any, res: any) => {
     let email = req.body.email;
