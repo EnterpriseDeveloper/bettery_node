@@ -17,6 +17,9 @@ if (process.env.NODE_TEST == 'false') {
         ca2 = "./keys/My_CA_Bundle.crt",
         ca3 = "./keys/TrustedRoot.crt";
 
+        let test = fs.readFileSync(key, 'utf8')
+        console.log(test);
+
     var credentials = {
         key: fs.readFileSync(key, 'utf8'),
         cert: fs.readFileSync(cert, 'utf8'),
