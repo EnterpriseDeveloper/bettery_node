@@ -17,6 +17,8 @@ services:
     restart: on-failure
     ports: 
       - 80:80
+      - 443:443
+      - 8090:8090
     container_name: bettery_app
     links:
       - redis 
