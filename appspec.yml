@@ -7,5 +7,7 @@ files:
 file_exists_behavior: OVERWRITE
 
 hooks:
+  BeforeInstall:
+    - location: build_scripts/beforeInstall.sh
   AfterInstall:
     - location: build_scripts/start.sh
