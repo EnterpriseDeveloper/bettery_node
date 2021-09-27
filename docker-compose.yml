@@ -9,8 +9,6 @@ services:
     restart: on-failure
     ports: 
       - 6379:6379
-    expose:
-      - "6379"
 
   app:
     build: ./
