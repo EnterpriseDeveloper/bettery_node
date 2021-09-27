@@ -8,4 +8,4 @@ sudo docker rmi app_app
 
 cp -r /home/ubuntu/node/keys /home/ubuntu/app/
 cd /home/ubuntu/app/
-sudo docker-compose up & ^C
+sudo docker-compose up -d
