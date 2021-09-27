@@ -23,7 +23,7 @@ const getTokens = async (req: any, res: any) => {
         }
         bty = balances.find((x: any)=>{return x.denom == "bty"})
         if (bty){
-            bty = bet.amount
+            bty = bty.amount
         }
 
         let betToken = bet ? Number(Number(web3.utils.fromWei(bet, "ether")).toFixed(2)) : 0

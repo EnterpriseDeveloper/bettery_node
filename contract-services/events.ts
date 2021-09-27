@@ -14,6 +14,7 @@ function loadHandler() {
     pubLetsFinishEvent(demonPath);
     pubEventCalcExpert(demonPath);
     pubEventFinished(demonPath);
+ //   errHandler(demonPath);
 }
 
 function pubEventReverted(demonPath: string) {
@@ -65,7 +66,9 @@ async function pubEventFinished(demonPath: string) {
 }
 
 // TODO think about error handler
-function errHandler(client: any) {
+function errHandler(demonPath: any) {
+    console.log("TEST HERE")
+    let client = RpcClient(`ws://${demonPath}:26657/websocket`);
     client.status('error', (err: any) => {
         if (String(err).search("websocket disconnected") != -1 ||
             String(err).search("subscription was cancelled") != -1 ||

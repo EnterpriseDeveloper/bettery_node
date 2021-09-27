@@ -2,7 +2,7 @@ import axios from "axios";
 import { path } from "../../config/path";
 import Web3 from "web3";
 import { expReputationCalc } from "./expertReputation"
-import {payToRefferers} from './payToRefferers';
+import { payToRefferers } from './payToRefferers';
 import { setCorrectAnswer, eventEnd } from '../../services/events/event_is_finish';
 
 let send: number = 0;
@@ -75,7 +75,7 @@ const usersPayment = async (data: any) => {
             correctAnswer: correctAnswer,
             tokens: mintedTokens
         }
-        await sendToDB(dataForSend.concat(expRepSend.forSendReputation), eventId, dataForCorrectAnswer)
+        await sendToDB(dataForSend.concat(expRepSend.forSendReputation), eventId, dataForCorrectAnswer, mintedTokens)
     } else {
         console.log("DUBLICATE EVENT", eventId)
     }
@@ -195,7 +195,7 @@ const getNeededData = (data: any) => {
         const token = eventDetails["attributes"].find((x: any) => {
             return x['key'] == 'mintedTokens'
         })
-        return !token ?  0 : token['value']
+        return !token ? 0 : token['value']
     }
     const mintedTokens = letFindMint()
 
@@ -208,15 +208,17 @@ const getNeededData = (data: any) => {
     }
 }
 
-const sendToDB = async (params: any, eventId: any, dataForCorrectAnswer: any) => {
+const sendToDB = async (params: any, eventId: any, dataForCorrectAnswer: any, mintedTokens: any) => {
     axios.post(path + '/transact', params).catch(err => {
         console.log('error in usersPayment: ' + err.response.statusText)
     })
     console.log("usersPayment: data sent successfully")
     await setCorrectAnswer(dataForCorrectAnswer)
-    await eventEnd({id: dataForCorrectAnswer.id})
+    await eventEnd({ id: dataForCorrectAnswer.id })
     // lets pay to refferalls
-    await payToRefferers(eventId)
+    if (Number(mintedTokens) > 0) {
+        await payToRefferers(eventId)
+    }
 }
 
 const arrayRestructuring = (arr: Array<any>) => {
