@@ -36,7 +36,6 @@ const setRevertEvent = async (req: any, res: any) => {
 }
 
 const revertEvent = async (eventId: any, participant: any, purpose: any, res: any) => {
-    // TODO
     let revert = [{
         "_id": eventId,
         "status": `reverted: ${purpose}`,
