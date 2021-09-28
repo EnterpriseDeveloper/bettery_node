@@ -1,37 +1,37 @@
 image: node:14.17.2
 
 pipelines:
-  default:
+  branches:
+    test_branch:
+      - step:
+          name: Build and upload to S3
+          script:           
+            - npm install
+            - npx jest
+            - npm run archive
+            - pipe: atlassian/aws-code-deploy:0.4.0
+              variables:
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+                APPLICATION_NAME: $APPLICATION_NAME
+                ZIP_FILE: 'bettery-app.zip'
+                S3_BUCKET: codedeploy-bucket-bettery-dev
+                COMMAND: 'upload'
 
-    - step:
-        name: Build and upload to S3
-        script:           
-          - npm install
-          - npx jest
-          - npm run archive
-          - pipe: atlassian/aws-code-deploy:0.4.0
-            variables:
-              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
-              APPLICATION_NAME: $APPLICATION_NAME
-              ZIP_FILE: 'bettery-app.zip'
-              S3_BUCKET: codedeploy-bucket-bettery-dev
-              COMMAND: 'upload'
-
-    - step:
-        name: Deploy with CodeDeploy
-        script:
-          - pipe: atlassian/aws-code-deploy:0.4.0
-            variables:
-              AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
-              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-              APPLICATION_NAME: $APPLICATION_NAME
-              DEPLOYMENT_GROUP: $DEPLOYMENT_GROUP_NAME
-              S3_BUCKET: codedeploy-bucket-bettery-dev
-              COMMAND: 'deploy'
-              DEBUG: 'true'
-              FILE_EXISTS_BEHAVIOR: 'OVERWRITE'
-        services:
-          - docker
+      - step:
+          name: Deploy with CodeDeploy
+          script:
+            - pipe: atlassian/aws-code-deploy:0.4.0
+              variables:
+                AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+                AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+                APPLICATION_NAME: $APPLICATION_NAME
+                DEPLOYMENT_GROUP: $DEPLOYMENT_GROUP_NAME
+                S3_BUCKET: codedeploy-bucket-bettery-dev
+                COMMAND: 'deploy'
+                DEBUG: 'true'
+                FILE_EXISTS_BEHAVIOR: 'OVERWRITE'
+          services:
+            - docker
