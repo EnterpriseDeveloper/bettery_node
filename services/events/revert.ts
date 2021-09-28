@@ -1,5 +1,6 @@
 import axios from "axios";
 import { path } from "../../config/path";
+import { connectToSign } from '../../contract-services/connectToChain'
 
 const setRevertEvent = async (req: any, res: any) => {
     let id = Number(req.body.id);
@@ -26,9 +27,7 @@ const setRevertEvent = async (req: any, res: any) => {
             res.send({ "status": "already reverted" });
         } else {
             let partic = data.data[0]['publicEvents/parcipiantsAnswer']
-            await revertEvent(id, partic, purpose);
-            res.status(200);
-            res.send({ "status": "done" });
+            await revertEvent(id, partic, purpose, res);
         }
     } else {
         res.status(400);
@@ -36,36 +35,47 @@ const setRevertEvent = async (req: any, res: any) => {
     }
 }
 
-const revertEvent = async (eventId: any, participant: any, purpose: any) => {
+const revertEvent = async (eventId: any, participant: any, purpose: any, res: any) => {
     // TODO
-    // let revert = [{
-    //     "_id": eventId,
-    //     "status": `reverted: ${purpose}`,
-    //     "eventEnd": Math.floor(new Date().getTime() / 1000.0)
-    // }]
+    let revert = [{
+        "_id": eventId,
+        "status": `reverted: ${purpose}`,
+        "eventEnd": Math.floor(new Date().getTime() / 1000.0)
+    }]
 
-    // await axios.post(`${path}/transact`, revert).catch((err: any) => {
-    //     console.log(err);
-    //     return;
-    // })
+    await axios.post(`${path}/transact`, revert).catch((err: any) => {
+        console.log(err);
+        return;
+    })
 
-    // if (participant !== undefined) {
-    //     let path = process.env.NODE_ENV
-    //     let betteryContract = await init(path, MPContr)
-    //     // TODO refund bot rewrite
-    //     try {
-    //         const gasEstimate = await betteryContract.methods.revertedPayment(eventId, purpose).estimateGas();
-    //         let nonce = await getNonce();
-    //         await betteryContract.methods.revertedPayment(eventId, purpose).send({
-    //             gas: gasEstimate * 2,
-    //             gasPrice: 0,
-    //             nonce: nonce
-    //         });
-    //     } catch (err) {
-    //         console.log("error from refund Bot")
-    //         console.log(err)
-    //     }
-    // }
+    if (participant !== undefined) {
+        let { memonic, address, client } = await connectToSign()
+
+        const msg = {
+            typeUrl: "/VoroshilovMax.bettery.publicevents.MsgCreateRefundPubEvents",
+            value: {
+                creator: address,
+                pubId: eventId,
+                purpose: purpose
+            }
+        };
+        const fee = {
+            amount: [],
+            gas: "1000000",
+        };
+        try {
+            await client.signAndBroadcast(address, [msg], fee, memonic);
+            res.status(200);
+            res.send({ "status": "done" });
+        } catch (err) {
+            console.log("from revertEvent", err)
+            res.status(400);
+            res.send(err);
+        }
+    } else {
+        res.status(200);
+        res.send({ "status": "done" });
+    }
 }
 
 export {
