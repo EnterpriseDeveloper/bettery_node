@@ -77,6 +77,14 @@ const createEvent = async (req: any, res: any) => {
         }
     }
 
+    if (req.body.thumFinish.length > 12) {
+        let type = await uploadImage(req.body.thumFinish, id);
+        let url = process.env.NODE_ENV == "production" ? "https://api.bettery.io" : `https://apitest.bettery.io`
+        allData.thumFinish = `${url}/image/${id}.${type}`;
+    } else {
+        allData.thumFinish = undefined;
+    }
+
     let hashtagsId = req.body.hashtagsId;
     let hostId = allData.host;
     let roomId = allData.roomId;
