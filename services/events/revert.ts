@@ -1,7 +1,7 @@
 import axios from "axios";
 import { path } from "../../config/path";
 
-const getEventData = async (req: any, res: any) => {
+const setRevertEvent = async (req: any, res: any) => {
     let id = Number(req.body.id);
     let purpose = req.body.purpose;
 
@@ -16,8 +16,6 @@ const getEventData = async (req: any, res: any) => {
         console.log(err);
         return;
     })
-
-    console.log(data.data[0])
 
     if (data.data.length != 0) {
         if (data.data[0]['publicEvents/status'].search('finished') != -1) {
@@ -71,6 +69,6 @@ const revertEvent = async (eventId: any, participant: any, purpose: any) => {
 }
 
 export {
-    getEventData,
+    setRevertEvent,
     revertEvent
 }
