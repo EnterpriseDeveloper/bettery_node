@@ -15,6 +15,8 @@ const auth0Secret = "uyXFkmokkGIJp4Wx9DngoBUkyarBXzUQ_9-hEGXCibIx8v5R6WuyYLz3fI6
 const testDemon = "54.255.226.141";
 //const testDemon = "localhost";
 const demon = "TODO";
+const testMemo = "runway all vivid glove black unknown client table replace brush snake save unveil creek put panic rare explain chapter able radio harbor gadget urban"
+const prodMemo = "TODO"
 
 export {
    apiKey,
@@ -32,5 +34,7 @@ export {
    auth0ClientId,
    auth0Secret,
    testDemon,
-   demon
+   demon,
+   testMemo,
+   prodMemo
 }

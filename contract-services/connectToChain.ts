@@ -3,6 +3,7 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import { MsgCreateMintBet } from "./funds/tx";
 import { MsgCreateFihishPubEvent, MsgCreateRefPubEvents, MsgCreateRefundPubEvents } from './publicEvents/tx';
 import { demonAPI } from "../config/path";
+import {testMemo, prodMemo} from '../config/key'
 
 
 const types = [
@@ -16,7 +17,7 @@ const registry = new Registry(<any>types);
 
 
 const connectToSign = async () => {
-    let memonic = "arctic peace position sustain vibrant segment clever danger vessel fit ridge job fire drive seat cash angry false once hobby rice monitor awful oppose"
+    const memonic = process.env.NODE_ENV == "production" ? prodMemo : testMemo;
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
         memonic
     );
