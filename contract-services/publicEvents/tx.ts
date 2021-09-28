@@ -6,6 +6,16 @@ import * as Long from 'long'
 export const protobufPackage = 'VoroshilovMax.bettery.publicevents'
 
 /** this line is used by starport scaffolding # proto/tx/message */
+export interface MsgCreateRefundPubEvents {
+  creator: string
+  pubId: number
+  purpose: string
+}
+
+export interface MsgCreateRefundPubEventsResponse {
+  id: number
+}
+
 export interface MsgCreateRefPubEvents {
   creator: string
   pubId: number
@@ -67,6 +77,150 @@ export interface MsgCreateCreatePubEvents {
 
 export interface MsgCreateCreatePubEventsResponse {
   id: number
+}
+
+const baseMsgCreateRefundPubEvents: object = { creator: '', pubId: 0, purpose: '' }
+
+export const MsgCreateRefundPubEvents = {
+  encode(message: MsgCreateRefundPubEvents, writer: Writer = Writer.create()): Writer {
+    if (message.creator !== '') {
+      writer.uint32(10).string(message.creator)
+    }
+    if (message.pubId !== 0) {
+      writer.uint32(16).uint64(message.pubId)
+    }
+    if (message.purpose !== '') {
+      writer.uint32(26).string(message.purpose)
+    }
+    return writer
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgCreateRefundPubEvents {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = { ...baseMsgCreateRefundPubEvents } as MsgCreateRefundPubEvents
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.creator = reader.string()
+          break
+        case 2:
+          message.pubId = longToNumber(reader.uint64() as Long)
+          break
+        case 3:
+          message.purpose = reader.string()
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MsgCreateRefundPubEvents {
+    const message = { ...baseMsgCreateRefundPubEvents } as MsgCreateRefundPubEvents
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = String(object.creator)
+    } else {
+      message.creator = ''
+    }
+    if (object.pubId !== undefined && object.pubId !== null) {
+      message.pubId = Number(object.pubId)
+    } else {
+      message.pubId = 0
+    }
+    if (object.purpose !== undefined && object.purpose !== null) {
+      message.purpose = String(object.purpose)
+    } else {
+      message.purpose = ''
+    }
+    return message
+  },
+
+  toJSON(message: MsgCreateRefundPubEvents): unknown {
+    const obj: any = {}
+    message.creator !== undefined && (obj.creator = message.creator)
+    message.pubId !== undefined && (obj.pubId = message.pubId)
+    message.purpose !== undefined && (obj.purpose = message.purpose)
+    return obj
+  },
+
+  fromPartial(object: DeepPartial<MsgCreateRefundPubEvents>): MsgCreateRefundPubEvents {
+    const message = { ...baseMsgCreateRefundPubEvents } as MsgCreateRefundPubEvents
+    if (object.creator !== undefined && object.creator !== null) {
+      message.creator = object.creator
+    } else {
+      message.creator = ''
+    }
+    if (object.pubId !== undefined && object.pubId !== null) {
+      message.pubId = object.pubId
+    } else {
+      message.pubId = 0
+    }
+    if (object.purpose !== undefined && object.purpose !== null) {
+      message.purpose = object.purpose
+    } else {
+      message.purpose = ''
+    }
+    return message
+  }
+}
+
+const baseMsgCreateRefundPubEventsResponse: object = { id: 0 }
+
+export const MsgCreateRefundPubEventsResponse = {
+  encode(message: MsgCreateRefundPubEventsResponse, writer: Writer = Writer.create()): Writer {
+    if (message.id !== 0) {
+      writer.uint32(8).uint64(message.id)
+    }
+    return writer
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgCreateRefundPubEventsResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = { ...baseMsgCreateRefundPubEventsResponse } as MsgCreateRefundPubEventsResponse
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.id = longToNumber(reader.uint64() as Long)
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MsgCreateRefundPubEventsResponse {
+    const message = { ...baseMsgCreateRefundPubEventsResponse } as MsgCreateRefundPubEventsResponse
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Number(object.id)
+    } else {
+      message.id = 0
+    }
+    return message
+  },
+
+  toJSON(message: MsgCreateRefundPubEventsResponse): unknown {
+    const obj: any = {}
+    message.id !== undefined && (obj.id = message.id)
+    return obj
+  },
+
+  fromPartial(object: DeepPartial<MsgCreateRefundPubEventsResponse>): MsgCreateRefundPubEventsResponse {
+    const message = { ...baseMsgCreateRefundPubEventsResponse } as MsgCreateRefundPubEventsResponse
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id
+    } else {
+      message.id = 0
+    }
+    return message
+  }
 }
 
 const baseMsgCreateRefPubEvents: object = {
@@ -1082,6 +1236,7 @@ export const MsgCreateCreatePubEventsResponse = {
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
+  CreateRefundPubEvents(request: MsgCreateRefundPubEvents): Promise<MsgCreateRefundPubEventsResponse>
   CreateRefPubEvents(request: MsgCreateRefPubEvents): Promise<MsgCreateRefPubEventsResponse>
   CreateFihishPubEvent(request: MsgCreateFihishPubEvent): Promise<MsgCreateFihishPubEventResponse>
   CreateValidPubEvents(request: MsgCreateValidPubEvents): Promise<MsgCreateValidPubEventsResponse>
@@ -1094,6 +1249,12 @@ export class MsgClientImpl implements Msg {
   constructor(rpc: Rpc) {
     this.rpc = rpc
   }
+  CreateRefundPubEvents(request: MsgCreateRefundPubEvents): Promise<MsgCreateRefundPubEventsResponse> {
+    const data = MsgCreateRefundPubEvents.encode(request).finish()
+    const promise = this.rpc.request('VoroshilovMax.bettery.publicevents.Msg', 'CreateRefundPubEvents', data)
+    return promise.then((data) => MsgCreateRefundPubEventsResponse.decode(new Reader(data)))
+  }
+
   CreateRefPubEvents(request: MsgCreateRefPubEvents): Promise<MsgCreateRefPubEventsResponse> {
     const data = MsgCreateRefPubEvents.encode(request).finish()
     const promise = this.rpc.request('VoroshilovMax.bettery.publicevents.Msg', 'CreateRefPubEvents', data)
@@ -1161,4 +1322,3 @@ if (util.Long !== Long) {
   util.Long = Long as any
   configure()
 }
-

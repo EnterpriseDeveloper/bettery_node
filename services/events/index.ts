@@ -11,7 +11,7 @@ import { getAllHashtags } from "./hashtags";
 import { participate, validate } from "./publicActivites";
 import eventLimitPrivate from '../../middlewares/eventLimitsPrivate'
 import eventLimitPublic from '../../middlewares/eventLimitsPublic'
-import { getEventData } from "./revert";
+import { setRevertEvent } from "./revert";
 import { findCorrectAnswer } from "../../contract-services/publicEvents/findCorrectAnswer"
 import userAnswerMiddleware from "../../middlewares/find-user-answer";
 import checkToken from '../../middlewares/check-token'
@@ -68,7 +68,7 @@ export default function Events(app: any) {
     })
 
     app.post("/publicEvents/revert", async (req: any, res: any) => {
-        getEventData(req, res);
+        setRevertEvent(req, res);
     })
 
     app.post("/bettery_event", async (req: any, res: any) => {
