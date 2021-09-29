@@ -24,11 +24,16 @@ const copyRecursiveSync = function (src, dest) {
 const filesArray = fs.readdirSync(process.cwd())
 fs.mkdirSync(`${process.cwd()}/archive`, err => console.log(err));
 for (item of filesArray){
-  if (item !== "node_modules"){
+  if (item !== "node_modules" && item !== "Dockerfile" && item !== "Dockerfile.prod"){
     const src = `${process.cwd()}/${item}`
     const dest = `${process.cwd()}/archive/${item}`
     copyRecursiveSync(src, dest)
   }
+}
+if(process.env.PROD == 'true'){
+  copyRecursiveSync(`${process.cwd()}/Dockerfile.prod`, `${process.cwd()}/archive/Dockerfile`)
+} else {
+  copyRecursiveSync(`${process.cwd()}/Dockerfile`, `${process.cwd()}/archive/Dockerfile`)
 }
 
 
