@@ -3,7 +3,7 @@ import { path } from "../../config/path";
 import { minBetAmount } from "../../config/limits";
 
 const participate = async (req: any, res: any) => {
-    let setAnswer = []
+    let setAnswer: any = []
 
     let eventId = req.body.event_id;
     let userId = Number(req.body.dataFromRedis.id)
@@ -19,15 +19,16 @@ const participate = async (req: any, res: any) => {
         res.send("Structure is incorrect");
         return;
     }
+    await participateSendToDB(answerIndex,userId, transactionHash, eventId, amount, setAnswer, res)
+}
 
+const participateSendToDB = async (answerIndex: any,userId: any, transactionHash: any, eventId: any, amount: any, setAnswer: any, res: any) => {
     if (Number(amount) < minBetAmount) {
         res.status(400);
         res.send("The minimum amount for betting is 0.01 BET");
         return;
     }
     // TODO add to the history of money transaction
-
-    // add to the publicActivites table
     let publicActivites = {
         _id: "publicActivites$act",
         from: userId,
@@ -64,7 +65,6 @@ const participate = async (req: any, res: any) => {
 
     res.status(200);
     res.send({ done: "ok" });
-
 }
 
 const validate = async (req: any, res: any) => {
@@ -127,5 +127,6 @@ const validate = async (req: any, res: any) => {
 
 export {
     participate,
-    validate
+    validate,
+    participateSendToDB
 }

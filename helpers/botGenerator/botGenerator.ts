@@ -1,6 +1,7 @@
 import {DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
 import axios from "axios";
 import {path} from "../../config/path";
+import {mintTokens} from "../../services/funds/betteryToken";
 
 const bip39 = require("bip39");
 
@@ -19,7 +20,7 @@ let creatOneBot = (i: any) => {
             "_id": "users",
             "avatar": `https://api.bettery.io/image/user_${i}.png`,
             "nickName": nickName,
-            "email": `${nickName + i}@fake.com`,
+            "email": `${nickName.replace(' ', '') + i}@fake.com`,
             "wallet": wallet,
             "isBot": true,
             "seedPhrase": mnemonic
@@ -36,7 +37,7 @@ const randomName = () => {
         return Math.floor(Math.random() * (max - min)) + min;
     }
 
-    return name[getRandomInt(0, name.length + 1)] + surname[getRandomInt(0, surname.length + 1)];
+    return name[getRandomInt(0, name.length + 1)] + ' ' + surname[getRandomInt(0, surname.length + 1)];
 }
 
 const generationWallet = async () => {
@@ -47,20 +48,42 @@ const generationWallet = async () => {
     return {wallet: pubKey.address, mnemonic}
 }
 
+const mintTokensAllBots = async () => {
+    let params = {
+        "select": ["_id, wallet"],
+        "where": "users/isBot = true"
+    }
+    let allBot: any = await axios.post(`${path}/query`, params).catch((err) => {
+        console.log(err.response.statusText)
+        console.log('error from mintTokensAllBots')
+        return
+    })
+    if (allBot && allBot.data.length) {
+        for (let i = 0; i < allBot.data.length; i++) {
+            await mintTokens(allBot.data[i].wallet, 10, allBot.data[i]._id)
+        }
+    }
+}
+
 const sendToDBBots = async (amount: number) => {
     let params = await creatAllBots(amount)
 
     if (params && params.length) {
-        // await axios.post(`${path}transact`, params).catch((err) => {
-        //     console.log(err.response.data.message)
-        //     console.log('from botGenerator')
+        // let response = await axios.post(`${path}/transact`, params).catch((err) => {
+        //     console.log(err.response.statusText)
+        //     console.log('error from botGenerator')
         //     return
         // })
-      //!  console.log(params, 'params')
+        // if (response) {
+        //     await mintTokensAllBots()
+        //     console.log('bots created successfully')
+        // }
     }
 }
 
-//! sendToDBBots(2)
+// sendToDBBots(10)
+
+// mintTokensAllBots()
 
 
 
