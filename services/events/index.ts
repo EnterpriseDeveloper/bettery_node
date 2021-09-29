@@ -95,7 +95,7 @@ export default function Events(app: any) {
         deletePrivateEvent(req, res);
     })
 
-    app.post('/participation_of_bots', async (req: any, res:any) => {
-        particOfBots(req, res)
+    app.post( "/participation_of_bots", async (req: any, res:any) => {
+        await particOfBots(req, res)
     })
 }

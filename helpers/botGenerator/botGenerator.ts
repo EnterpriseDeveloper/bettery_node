@@ -7,7 +7,7 @@ const bip39 = require("bip39");
 
 const creatAllBots = async (amount: number) => {
     let params = []
-    for (let i = 1; i <= amount; i++) {
+    for (let i = 0; i < amount; i++) {
         params.push(await creatOneBot(i))
     }
     return params
@@ -18,7 +18,7 @@ let creatOneBot = (i: any) => {
         const nickName = randomName();
         return {
             "_id": "users",
-            "avatar": `https://api.bettery.io/image/user_${i}.png`,
+            "avatar": `https://apitest.bettery.io/image/user_${i}.png`, // todo correct url
             "nickName": nickName,
             "email": `${nickName.replace(' ', '') + i}@fake.com`,
             "wallet": wallet,
@@ -69,21 +69,20 @@ const sendToDBBots = async (amount: number) => {
     let params = await creatAllBots(amount)
 
     if (params && params.length) {
-        // let response = await axios.post(`${path}/transact`, params).catch((err) => {
-        //     console.log(err.response.statusText)
-        //     console.log('error from botGenerator')
-        //     return
-        // })
-        // if (response) {
-        //     await mintTokensAllBots()
-        //     console.log('bots created successfully')
-        // }
+        console.log(params, 'params')
+        let response = await axios.post(`${path}/transact`, params).catch((err) => {
+            console.log(err.response.statusText)
+            console.log('error from botGenerator')
+            return
+        })
+        if (response) {
+            await mintTokensAllBots()
+            console.log('bots created successfully')
+        }
     }
 }
 
-// sendToDBBots(10)
-
-// mintTokensAllBots()
+// sendToDBBots(1)
 
 
 
