@@ -1,18 +1,21 @@
-import {participateSendToDB} from './publicActivites'
 import axios from "axios";
-import {demonAPI, path} from "../../config/path";
-import {mintTokens} from "../funds/betteryToken";
 import Web3 from "web3";
 
+import {participateSendToDB} from './publicActivites'
+import {path} from "../../config/path";
+import {mintTokens} from "../funds/betteryToken";
+import {balanceCheck} from "../funds/userTokens";
+import {connectToSign} from "../../contract-services/connectToChain";
+
 let particOfBots = async (req: any, res: any) => {
-    const id = req.body.id
+    const eventId = req.body.id
     const botAmount = req.bode.botAmount
     const eventParams = {
         "select": ['answers'],
-        "from": 422212465065984,
+        "from": eventId, //! change
     }
     const botParams = {
-        "select": ["bet"],
+        "select": ["wallet"],
         "where": "users/isBot = true"
     }
 
@@ -29,25 +32,48 @@ let particOfBots = async (req: any, res: any) => {
     })
 
     if(bots && bots.data.length && event && event.data.length){
-        console.log(bots.data, 1)
-        console.log(event.data, 2)
-        // botParc(bots, event, id, botAmount)
-
-        // Math.floor(Math.random() * (answerAmount +1))
+        let response = await botParc(bots.data, event.data[0], eventId, botAmount)
+        if(response) {
+            res.status(response.status)
+            res.send(response.response)
+        }
     }
 }
 
-const botParc = (bots: any, event: any, id: number, botAmount: number ) => {
-    let indexRandom = Math.floor(Math.random() * (event.answers.length +1)) //? рандомный ответ
+const botParc = async (bots: any, event: any, eventId: number, botAmount: number ) => {
     let botsPartic = letsChooseRandomBots(botAmount, bots)
-    let randomBet = letsChooseRandomBet (0.1, 1)
+    if(!botsPartic || !botsPartic.length){
+        return {
+            status: 400,
+            response: {status: 'no bots in the database'}
+        }
+    }
 
     for (let i = 0; i < botsPartic.length; i++) {
-        if(Number(botsPartic[i].bet) > randomBet){
-            //todo do bet
+
+        let botId = botsPartic[i]._id
+        let wallet = botsPartic[i].wallet
+        let indexAnswerRandom = Math.floor(Math.random() * (event.answers.length +1))
+        let answerValue = event.answers[indexAnswerRandom]
+        let randomBet = letsChooseRandomBet (0.1, 1)
+        let { bet } = await balanceCheck(wallet)
+
+        if(bet && bet > randomBet){
+            let result = await callSendToDemon(randomBet, eventId,answerValue, indexAnswerRandom, botId)
+
+            if(result){
+                return result
+            }
         }
-        if(Number(botsPartic[i].bet) <= randomBet){
-            //todo request more token
+        if(!bet){
+            let mintResult = await mintTokens(wallet, 10, botId )
+            if(mintResult){
+                let result = await callSendToDemon(randomBet, eventId,answerValue, indexAnswerRandom, botId)
+
+                if(result){
+                    return result
+                }
+            }
         }
 
 
@@ -63,13 +89,71 @@ const letsChooseRandomBet = (min: number, max: number) => {
     return Number((Math.random() * (max - min) + min).toFixed(1))
 }
 
+const callSendToDemon = async (randomBet: number, eventId: number,answerValue: any, indexAnswerRandom: number, botId: number) => {
+    let getTransect = await sendToDemonParticipate(randomBet, eventId, answerValue )
+    if(getTransect && getTransect.transact){
+        let result = await participateSendToDB(indexAnswerRandom, botId, getTransect.transact, eventId,randomBet)
+        if(result.status == 400) {
+            return {
+                status: 400,
+                response: {status: result.response}
+            }
+        }
+    }
+
+    if(getTransect.status == 400){
+        return {
+            status: getTransect.status,
+            response: {status: getTransect.response}
+        }
+    } else {
+        return {
+            status: 200,
+            response: {status: 'OK'}
+        }
+    }
+}
+
+ const sendToDemonParticipate = async (randomBet: any, eventId: number, answerValue: any) => {
+     let web3 = new Web3();
+     var _money = web3.utils.toWei(String(randomBet), 'ether')
+     let { memonic, address, client } = await connectToSign()
+
+     const msg = {
+         typeUrl: "/VoroshilovMax.bettery.publicevents.MsgCreatePartPubEvents",
+         value: {
+             creator: address,
+             pubId: eventId,
+             answers: answerValue,
+             amount: _money
+         }
+     };
+     const fee = {
+         amount: [],
+         gas: "1000000",
+     };
+     try {
+         let transact: any = await client.signAndBroadcast(address, [msg], fee, memonic);
+         if(transact.transactionHash && transact.code == 0){
+             return {
+                 transact: transact.transactionHash
+             }
+         }else{
+             console.log(`Error sendToDemonParticipate ${String(transact)}`)
+             return {
+                 status: 400,
+                 response: {status: String(transact)}
+             }
+         }
+     } catch (err) {
+         console.log(`Error sendToDemonParticipate ${String(err.error)}`)
+         return {
+             status: 400,
+             response: {status: String(err.error)}
+         }
+     }
+ }
+
 export {
     particOfBots
 }
-// mintTokens('cosmos1ngme0tlkmeldygah3405mqp4lcfklv3xdkdhxn',10,351843720888332)
-
-// getTokensIn('cosmos1ngme0tlkmeldygah3405mqp4lcfklv3xdkdhxn',351843720888332)
-
-// particOfBots(null, null)
-
-

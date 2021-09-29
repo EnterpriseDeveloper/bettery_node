@@ -3,8 +3,6 @@ import { path } from "../../config/path";
 import { minBetAmount } from "../../config/limits";
 
 const participate = async (req: any, res: any) => {
-    let setAnswer: any = []
-
     let eventId = req.body.event_id;
     let userId = Number(req.body.dataFromRedis.id)
     let amount = req.body.amount;
@@ -19,14 +17,21 @@ const participate = async (req: any, res: any) => {
         res.send("Structure is incorrect");
         return;
     }
-    await participateSendToDB(answerIndex,userId, transactionHash, eventId, amount, setAnswer, res)
+    let { status, response }  = await participateSendToDB(answerIndex, userId, transactionHash, eventId, amount)
+
+    if(response){
+        res.status(status)
+        res.send(response)
+    }
 }
 
-const participateSendToDB = async (answerIndex: any,userId: any, transactionHash: any, eventId: any, amount: any, setAnswer: any, res: any) => {
+const participateSendToDB = async (answerIndex: any, userId: any, transactionHash: any, eventId: any, amount: any) => {
+    let setAnswer: any = []
     if (Number(amount) < minBetAmount) {
-        res.status(400);
-        res.send("The minimum amount for betting is 0.01 BET");
-        return;
+        return {
+            status: 400,
+            response: "The minimum amount for betting is 0.01 BET"
+        }
     }
     // TODO add to the history of money transaction
     let publicActivites = {
@@ -57,14 +62,16 @@ const participateSendToDB = async (answerIndex: any,userId: any, transactionHash
     setAnswer.push(user)
 
     await axios.post(`${path}/transact`, setAnswer).catch((err) => {
-        res.status(400);
-        res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
-        return;
+        return {
+            status: 400,
+            response: err.response.data.message
+        }
     })
-
-    res.status(200);
-    res.send({ done: "ok" });
+    return {
+        status: 200,
+        response: {done: "ok"}
+    }
 }
 
 const validate = async (req: any, res: any) => {
