@@ -64,16 +64,22 @@ const revertEvent = async (eventId: any, participant: any, purpose: any, res: an
         };
         try {
             await client.signAndBroadcast(address, [msg], fee, memonic);
-            res.status(200);
-            res.send({ "status": "done" });
+            if (res) {
+                res.status(200);
+                res.send({ "status": "done" });
+            }
         } catch (err) {
             console.log("from revertEvent", err)
-            res.status(400);
-            res.send(err);
+            if (res) {
+                res.status(400);
+                res.send(err);
+            }
         }
     } else {
-        res.status(200);
-        res.send({ "status": "done" });
+        if (res) {
+            res.status(200);
+            res.send({ "status": "done" });
+        }
     }
 }
 

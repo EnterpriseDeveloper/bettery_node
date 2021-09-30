@@ -26,7 +26,7 @@ const refundBot = async () => {
                 let week = epochWeek;
                 if (timeNow - endTime > week) {
                     let participant = events[i]["publicEvents/parcipiantsAnswer"];
-                    await revertEvent(eventId, participant, "not enough experts")
+                    await revertEvent(eventId, participant, "not enough experts", undefined)
                 };
             }
         }

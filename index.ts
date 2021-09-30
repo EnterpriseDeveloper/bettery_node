@@ -1,3 +1,12 @@
+var cluster = require('cluster');
+if (cluster.isMaster) {
+    cluster.fork();
+
+    cluster.on('exit', function (worker: any, code: any, signal: any) {
+        cluster.fork();
+    });
+}
+
 import express from 'express';
 import bodyParser from 'body-parser'
 const app = express();
@@ -7,49 +16,6 @@ import { loadHandler } from "./contract-services/events";
 import https from 'https';
 import http from 'http';
 import comments from './services/comments/index';
-
-if (process.env.NODE_TEST == 'false') {
-
-    let key = "./keys/key.pem",
-        cert = "./keys/star_bettery_io.crt",
-        ca1 = "./keys/DigiCertCA.crt",
-        ca2 = "./keys/My_CA_Bundle.crt",
-        ca3 = "./keys/TrustedRoot.crt";
-
-    var credentials = {
-        key: fs.readFileSync(key, 'utf8'),
-        cert: fs.readFileSync(cert, 'utf8'),
-        ca: [
-            fs.readFileSync(ca1, 'utf8'),
-            fs.readFileSync(ca2, 'utf8'),
-            fs.readFileSync(ca3, 'utf8')
-        ]
-    };
-
-    var httpsServer = https.createServer(credentials, app);
-    var io = require('socket.io')(httpsServer);
-    comments(io);
-    httpsServer.listen(443);
-}
-
-
-var cors = require('cors');
-
-app.use(cors({
-    origin: "*"
-}))
-app.use(bodyParser.json({ limit: '50mb' }));
-app.use(bodyParser.text({ limit: '50mb' }));
-app.use(bodyParser.urlencoded({
-    limit: '50mb',
-    extended: true
-}));
-var httpServer = http.createServer(app);
-
-if (process.env.NODE_TEST != 'false') {
-    var io = require('socket.io')(httpServer);
-    comments(io);
-}
 
 import Events from './services/events';
 Events(app);
@@ -66,12 +32,57 @@ Image(app);
 import TokenSale from './contract-services/tokensale';
 TokenSale(app);
 
-httpServer.listen(80, async () => {
-    await loadHandler();
-    setInterval(() => {
-        refundBot();
-    }, 1000 * 60 * 60 * 24 * 3);
+if (cluster.isWorker) {
 
-    console.log("server run port 80");
-});
+    if (process.env.NODE_TEST == 'false') {
 
+        let key = "./keys/key.pem",
+            cert = "./keys/star_bettery_io.crt",
+            ca1 = "./keys/DigiCertCA.crt",
+            ca2 = "./keys/My_CA_Bundle.crt",
+            ca3 = "./keys/TrustedRoot.crt";
+
+        var credentials = {
+            key: fs.readFileSync(key, 'utf8'),
+            cert: fs.readFileSync(cert, 'utf8'),
+            ca: [
+                fs.readFileSync(ca1, 'utf8'),
+                fs.readFileSync(ca2, 'utf8'),
+                fs.readFileSync(ca3, 'utf8')
+            ]
+        };
+
+        var httpsServer = https.createServer(credentials, app);
+        var io = require('socket.io')(httpsServer);
+        comments(io);
+        httpsServer.listen(443);
+    }
+
+
+    var cors = require('cors');
+
+    app.use(cors({
+        origin: "*"
+    }))
+    app.use(bodyParser.json({ limit: '50mb' }));
+    app.use(bodyParser.text({ limit: '50mb' }));
+    app.use(bodyParser.urlencoded({
+        limit: '50mb',
+        extended: true
+    }));
+    var httpServer = http.createServer(app);
+
+    if (process.env.NODE_TEST != 'false') {
+        var io = require('socket.io')(httpServer);
+        comments(io);
+    }
+
+    httpServer.listen(80, async () => {
+        await loadHandler();
+        setInterval(() => {
+            refundBot();
+        }, 1000 * 60 * 60 * 24 * 3);
+
+        console.log("server run port 80");
+    });
+}
