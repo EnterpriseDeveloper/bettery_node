@@ -48,19 +48,10 @@ const generationWallet = async () => {
     return {wallet: pubKey.address, mnemonic}
 }
 
-const mintTokensAllBots = async () => {
-    let params = {
-        "select": ["_id, wallet"],
-        "where": "users/isBot = true"
-    }
-    let allBot: any = await axios.post(`${path}/query`, params).catch((err) => {
-        console.log(err.response.statusText)
-        console.log('error from mintTokensAllBots')
-        return
-    })
-    if (allBot && allBot.data.length) {
-        for (let i = 0; i < allBot.data.length; i++) {
-            await mintTokens(allBot.data[i].wallet, 10, allBot.data[i]._id)
+const mintTokensAllBots = async (params: any) => {
+    if (params && params.length) {
+        for (let i = 0; i < params.length; i++) {
+            await mintTokens(params[i].wallet, 10, params[i]._id)
         }
     }
 }
@@ -76,7 +67,7 @@ const sendToDBBots = async (amount: number) => {
             return
         })
         if (response) {
-            await mintTokensAllBots()
+            await mintTokensAllBots(params)
             console.log('bots created successfully')
         }
     }

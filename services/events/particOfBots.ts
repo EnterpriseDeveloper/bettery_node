@@ -13,6 +13,7 @@ import {MsgCreatePartPubEvents} from "../../contract-services/publicEvents/tx";
 let particOfBots = async (req: any, res: any) => {
     const eventId = req.body.id
     const botAmount = req.body.botAmount
+
     const eventParams = {
         "select": ['answers'],
         "from": eventId,
@@ -160,6 +161,7 @@ const sendToDemonParticipate = async (randomBet: any, eventId: number, answerVal
         }
     }
 }
+
 const connectToSign = async (memonic: string) => {
     const types = [
         ["/VoroshilovMax.bettery.publicevents.MsgCreatePartPubEvents", MsgCreatePartPubEvents],
