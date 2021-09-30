@@ -8,21 +8,6 @@ import https from 'https';
 import http from 'http';
 import comments from './services/comments/index';
 
-import Events from './services/events';
-Events(app);
-import Funds from './services/funds';
-Funds(app);
-import Users from './services/users';
-Users(app);
-import Rooms from './services/rooms';
-Rooms(app);
-import Subscribe from './services/subscribe';
-Subscribe(app);
-import Image from './services/image';
-Image(app);
-import TokenSale from './contract-services/tokensale';
-TokenSale(app);
-
 if (process.env.NODE_TEST == 'false') {
 
     let key = "./keys/key.pem",
@@ -65,6 +50,21 @@ if (process.env.NODE_TEST != 'false') {
     var io = require('socket.io')(httpServer);
     comments(io);
 }
+
+import Events from './services/events';
+Events(app);
+import Funds from './services/funds';
+Funds(app);
+import Users from './services/users';
+Users(app);
+import Rooms from './services/rooms';
+Rooms(app);
+import Subscribe from './services/subscribe';
+Subscribe(app);
+import Image from './services/image';
+Image(app);
+import TokenSale from './contract-services/tokensale';
+TokenSale(app);
 
 httpServer.listen(80, async () => {
     await loadHandler();
