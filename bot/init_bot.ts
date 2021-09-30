@@ -73,4 +73,3 @@ const sendToDBBots = async (amount: number) => {
     }
 }
 
-// sendToDBBots(1)

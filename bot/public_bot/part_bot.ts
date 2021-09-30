@@ -13,9 +13,9 @@ let particOfBots = async (req: any, res: any) => {
     const eventId = req.body.id
     const botAmount = req.body.botAmount
 
-    if(!botAmount || botAmount > 200){
+    if(!botAmount || botAmount > 50){
         res.status(400)
-        res.send({message: "enter the correct number of bots ( bots > 0 && bots <= 200)"})
+        res.send({message: "enter the correct number of bots ( bots > 0 && bots <= 50)"})
     }else {
         const eventParams = {
             "select": ['answers'],
@@ -40,9 +40,12 @@ let particOfBots = async (req: any, res: any) => {
 
         if (bots && bots.data.length && event && event.data.length) {
             let response = await botParc(bots.data, event.data[0], eventId, botAmount)
-            if (response) {
+            if (response && response.status == 400) {
                 res.status(response.status)
                 res.send(response.response)
+            } else {
+                res.status(200)
+                res.send({done: 'OK'})
             }
         }
     }
@@ -75,7 +78,9 @@ const botParc = async (bots: any, event: any, eventId: number, botAmount: number
             let mintResult = await mintTokens(wallet, 10, botId)
             if (mintResult) {
                 let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
-                return result
+                if (result) {
+                    return result
+                }
             }
         }
     }
@@ -99,11 +104,6 @@ const callSendToDemon = async (randomBet: number, eventId: number, answerValue: 
                 status: 400,
                 response: {status: result.response}
             }
-        } else {
-            return {
-                status: 200,
-                response: {done: 'OK'}
-            }
         }
     }
 
@@ -111,11 +111,6 @@ const callSendToDemon = async (randomBet: number, eventId: number, answerValue: 
         return {
             status: getTransect.status,
             response: {status: getTransect.response}
-        }
-    } else {
-        return {
-            status: 200,
-            response: {status: 'OK'}
         }
     }
 }
