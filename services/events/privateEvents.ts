@@ -67,6 +67,17 @@ const createPrivateEvent = async (req: any, res: any) => {
         }
     }
 
+    if (req.body.thumFinish) {
+        if (req.body.thumFinish.length > 12) {
+            let name = `${id}_finished`;
+            let type = await uploadImage(req.body.thumFinish, name);
+            let url = process.env.NODE_ENV == "production" ? "https://api.bettery.io" : `https://apitest.bettery.io`
+            allData.thumFinish = `${url}/image/${name}.${type}`;
+        } else {
+            allData.thumFinish = undefined;
+        }
+    }
+
     delete allData.prodDev;
     let data;
     if (req.body.whichRoom == "new") {
