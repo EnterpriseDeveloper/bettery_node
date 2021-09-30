@@ -1,45 +1,49 @@
 import axios from "axios";
 import Web3 from "web3";
-
-import {participateSendToDB} from './publicActivites'
 import {demonAPI, path} from "../../config/path";
-import {mintTokens} from "../funds/betteryToken";
-import {balanceCheck} from "../funds/userTokens";
-import {DirectSecp256k1HdWallet, Registry} from "@cosmjs/proto-signing";
 import {SigningStargateClient} from "@cosmjs/stargate";
+import {DirectSecp256k1HdWallet, Registry} from "@cosmjs/proto-signing";
 import {MsgCreatePartPubEvents} from "../../contract-services/publicEvents/tx";
 
+import {mintTokens} from "../../services/funds/betteryToken";
+import {balanceCheck} from "../../services/funds/userTokens";
+import {participateSendToDB} from "../../services/events/publicActivites";
 
 let particOfBots = async (req: any, res: any) => {
     const eventId = req.body.id
     const botAmount = req.body.botAmount
 
-    const eventParams = {
-        "select": ['answers'],
-        "from": eventId,
-    }
-    const botParams = {
-        "select": ["users/wallet", "users/seedPhrase"],
-        "where": "users/isBot = true"
-    }
+    if(!botAmount || botAmount > 200){
+        res.status(400)
+        res.send({message: "enter the correct number of bots ( bots > 0 && bots <= 200)"})
+    }else {
+        const eventParams = {
+            "select": ['answers'],
+            "from": eventId,
+        }
+        const botParams = {
+            "select": ["users/wallet", "users/seedPhrase"],
+            "where": "users/isBot = true"
+        }
 
-    let event = await axios.post(`${path}/query`, eventParams).catch((err) => {
-        res.status(400);
-        res.send(err.return.data.message);
-        return;
-    })
+        let event = await axios.post(`${path}/query`, eventParams).catch((err) => {
+            res.status(400);
+            res.send(err.return.data.message);
+            return;
+        })
 
-    let bots = await axios.post(`${path}/query`, botParams).catch((err) => {
-        res.status(400);
-        res.send(err.return.data.message);
-        return;
-    })
+        let bots = await axios.post(`${path}/query`, botParams).catch((err) => {
+            res.status(400);
+            res.send(err.return.data.message);
+            return;
+        })
 
-    if (bots && bots.data.length && event && event.data.length) {
-        let response = await botParc(bots.data, event.data[0], eventId, botAmount)
-        if (response) {
-            res.status(response.status)
-            res.send(response.response)
+        if (bots && bots.data.length && event && event.data.length) {
+            let response = await botParc(bots.data, event.data[0], eventId, botAmount)
+            if (response) {
+                res.status(response.status)
+                res.send(response.response)
+            }
         }
     }
 }
@@ -53,27 +57,27 @@ const botParc = async (bots: any, event: any, eventId: number, botAmount: number
         }
     }
     for (let i = 0; i < botsPartic.length; i++) {
-                let botId = botsPartic[i]._id
-                let mnemonic = botsPartic[i]["users/seedPhrase"]
-                let wallet = botsPartic[i]["users/wallet"]
-                let indexAnswerRandom = Math.floor(Math.random() * (event.answers.length))
-                let answerValue = event.answers[indexAnswerRandom]
-                let randomBet = letsChooseRandomBet(0.1, 1)
-                let {bet} = await balanceCheck(wallet)
+        let botId = botsPartic[i]._id
+        let mnemonic = botsPartic[i]["users/seedPhrase"]
+        let wallet = botsPartic[i]["users/wallet"]
+        let indexAnswerRandom = Math.floor(Math.random() * (event.answers.length))
+        let answerValue = event.answers[indexAnswerRandom]
+        let randomBet = letsChooseRandomBet(0.1, 1)
+        let {bet} = await balanceCheck(wallet)
 
-                if (bet && bet > randomBet) {
-                    let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
-                    if (result) {
-                        return result
-                    }
-                }
-                if (!bet) {
-                    let mintResult = await mintTokens(wallet, 10, botId)
-                    if (mintResult) {
-                        let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
-                        return result
-                    }
-                }
+        if (bet && bet > randomBet) {
+            let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
+            if (result) {
+                return result
+            }
+        }
+        if (!bet) {  //? ===========
+            let mintResult = await mintTokens(wallet, 10, botId)
+            if (mintResult) {
+                let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
+                return result
+            }
+        }
     }
 }
 

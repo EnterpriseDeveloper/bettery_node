@@ -15,7 +15,6 @@ import { getEventData } from "./revert";
 import { findCorrectAnswer } from "../../contract-services/publicEvents/findCorrectAnswer"
 import userAnswerMiddleware from "../../middlewares/find-user-answer";
 import checkToken from '../../middlewares/check-token'
-import {particOfBots} from "./particOfBots";
 
 export default function Events(app: any) {
     app.get("/publicEvents/create_event_id", checkToken, eventLimitPublic, async (req: any, res: any) => {
@@ -93,9 +92,5 @@ export default function Events(app: any) {
 
     app.post("/privateEvents/delete_event_id", checkToken, async (req:any, res: any) =>{
         deletePrivateEvent(req, res);
-    })
-
-    app.post( "/participation_of_bots", async (req: any, res:any) => {
-        await particOfBots(req, res)
     })
 }

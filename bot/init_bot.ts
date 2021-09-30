@@ -1,7 +1,7 @@
 import {DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
 import axios from "axios";
-import {path} from "../../config/path";
-import {mintTokens} from "../../services/funds/betteryToken";
+import {path} from "../config/path";
+import {mintTokens} from "../services/funds/betteryToken";
 
 const bip39 = require("bip39");
 
@@ -74,6 +74,3 @@ const sendToDBBots = async (amount: number) => {
 }
 
 // sendToDBBots(1)
-
-
-
