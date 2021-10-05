@@ -19,7 +19,7 @@ export default async (req: any, res: any, next: any) => {
         }
         req.body.userId = fromRedis.id
         next()
-    } catch (e) {
+    } catch (e: any) {
         res.send(e.message);
         console.log(e + 'find-user-answer middleware')
     }
