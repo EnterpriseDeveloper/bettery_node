@@ -65,6 +65,8 @@ import Image from './services/image';
 Image(app);
 import TokenSale from './contract-services/tokensale';
 TokenSale(app);
+import Public_bot from "./bot/public_bot";
+Public_bot(app)
 
 httpServer.listen(80, async () => {
     await loadHandler();

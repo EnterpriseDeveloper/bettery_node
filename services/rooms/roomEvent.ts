@@ -99,7 +99,7 @@ const getData = async (id: any, res: any) => {
     // TODO symplify query
     let event = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ["*"] }] },
+            { 'publicEvents/parcipiantsAnswer': ["*",{"_as": "publicEvents/parcipiantsAnswer", "_limit": 1000}, { "publicActivites/from": ["*"] }] },
             { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ["*"] }] },
             { 'publicEvents/host': ["*"] },
             { 'publicEvents/room': ["*"] }
