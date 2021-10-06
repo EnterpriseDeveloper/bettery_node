@@ -22,7 +22,7 @@ const sendToBlockChain = async (id: number) =>{
     };
     const fee = {
         amount: [],
-        gas: "10000000000000000",
+        gas: "1000000000",
     };
     try{
         let tx =  await client.signAndBroadcast(address, [msg], fee, memonic);
