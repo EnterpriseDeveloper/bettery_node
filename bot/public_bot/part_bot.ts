@@ -13,7 +13,7 @@ let part_bot = async (req: any, res: any) => {
     const eventId = req.body.id
     const botAmount = req.body.botAmount
 
-    if (!botAmount || botAmount > 150) {
+    if (!botAmount || botAmount <= 0 || botAmount > 150 || typeof botAmount != "number") {
         res.status(400)
         res.send({message: "enter the correct number of bots ( bots > 0 && bots <= 150)"})
     } else {
@@ -21,7 +21,7 @@ let part_bot = async (req: any, res: any) => {
             "select": ["publicEvents/answers", "publicEvents/endTime", { "publicEvents/parcipiantsAnswer": [
                     {"publicActivites/from": ["users/isBot"]}
                 ]} ],
-            "from": eventId
+            "from": Number(eventId)
         }
         const botParams = {
             "select": ["users/wallet", "users/seedPhrase"],
@@ -39,7 +39,6 @@ let part_bot = async (req: any, res: any) => {
             res.send(`Error from DB:  ${err.response.statusText}`);
             return;
         })
-
         if (bots && bots.data.length && event && event.data.length) {
             let endTime = event.data[0]["publicEvents/endTime"]
             let  parc = event.data[0]["publicEvents/parcipiantsAnswer"]
@@ -69,6 +68,9 @@ let part_bot = async (req: any, res: any) => {
                res.status(400)
                res.send({message: 'bots have already been applied for this event'})
            }
+        } else {
+            res.status(400)
+            res.send({message: "id not correct "})
         }
     }
 }
@@ -91,14 +93,12 @@ const botParc = async (bots: any, event: any, eventId: number, botAmount: number
         let {bet} = await balanceCheck(wallet)
 
         if (bet && bet > randomBet) {
-            // console.log(wallet, 'деньги есть')
             let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
             if (result) {
                 return result
             }
         }
         if (!bet) {
-            // console.log(wallet, 'денег нет')
             let mintResult = await mintTokens(wallet, 100, botId)
             if (mintResult) {
                 let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
