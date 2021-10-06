@@ -34,5 +34,6 @@ const sendToBlockChain = async (id: number) =>{
 
 
 export {
-    findCorrectAnswer
+    findCorrectAnswer,
+    sendToBlockChain
 }

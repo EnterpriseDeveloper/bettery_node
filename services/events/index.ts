@@ -1,4 +1,4 @@
-import { createEvent, getById, getAll, getAllForTest, getBetteryEvent, createEventID, deleteEvent} from "./publicEvents";
+import { createEvent, getById, getAll, getAllForTest, getBetteryEvent, createEventID, deleteEvent } from "./publicEvents";
 import {
     createPrivateEvent,
     createPrivateEventID,
@@ -12,7 +12,7 @@ import { participate, validate } from "./publicActivites";
 import eventLimitPrivate from '../../middlewares/eventLimitsPrivate'
 import eventLimitPublic from '../../middlewares/eventLimitsPublic'
 import { setRevertEvent } from "./revert";
-import { findCorrectAnswer } from "../../contract-services/publicEvents/findCorrectAnswer"
+import { sendToBlockChain } from "../../contract-services/publicEvents/findCorrectAnswer"
 import userAnswerMiddleware from "../../middlewares/find-user-answer";
 import checkToken from '../../middlewares/check-token'
 
@@ -21,7 +21,7 @@ export default function Events(app: any) {
         createEventID(req, res);
     })
 
-    app.post("/publicEvents/delete_event_id", checkToken, async (req:any, res: any) =>{
+    app.post("/publicEvents/delete_event_id", checkToken, async (req: any, res: any) => {
         deleteEvent(req, res);
     })
 
@@ -33,7 +33,7 @@ export default function Events(app: any) {
         getById(req, res);
     })
 
-    app.post("/publicEvents/get_all",userAnswerMiddleware, async (req: any, res: any) => {
+    app.post("/publicEvents/get_all", userAnswerMiddleware, async (req: any, res: any) => {
         getAll(req, res);
     })
 
@@ -77,11 +77,8 @@ export default function Events(app: any) {
 
     app.post("/public_event/finishEvent", async (req: any, res: any) => {
         let id = req.body.id
-        let data = {
-            id: id
-        }
 
-        await findCorrectAnswer(data);
+        await sendToBlockChain(Number(id));
         res.status(200);
         res.send({ status: "OK" });
     })
@@ -90,7 +87,7 @@ export default function Events(app: any) {
         await createPrivateEventID(req, res);
     })
 
-    app.post("/privateEvents/delete_event_id", checkToken, async (req:any, res: any) =>{
+    app.post("/privateEvents/delete_event_id", checkToken, async (req: any, res: any) => {
         deletePrivateEvent(req, res);
     })
 }
