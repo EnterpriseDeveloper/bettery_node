@@ -20,12 +20,21 @@ let creatOneBot = (i: any) => {
             "_id": "users",
             "avatar": `https://apitest.bettery.io/image/user_${i}.png`, // todo correct url
             "nickName": nickName,
-            "email": `${nickName.replace(' ', '') + i}@fake.com`,
+            "email": `${nickName.replace(' ', '') + i}@gmail.com`,
             "wallet": wallet,
             "isBot": true,
             "seedPhrase": mnemonic
         }
     })
+}
+
+const mintTokensAllBots = async (params: any) => {
+    if (params && params.length) {
+        for (let i = 0; i < params.length; i++) {
+            console.log(params[i].wallet)
+            await mintTokens(params[i].wallet, 100, params[i]._id)
+        }
+    }
 }
 
 
@@ -37,7 +46,7 @@ const randomName = () => {
         return Math.floor(Math.random() * (max - min)) + min;
     }
 
-    return name[getRandomInt(0, name.length + 1)] + ' ' + surname[getRandomInt(0, surname.length + 1)];
+    return name[getRandomInt(0, name.length)] + ' ' + surname[getRandomInt(0, surname.length)];
 }
 
 const generationWallet = async () => {
@@ -48,22 +57,14 @@ const generationWallet = async () => {
     return {wallet: pubKey.address, mnemonic}
 }
 
-const mintTokensAllBots = async (params: any) => {
-    if (params && params.length) {
-        for (let i = 0; i < params.length; i++) {
-            await mintTokens(params[i].wallet, 10, params[i]._id)
-        }
-    }
-}
 
 const sendToDBBots = async (amount: number) => {
     let params = await creatAllBots(amount)
 
     if (params && params.length) {
-        console.log(params, 'params')
+        // console.log(params, 'params')
         let response = await axios.post(`${path}/transact`, params).catch((err) => {
             console.log(err.response.statusText)
-            console.log('error from botGenerator')
             return
         })
         if (response) {

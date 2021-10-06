@@ -9,44 +9,66 @@ import {mintTokens} from "../../services/funds/betteryToken";
 import {balanceCheck} from "../../services/funds/userTokens";
 import {participateSendToDB} from "../../services/events/publicActivites";
 
-let particOfBots = async (req: any, res: any) => {
+let part_bot = async (req: any, res: any) => {
     const eventId = req.body.id
     const botAmount = req.body.botAmount
 
-    if(!botAmount || botAmount > 50){
+    if (!botAmount || botAmount > 150) {
         res.status(400)
-        res.send({message: "enter the correct number of bots ( bots > 0 && bots <= 50)"})
-    }else {
+        res.send({message: "enter the correct number of bots ( bots > 0 && bots <= 150)"})
+    } else {
         const eventParams = {
-            "select": ['answers'],
-            "from": eventId,
+            "select": ["publicEvents/answers", "publicEvents/endTime", { "publicEvents/parcipiantsAnswer": [
+                    {"publicActivites/from": ["users/isBot"]}
+                ]} ],
+            "from": eventId
         }
         const botParams = {
             "select": ["users/wallet", "users/seedPhrase"],
             "where": "users/isBot = true"
         }
 
-        let event = await axios.post(`${path}/query`, eventParams).catch((err) => {
+        let event: any = await axios.post(`${path}/query`, eventParams).catch((err) => {
             res.status(400);
-            res.send(err.return.data.message);
+            res.send(`Error from DB:  ${err.response.statusText}`);
             return;
         })
 
-        let bots = await axios.post(`${path}/query`, botParams).catch((err) => {
+        let bots: any = await axios.post(`${path}/query`, botParams).catch((err) => {
             res.status(400);
-            res.send(err.return.data.message);
+            res.send(`Error from DB:  ${err.response.statusText}`);
             return;
         })
 
         if (bots && bots.data.length && event && event.data.length) {
-            let response = await botParc(bots.data, event.data[0], eventId, botAmount)
-            if (response && response.status == 400) {
-                res.status(response.status)
-                res.send(response.response)
-            } else {
-                res.status(200)
-                res.send({done: 'OK'})
+            let endTime = event.data[0]["publicEvents/endTime"]
+            let  parc = event.data[0]["publicEvents/parcipiantsAnswer"]
+
+            let index: any
+            if(parc){
+                index = parc.findIndex((el: any) => {
+                    return  el["publicActivites/from"]["users/isBot"]
+                })
             }
+
+           if(index == -1 || index == undefined){
+               if (checkEndTime(endTime)) {
+                   let response = await botParc(bots.data, event.data[0], eventId, botAmount)
+                   if (response && response.status == 400) {
+                       res.status(response.status)
+                       res.send(response.response)
+                   } else {
+                       res.status(200)
+                       res.send({done: 'OK'})
+                   }
+               } else {
+                   res.status(400)
+                   res.send({message: 'the time for participation in the event has expired, or there is less than 45 minutes left'})
+               }
+           } else {
+               res.status(400)
+               res.send({message: 'bots have already been applied for this event'})
+           }
         }
     }
 }
@@ -63,19 +85,21 @@ const botParc = async (bots: any, event: any, eventId: number, botAmount: number
         let botId = botsPartic[i]._id
         let mnemonic = botsPartic[i]["users/seedPhrase"]
         let wallet = botsPartic[i]["users/wallet"]
-        let indexAnswerRandom = Math.floor(Math.random() * (event.answers.length))
-        let answerValue = event.answers[indexAnswerRandom]
+        let indexAnswerRandom = Math.floor(Math.random() * (event["publicEvents/answers"].length))
+        let answerValue = event["publicEvents/answers"][indexAnswerRandom]
         let randomBet = letsChooseRandomBet(0.1, 1)
         let {bet} = await balanceCheck(wallet)
 
         if (bet && bet > randomBet) {
+            // console.log(wallet, 'деньги есть')
             let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
             if (result) {
                 return result
             }
         }
-        if (!bet) {  //? ===========
-            let mintResult = await mintTokens(wallet, 10, botId)
+        if (!bet) {
+            // console.log(wallet, 'денег нет')
+            let mintResult = await mintTokens(wallet, 100, botId)
             if (mintResult) {
                 let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
                 if (result) {
@@ -93,6 +117,11 @@ const letsChooseRandomBots = (amount: number, arr: any) => {
 
 const letsChooseRandomBet = (min: number, max: number) => {
     return Number((Math.random() * (max - min) + min).toFixed(1))
+}
+
+const checkEndTime = (time: number) => {
+    let endTime: any = (time * 1000).toFixed(0)
+    return (endTime - 2700000) > Date.now()
 }
 
 const callSendToDemon = async (randomBet: number, eventId: number, answerValue: any, indexAnswerRandom: number, botId: number, mnemonic: string) => {
@@ -153,10 +182,10 @@ const sendToDemonParticipate = async (randomBet: any, eventId: number, answerVal
             }
         }
     } catch (err) {
-        console.log(`Error sendToDemonPart 2 ${String(err.error)}`)
+        console.log(`Error sendToDemonPart 2 ${String(err)} 2`)
         return {
             status: 400,
-            response: {status: String(err.error)}
+            response: {status: String(err.message)}
         }
     }
 }
@@ -184,5 +213,5 @@ const connectToSign = async (memonic: string) => {
 
 
 export {
-    particOfBots
+    part_bot
 }
