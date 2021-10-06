@@ -210,7 +210,7 @@ const getAll = async (req: any, res: any) => {
     let userId = req.body.userId;
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+            { 'publicEvents/parcipiantsAnswer': ["*",{"_as": "publicEvents/parcipiantsAnswer", "_limit": 1000}, { "publicActivites/from": ['users/avatar'] }] },
             { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
             { 'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet'] },
             { 'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId'] }
