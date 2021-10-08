@@ -3,8 +3,7 @@ import bodyParser from 'body-parser'
 const app = express();
 import fs from 'fs';
 import { refundBot } from './bot/refundBot';
-import { loadHandler } from "./contract-services/eventHandler";
-import { nonceInit } from "./contract-services/nonce/nonce";
+import { loadHandler } from "./contract-services/events";
 import https from 'https';
 import http from 'http';
 import comments from './services/comments/index';
@@ -66,9 +65,10 @@ import Image from './services/image';
 Image(app);
 import TokenSale from './contract-services/tokensale';
 TokenSale(app);
+import Public_bot from "./bot/public_bot";
+Public_bot(app)
 
 httpServer.listen(80, async () => {
-    await nonceInit();
     await loadHandler();
     setInterval(() => {
         refundBot();

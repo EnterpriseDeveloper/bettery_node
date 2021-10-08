@@ -12,6 +12,10 @@ const secretRedisForAllKey = "kdXBlciBzZWNyZXQgd";
 const auth0Path = "https://bettery.us.auth0.com";
 const auth0ClientId = "by3kXEWyBmVBWrAxrd5fVE97HRAQf1Wk";
 const auth0Secret = "uyXFkmokkGIJp4Wx9DngoBUkyarBXzUQ_9-hEGXCibIx8v5R6WuyYLz3fI6udHGe";
+const testDemon = "54.255.226.141";
+const demon = "13.213.38.183";
+const testMemo = "basic curious upset exhaust explain element ritual rent toward fit high fee any gaze path glove poem tired valid depart ginger sentence truck bamboo"
+const prodMemo = "window repair debris arrest example honey ethics review despair arctic upgrade idle cancel beef basket describe saddle vehicle beauty edit decrease garbage track shoot"
 
 export {
    apiKey,
@@ -27,5 +31,9 @@ export {
    secretRedisForAllKey,
    auth0Path,
    auth0ClientId,
-   auth0Secret
+   auth0Secret,
+   testDemon,
+   demon,
+   testMemo,
+   prodMemo
 }

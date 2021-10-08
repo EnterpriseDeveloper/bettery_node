@@ -7,23 +7,9 @@ import { searchData } from '../../helpers/filter';
 import { trendingSorting, controversialSorting } from '../../helpers/sorting';
 import { getAdditionalData, getAnswers } from '../../helpers/additionalData';
 import { sendNotificationToUser } from '../rooms/notification';
-import { init } from "../../contract-services/contractInit";
-import PublicEvents from "../../contract-services/abi/PublicEvents.json";
-import { getNonce } from "../../contract-services/nonce/nonce";
 import { uploadImage } from "../../helpers/helpers";
-import { getGasPrice, estimateGasLimit } from "../../contract-services/gasPrice/getGasPrice";
 
-const createEvent = async (req: any, res: any) => {
-    req.body.host = req.body.dataFromRedis.id
-    let wallet = req.body.dataFromRedis.wallet
-    let dateNow = Number((new Date().getTime() / 1000).toFixed(0))
-
-    if (dateNow > req.body.endTime) {
-        res.status(400);
-        res.send("Please check your event end time. This time already passed.");
-        return;
-    }
-
+const createEventID = async (req: any, res: any) => {
     // create event id
     let createEventID = [{
         _id: "publicEvents$newEvents",
@@ -34,142 +20,146 @@ const createEvent = async (req: any, res: any) => {
             console.log("DB error: " + err.response.data.message)
             res.status(400);
             res.send(err.response.data.message);
+            return
         })
 
     let id = eventData.data.tempids["publicEvents$newEvents"];
+    res.status(200);
+    res.send({ id: id });
+}
 
-    try {
-        let startTime = req.body.startTime;
-        let endTime = req.body.endTime;
-        let questionQuantity = req.body.answers.length;
-        let amountExperts = req.body.calculateExperts === "company" ? 0 : req.body.validatorsAmount;
-        let calculateExperts = req.body.calculateExperts === "company" ? true : false
-        let amountPremiumEvent = req.body.amount;
-        let pathContr = process.env.NODE_ENV;
-        let contract = await init(pathContr, PublicEvents)
+const deleteEvent = (req: any, res: any) => {
+    // TODO check status before deleting
+    let id = req.body.id
+    let removeEvent = [{
+        _id: id,
+        _action: 'delete',
+    }]
+    axios.post(`${path}/transact`, removeEvent)
+        .catch((err) => {
+            console.log("DB error: " + err.response.data.message)
+            res.status(400);
+            res.send(err.response.data.message);
+            return
+        })
+    res.status(200)
+    res.send({ "status": "ok" })
+}
 
-        let gasEstimate = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).estimateGas();
-        let transaction = await contract.methods.newEvent(id, startTime, endTime, questionQuantity, amountExperts, calculateExperts, wallet, amountPremiumEvent).send({
-            gas: await estimateGasLimit(gasEstimate),
-            gasPrice: await getGasPrice(),
-            nonce: await getNonce()
-        });
-        if (transaction) {
-            let allData = req.body
-            delete allData.dataFromRedis
+const createEvent = async (req: any, res: any) => {
+    req.body.host = req.body.dataFromRedis.id
+    let dateNow = Number((new Date().getTime() / 1000).toFixed(0))
+    let id = req.body._id
 
-            // upload image
-            if (req.body.thumImage != "undefined") {
-                let type = await uploadImage(req.body.thumImage, id);
-                let url = process.env.NODE_ENV == "production" ? "https://api.bettery.io" : `https://apitest.bettery.io`
-                allData.thumImage = `${url}/image/${id}.${type}`;
-                allData.thumColor = undefined;
-            } else if (req.body.thumColor != "undefined") {
-                allData.thumImage = undefined;
-            } else if (req.body.thumColor === "undefined" && req.body.thumImage === "undefined") {
-                allData.thumImage = undefined;
-                if (req.body.whichRoom == "new") {
-                    allData.thumColor = req.body.roomColor;
-                } else {
-                    allData.thumColor = await getRoomColor(allData.roomId);
-                }
-            }
-
-            let hashtagsId = req.body.hashtagsId;
-            let hostId = allData.host;
-            let roomId = allData.roomId;
-            let whichRoom = req.body.whichRoom;
-
-            delete allData.amount;
-            delete allData.calculateExperts;
-
-            //TODO add to the history host tokens amount in premium events
-
-            allData.premiumTokens = amountPremiumEvent
-            allData._id = id;
-            allData.finalAnswer = "";
-            allData.dateCreation = Math.floor(Date.now() / 1000)
-            allData.status = "deployed";
-            allData.validated = 0;
-            allData.transactionHash = transaction.transactionHash;
-            let data = []
-
-            // add room
-            if (whichRoom == "new") {
-                let room = createRoom(allData, "publicEventsId");
-                allData.room = [room._id]
-                delete allData.roomName;
-                delete allData.roomColor;
-                delete allData.whichRoom;
-                delete allData.roomId;
-                data.push(room);
-            } else {
-                let room = {
-                    _id: Number(roomId),
-                    publicEventsId: [Number(id)]
-                }
-                data.push(room);
-                allData.room = [Number(roomId)]
-
-                // Add notification
-                sendNotificationToUser(roomId, id, res);
-
-                delete allData.roomName;
-                delete allData.roomColor;
-                delete allData.whichRoom;
-                delete allData.roomId;
-            }
-
-            if (allData.hashtags.length !== 0) {
-                data.push({
-                    _id: hashtagsId,
-                    hashtags: allData.hashtags
-                })
-                delete allData['hashtagsId'];
-            } else {
-                delete allData['hashtagsId'];
-            }
-            data.push(allData)
-            // ADD to host
-            data.push({
-                _id: hostId,
-                hostPublicEvents: [id],
-            })
-            await axios.post(path + "/transact", data).catch((err) => {
-                console.log("DB error: " + err.response.data.message)
-                res.status(400);
-                res.send(err.response.data.message);
-                return;
-            })
-            if (whichRoom == 'new') {
-                let roomId = await getRoomId(id, res);
-                res.status(200).send({
-                    roomId: roomId,
-                    eventId: id
-                });
-            } else {
-                res.status(200).send({
-                    roomId: roomId,
-                    eventId: id
-                });
-            }
-        }
-
-    } catch (err) {
-        console.log(err);
-        // remove event id
-        let removeEvent = [{
-            _id: id,
-            _action: 'delete',
-        }]
-        axios.post(`${path}/transact`, removeEvent)
-            .catch((err) => {
-                console.log("DB error: " + err.response.data.message)
-                res.status(400);
-                res.send(err.response.data.message);
-            })
+    if (dateNow > req.body.endTime) {
         res.status(400);
-        console.log(err.message);
+        res.send("Please check your event end time. This time already passed.");
+        return;
+    }
+
+    let allData = req.body
+    delete allData.dataFromRedis
+
+    // upload image
+    if (req.body.thumImage != "undefined") {
+        let type = await uploadImage(req.body.thumImage, id);
+        let url = process.env.NODE_ENV == "production" ? "https://api.bettery.io" : `https://apitest.bettery.io`
+        allData.thumImage = `${url}/image/${id}.${type}`;
+        allData.thumColor = undefined;
+    } else if (req.body.thumColor != "undefined") {
+        allData.thumImage = undefined;
+    } else if (req.body.thumColor === "undefined" && req.body.thumImage === "undefined") {
+        allData.thumImage = undefined;
+        if (req.body.whichRoom == "new") {
+            allData.thumColor = req.body.roomColor;
+        } else {
+            allData.thumColor = await getRoomColor(allData.roomId);
+        }
+    }
+    if (req.body.thumFinish) {
+        if (req.body.thumFinish.length > 12) {
+            let name = `${id}_finished`;
+            let type = await uploadImage(req.body.thumFinish, name);
+            let url = process.env.NODE_ENV == "production" ? "https://api.bettery.io" : `https://apitest.bettery.io`
+            allData.thumFinish = `${url}/image/${name}.${type}`;
+        } else {
+            allData.thumFinish = undefined;
+        }
+    }
+
+    let hashtagsId = req.body.hashtagsId;
+    let hostId = allData.host;
+    let roomId = allData.roomId;
+    let whichRoom = req.body.whichRoom;
+
+    delete allData.calculateExperts;
+
+    //TODO add to the history host tokens amount in premium events
+
+    allData.finalAnswer = "";
+    allData.dateCreation = Math.floor(Date.now() / 1000)
+    allData.status = "deployed";
+    allData.validated = 0;
+    let data = []
+
+    // add room
+    if (whichRoom == "new") {
+        let room = createRoom(allData, "publicEventsId");
+        allData.room = [room._id]
+        delete allData.roomName;
+        delete allData.roomColor;
+        delete allData.whichRoom;
+        delete allData.roomId;
+        data.push(room);
+    } else {
+        let room = {
+            _id: Number(roomId),
+            publicEventsId: [Number(id)]
+        }
+        data.push(room);
+        allData.room = [Number(roomId)]
+
+        // Add notification
+        sendNotificationToUser(roomId, id, res);
+
+        delete allData.roomName;
+        delete allData.roomColor;
+        delete allData.whichRoom;
+        delete allData.roomId;
+    }
+
+    if (allData.hashtags.length !== 0) {
+        data.push({
+            _id: hashtagsId,
+            hashtags: allData.hashtags
+        })
+        delete allData['hashtagsId'];
+    } else {
+        delete allData['hashtagsId'];
+    }
+    data.push(allData)
+    // ADD to host
+    data.push({
+        _id: hostId,
+        hostPublicEvents: [id],
+    })
+    await axios.post(path + "/transact", data).catch((err) => {
+        console.log("DB error: " + err.response.data.message)
+        res.status(400);
+        res.send(err.response.data.message);
+        return;
+    })
+    if (whichRoom == 'new') {
+        let roomId = await getRoomId(id, res);
+        res.status(200).send({
+            roomId: roomId,
+            eventId: id
+        });
+    } else {
+        res.status(200).send({
+            roomId: roomId,
+            eventId: id
+        });
     }
 }
 
@@ -228,11 +218,9 @@ const getAll = async (req: any, res: any) => {
     let sort = req.body.sort != undefined ? req.body.sort : 'trending' // controversial 
     let finished = req.body.finished;
     let userId = req.body.userId;
-
-    let o = Date.now();
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
+            { 'publicEvents/parcipiantsAnswer': ["*",{"_as": "publicEvents/parcipiantsAnswer", "_limit": 1000}, { "publicActivites/from": ['users/avatar'] }] },
             { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
             { 'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet'] },
             { 'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId'] }
@@ -247,9 +235,6 @@ const getAll = async (req: any, res: any) => {
             console.log("DB error: " + err.response.data.message)
             return;
         })
-
-    let z = Date.now()
-    console.log(z - o)
 
     let obj = publicEventStructure(x.data)
 
@@ -358,5 +343,7 @@ export {
     getById,
     getAll,
     getBetteryEvent,
-    getAllForTest
+    getAllForTest,
+    createEventID,
+    deleteEvent
 }

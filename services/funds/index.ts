@@ -1,6 +1,6 @@
 import { setInitWithd } from "./withdrawal";
 import { getBTYToken } from './betteryToken';
-import { sendTokens } from './userTokens'
+import { getTokens } from './userTokens'
 import checkToken from '../../middlewares/check-token';
 
 export default function Funds(app: any) {
@@ -17,7 +17,7 @@ export default function Funds(app: any) {
         getBTYToken(req, res);
     })
 
-    app.post("/users/updateBalance", checkToken, async (req: any, res: any) => {
-        sendTokens(req, res);
+    app.get("/users/getBalance", checkToken, async (req: any, res: any) => {
+        getTokens(req, res);
     })
 }

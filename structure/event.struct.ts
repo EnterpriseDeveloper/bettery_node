@@ -23,6 +23,7 @@ const publicEventStructure = (data: any) => {
             },
             thumImage: z['publicEvents/thumImage'] === undefined ? "undefined" : z['publicEvents/thumImage'],
             thumColor: getPublicColor(z),
+            thumFinish: getFinishImage(z),
             validated: z['publicEvents/validated'],
             status: z['publicEvents/status'],
             answers: z['publicEvents/answers'],
@@ -70,7 +71,12 @@ const publicEventStructure = (data: any) => {
 }
 
 const privateEventStructure = (data: any) => {
-    return data.map((z: any) => {
+    return data.filter((x: any) => {
+        if (x['privateEvents/status'] == "id created") {
+            return false;
+        }
+        return true;
+    }).map((z: any) => {
         return {
             winner: z['privateEvents/winner'],
             loser: z['privateEvents/loser'],
@@ -123,6 +129,20 @@ const privateEventStructure = (data: any) => {
 const getPublicColor = (z: any) => {
     if (z['publicEvents/thumImage'] === undefined) {
         return z['publicEvents/thumColor'] === undefined ? z['publicEvents/room'][0]['room/color'] : z['publicEvents/thumColor']
+    } else {
+        return "undefined"
+    }
+}
+
+const getFinishImage = (z: any) => {
+    if (z['publicEvents/thumFinish'] != undefined) {
+        const timeNow = Number((Date.now() / 1000).toFixed(0));
+        let finishDate = z['publicEvents/endTime'];
+        if (timeNow - finishDate > 0) {
+            return z['publicEvents/thumFinish']
+        } else {
+            return "undefined"
+        }
     } else {
         return "undefined"
     }

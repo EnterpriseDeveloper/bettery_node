@@ -3,7 +3,6 @@ import { path } from "../../config/path";
 
 
 const setCorrectAnswer = async (data: any) => {
-
     let finalAnswer = [{
         "_id": Number(data.id),
         "finalAnswerNumber": Number(data.correctAnswer),

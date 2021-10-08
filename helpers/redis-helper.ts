@@ -1,6 +1,6 @@
 import { secretRedisForAllKey } from "../config/key";
 import redis from "redis";
-const redisUrl = "redis://127.0.0.1:6379";
+const redisUrl = process.env.NODE_TEST == 'true' ? "redis://127.0.0.1:6379" : "redis://redis:6379";
 const client = redis.createClient(redisUrl);
 
 client.on("error", function (error) {

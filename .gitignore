@@ -1,5 +1,7 @@
 # dependencies
 /node_modules
 /keys
-/config/keys.js
 /build/*
+/.vscode
+/archive
+bettery-app.zip

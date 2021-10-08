@@ -1,0 +1,22 @@
+version: "3.7"
+
+services: 
+
+  redis:
+    image: "bitnami/redis:latest"  
+    environment:
+      -   ALLOW_EMPTY_PASSWORD=yes
+    restart: on-failure
+    ports: 
+      - 6379:6379
+
+  app:
+    build: ./
+    restart: on-failure
+    ports: 
+      - 80:80
+      - 443:443
+      - 8090:8090
+    container_name: bettery_app
+    links:
+      - redis 
