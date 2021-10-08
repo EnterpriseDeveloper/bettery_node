@@ -146,5 +146,6 @@ const validateCendToDB = async (eventId: any, from: any, reputation: any, transa
 export {
     participate,
     validate,
-    participateSendToDB
+    participateSendToDB,
+    validateCendToDB
 }

@@ -1,13 +1,14 @@
 import axios from 'axios';
 
 import { path } from "../../config/path";
+import { validateCendToDB }  from '../../services/events/publicActivites';
 
 const validEventBot = async (req: any, res: any) => {
     const eventId = req.body.id;
-    const answer = req.body.answer;
+    const trueAnswerNumber = req.body.answer;
 
     const eventParams = {
-        "select": ['answers', 'endTime', 'status', 'validatorsAmount', 'validatorsAnswer'],
+        "select": ['answers', 'endTime', 'status', 'validatorsAmount', 'validatorsAnswer', { "publicEvents/parcipiantsAnswer": ["from"] }],
         "from": eventId,
     }
     const botParams = {
@@ -29,6 +30,17 @@ const validEventBot = async (req: any, res: any) => {
     if (event && event.data[0] && bots) {
         const eventData = event.data[0]
 
+
+        if (eventData.validatorsAmount == undefined){
+            eventData.validatorsAmount = []
+        }
+
+        if (trueAnswerNumber >= eventData.answers.length) {
+            res.status(400)
+            res.send('Answer number is invalid')
+            return;
+        }
+
         const endTimeRes = checkEventTime(eventData.endTime)
         if(endTimeRes && endTimeRes.status === 400){
             res.status(endTimeRes.status)
@@ -42,16 +54,31 @@ const validEventBot = async (req: any, res: any) => {
             return;
         }
 
+        if (eventData.status !== 'finished' && eventData.status !== 'deployed') {
+            res.status(400)
+            res.send('Event status is reverted or cancel')
+            return;
+        }
+
         const numberOfValids = eventData.validatorsAmount - eventData.validatorsAnswer.length
 
-        const choosenBots = chooseBots(bots.data, numberOfValids, eventData.validatorsAnswer)
+        const choosenBots = chooseBots(bots.data, numberOfValids, eventData['publicEvents/parcipiantsAnswer'])
         const trueAnswers = countTrueAnswers(numberOfValids)
 
-
-
-
-
-        
+        for (let i = 0; i < choosenBots.length; i++) {
+            if (i < trueAnswers) {
+                // validateCendToDB(eventId, choosenBots[i]._id,  ,  , trueAnswerNumber)
+            } else {
+                let falseAnswerNumber
+                for (let index = 0; index < 1;) {
+                    falseAnswerNumber = Math.floor(Math.random() * eventData.answers.length)
+                    if (falseAnswerNumber !== trueAnswerNumber) {
+                        index++
+                    }
+                }
+                // validateCendToDB(eventId, choosenBots[i]._id,  ,  , trueAnswerNumber)
+            }
+        }
 
     } else {
         res.status(400)
@@ -60,55 +87,38 @@ const validEventBot = async (req: any, res: any) => {
     } 
 }
 
-const chooseBots = (botsData: any, numberOfValids: number, answers:any) => {
-    const botsForValidate: any[] = [];
-
-    const checkAnswersId = (botId: number) => {
-        for (let answer of answers) {
-            if (botId == answer._id){
-                return false
-            }
-        }
-        return true
+const shuffle = (array: any[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
-
-    const checkChoosenBotsId = (botId: number) => {
-        for (let botForValidate of botsForValidate) {
-            if (botId == botForValidate._id) {
-                return false
-            }
-        }
-        return true
-    }
-
-    for (let i = 0; i < numberOfValids;) {
-        const botIndex = Math.floor(Math.random() * botsData.length)
-
-        const answersResponse = checkAnswersId(botsData[botIndex]._id)
-
-        if (answersResponse) {
-            if (botsForValidate[0]){  
-                const choosenBotsResponse = checkChoosenBotsId(botsData[botIndex]._id)
-                if (choosenBotsResponse) {
-                    botsForValidate.push(botsData[botIndex])
-                    i++   
-                }
-            } else {
-                botsForValidate.push(botsData[botIndex])
-                i++
-            }                
-        }
-    }
-
-    return botsForValidate;       
+    return array
 }
+
+const chooseBots = (botsData: any, numberOfValids: number, answers:any) => {
+    let botsForValidate: any[] = [];
+    
+    for (let answer of answers) {
+        for (let bot of botsData) {
+            if (answer.from._id !== bot._id) {
+              botsForValidate.push(bot)
+            }
+        }
+    }
+
+    botsForValidate = shuffle(botsForValidate)
+    botsForValidate = botsForValidate.slice(0, numberOfValids)
+
+    return botsForValidate;
+}
+
 
 const checkEventTime = (endTime: number) => {
     const nowTime = Math.floor(Date.now() / 1000);
-    if (endTime < nowTime) {
+    if (endTime > nowTime) {
         return {
             status: 400,
-            response: { status: 'Event time is over' }
+            response: { status: 'Event time is not over' }
         }
     }
     return;
@@ -116,13 +126,20 @@ const checkEventTime = (endTime: number) => {
 
 const countTrueAnswers = (numberOfValids: number) => {
     if (numberOfValids == 1){
-        return [1, 0]
+        return 1
     }
     const trueAnswers = Math.floor((numberOfValids / 10) * 6);
-    const falseAnswers = numberOfValids - trueAnswers
 
-    return [trueAnswers, falseAnswers]  
+    return trueAnswers
 }
+
+
+
+
+
+
+
+
 
 
 export {
