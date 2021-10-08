@@ -6,9 +6,7 @@
   "scripts": {
     "dev": "NODE_TEST=true NODE_ENV=test nodemon",
     "start": "webpack --mode=development --config webpack.config.js && NODE_TEST=false NODE_ENV=test node server.js",
-    "start_prod": "NODE_TEST=false NODE_ENV=production node server_prod.js",
-    "build_prod": "webpack --mode=production --config webpack.production.config.js && sudo npm run deploy_prod",
-    "deploy_prod": "sudo scp -i ~/.ssh/bettery_dev.pem -r server_prod.js ubuntu@13.213.49.239:/home/ubuntu/node",
+    "start_prod": "webpack --mode=production --config webpack.production.config.js && NODE_TEST=false NODE_ENV=production node server_prod.js",
     "archive": "node build_scripts/zip_project.js",
     "archive_prod": "PROD=true node build_scripts/zip_project.js"
   },
