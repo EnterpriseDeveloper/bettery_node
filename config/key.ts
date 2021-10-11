@@ -15,7 +15,7 @@ const auth0Secret = "uyXFkmokkGIJp4Wx9DngoBUkyarBXzUQ_9-hEGXCibIx8v5R6WuyYLz3fI6
 const testDemon = "54.255.226.141";
 const demon = "13.213.38.183";
 const testMemo = "basic curious upset exhaust explain element ritual rent toward fit high fee any gaze path glove poem tired valid depart ginger sentence truck bamboo"
-const prodMemo = "window repair debris arrest example honey ethics review despair arctic upgrade idle cancel beef basket describe saddle vehicle beauty edit decrease garbage track shoot"
+const prodMemo = "basket opinion enrich where input lemon fee penalty leisure coach sea helmet tide match pipe jaguar aunt math sunny just imitate garbage more machine"
 
 export {
    apiKey,
