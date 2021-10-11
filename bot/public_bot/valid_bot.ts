@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-import { path } from "../../config/path";
+import { demonAPI, path } from "../../config/path";
 import { validateCendToDB }  from '../../services/events/publicActivites';
+import { DirectSecp256k1HdWallet, Registry } from "@cosmjs/proto-signing";
+import { MsgCreatePartPubEvents } from "../../contract-services/publicEvents/tx";
+import { SigningStargateClient } from '@cosmjs/stargate';
 
 const validEventBot = async (req: any, res: any) => {
     const eventId = req.body.id;
@@ -12,7 +15,7 @@ const validEventBot = async (req: any, res: any) => {
         "from": eventId,
     }
     const botParams = {
-        "select": ["_id"],
+        "select": ["_id", "expertReputPoins", "seedPhrase"],
         "where": "users/isBot = true"
     }
 
@@ -30,9 +33,8 @@ const validEventBot = async (req: any, res: any) => {
     if (event && event.data[0] && bots) {
         const eventData = event.data[0]
 
-
-        if (eventData.validatorsAmount == undefined){
-            eventData.validatorsAmount = []
+        if (eventData.validatorsAnswer == undefined){
+            eventData.validatorsAnswer = []
         }
 
         if (trueAnswerNumber >= eventData.answers.length) {
@@ -65,18 +67,25 @@ const validEventBot = async (req: any, res: any) => {
         const choosenBots = chooseBots(bots.data, numberOfValids, eventData['publicEvents/parcipiantsAnswer'])
         const trueAnswers = countTrueAnswers(numberOfValids)
 
+
         for (let i = 0; i < choosenBots.length; i++) {
-            if (i < trueAnswers) {
-                // validateCendToDB(eventId, choosenBots[i]._id,  ,  , trueAnswerNumber)
-            } else {
-                let falseAnswerNumber
-                for (let index = 0; index < 1;) {
-                    falseAnswerNumber = Math.floor(Math.random() * eventData.answers.length)
-                    if (falseAnswerNumber !== trueAnswerNumber) {
-                        index++
-                    }
+            const indexAnswerRandom = Math.floor(Math.random() * (eventData.answers.length))
+            const answerValue = eventData.answers[indexAnswerRandom]
+            const getTransect = await setToNetworkValidation(choosenBots[i].expertReputPoins, eventId, answerValue, choosenBots[i].seedPhrase)
+            
+            if (getTransect && getTransect.transact) {
+                
+                if (i < trueAnswers) {
+                    validateCendToDB(eventId, choosenBots[i]._id, choosenBots[i].expertReputPoins, getTransect.transact, trueAnswerNumber)
+                } else {
+                    const falseAnswerNumber = Math.floor(Math.random() * eventData.answers.length)
+                    validateCendToDB(eventId, choosenBots[i]._id, choosenBots[i].expertReputPoins, getTransect.transact, falseAnswerNumber)
                 }
-                // validateCendToDB(eventId, choosenBots[i]._id,  ,  , trueAnswerNumber)
+
+            } else {
+                res.status(getTransect.status)
+                res.send(getTransect.response)
+                return;
             }
         }
 
@@ -101,7 +110,10 @@ const chooseBots = (botsData: any, numberOfValids: number, answers:any) => {
     for (let answer of answers) {
         for (let bot of botsData) {
             if (answer.from._id !== bot._id) {
-              botsForValidate.push(bot)
+                if (bot.expertReputPoins == undefined) {
+                    bot.expertReputPoins = 0
+                }
+                botsForValidate.push(bot)
             }
         }
     }
@@ -133,14 +145,70 @@ const countTrueAnswers = (numberOfValids: number) => {
     return trueAnswers
 }
 
+const setToNetworkValidation = async (reput: any, eventId: number, answerValue: any, mnemonic: string) => {
+    let memonic, address, client
 
+    let data: any = await connectToSign(mnemonic)
+    if (data.memonic) {
+        memonic = data.memonic
+        address = data.address
+        client = data.client
+    }
+    const msg = {
+        typeUrl: "/VoroshilovMax.bettery.publicevents.MsgCreateValidPubEvents",
+        value: {
+            creator: address,
+            pubId: eventId,
+            answers: answerValue,
+            reput
+        }
+    };
+    const fee = {
+        amount: [],
+        gas: "1000000",
+    };
+    try {
+        let transact: any = await client.signAndBroadcast(address, [msg], fee, memonic);
+        if (transact.transactionHash && transact.code == 0) {
+            return {
+                transact: transact.transactionHash
+            }
+        } else {
+            console.log(`Error sendToDemonPart 1 ${String(transact)}`)
+            return {
+                status: 400,
+                response: { status: String(transact) }
+            }
+        }
+    } catch (err: any) {
+        console.log(`Error sendToDemonPart 2 ${String(err.error)}`)
+        return {
+            status: 400,
+            response: { status: String(err.error) }
+        }
+    }
+}
 
+const connectToSign = async (memonic: string) => {
+    const types = [
+        ["/VoroshilovMax.bettery.publicevents.MsgCreateValidPubEvents", MsgCreatePartPubEvents],
+    ];
+    const registry = new Registry(<any>types);
 
+    if (memonic) {
+        const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
+            memonic
+        );
 
+        let addr = `${demonAPI}:26657`;
+        const [{ address }] = await wallet.getAccounts();
+        const client = await SigningStargateClient.connectWithSigner(addr, wallet, { registry });
+        return { memonic, address, client }
+    } else {
+        console.log("error getting memonic")
+    }
 
-
-
-
+}
 
 export {
     validEventBot
