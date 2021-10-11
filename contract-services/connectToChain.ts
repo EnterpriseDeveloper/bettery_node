@@ -2,7 +2,7 @@ import { DirectSecp256k1HdWallet, Registry } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { MsgCreateMintBet } from "./funds/tx";
 import { MsgCreateFihishPubEvent, MsgCreateRefPubEvents, MsgCreateRefundPubEvents } from './publicEvents/tx';
-import { demonAPI } from "../config/path";
+import { demonEndPointProd, demonEndPointTest } from "../config/key";
 import {testMemo, prodMemo} from '../config/key'
 
 
@@ -22,9 +22,9 @@ const connectToSign = async () => {
         memonic
     );
 
-    let addr = `${demonAPI}:26657`;
+    const demonAPI = process.env.NODE_ENV == "production" ? demonEndPointProd : demonEndPointTest;
     const [{ address }] = await wallet.getAccounts();
-    const client = await SigningStargateClient.connectWithSigner(addr, wallet, { registry });
+    const client = await SigningStargateClient.connectWithSigner(demonAPI, wallet, { registry });
     return { memonic, address, client }
 }
 
