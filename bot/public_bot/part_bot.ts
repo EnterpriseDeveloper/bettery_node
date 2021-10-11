@@ -1,6 +1,6 @@
 import axios from "axios";
 import Web3 from "web3";
-import {demonAPI, path} from "../../config/path";
+import {path} from "../../config/path";
 import {SigningStargateClient} from "@cosmjs/stargate";
 import {DirectSecp256k1HdWallet, Registry} from "@cosmjs/proto-signing";
 import {MsgCreatePartPubEvents} from "../../contract-services/publicEvents/tx";
@@ -8,6 +8,7 @@ import {MsgCreatePartPubEvents} from "../../contract-services/publicEvents/tx";
 import {mintTokens} from "../../services/funds/betteryToken";
 import {balanceCheck} from "../../services/funds/userTokens";
 import {participateSendToDB} from "../../services/events/publicActivites";
+import { demonEndPointProd, demonEndPointTest } from "../../config/key";
 
 let part_bot = async (req: any, res: any) => {
     const eventId = req.body.id
@@ -181,7 +182,7 @@ const sendToDemonParticipate = async (randomBet: any, eventId: number, answerVal
                 response: {status: String(transact)}
             }
         }
-    } catch (err) {
+    } catch (err: any) {
         console.log(`Error sendToDemonPart 2 ${String(err)} 2`)
         return {
             status: 400,
@@ -201,9 +202,9 @@ const connectToSign = async (memonic: string) => {
             memonic
         );
 
-        let addr = `${demonAPI}:26657`;
+        const demonAPI = process.env.NODE_ENV == "production" ? demonEndPointProd : demonEndPointTest;
         const [{address}] = await wallet.getAccounts();
-        const client = await SigningStargateClient.connectWithSigner(addr, wallet, {registry});
+        const client = await SigningStargateClient.connectWithSigner(demonAPI, wallet, {registry});
         return {memonic, address, client}
     } else {
         console.log("error getting memonic")
