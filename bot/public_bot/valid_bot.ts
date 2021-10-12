@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 import { demonAPI, path } from "../../config/path";
-import { validateCendToDB }  from '../../services/events/publicActivites';
+import { validateCendToDB } from '../../services/events/publicActivites';
 import { DirectSecp256k1HdWallet, Registry } from "@cosmjs/proto-signing";
-import { MsgCreatePartPubEvents } from "../../contract-services/publicEvents/tx";
+import { MsgCreateValidPubEvents } from "../../contract-services/publicEvents/tx";
 import { SigningStargateClient } from '@cosmjs/stargate';
 
 const validEventBot = async (req: any, res: any) => {
@@ -19,14 +19,14 @@ const validEventBot = async (req: any, res: any) => {
         "where": "users/isBot = true"
     }
 
-    let event = await axios.post(`${path}/query`, eventParams).catch((err) => {
+    const event = await axios.post(`${path}/query`, eventParams).catch((err) => {
         res.status(400);
-        res.send(err.return.data.message);
+        res.send(err.toJSON().message);
         return;
     })
-    let bots = await axios.post(`${path}/query`, botParams).catch((err) => {
+    const bots = await axios.post(`${path}/query`, botParams).catch((err) => {
         res.status(400);
-        res.send(err.return.data.message);
+        res.send(err.toJSON().message);
         return;
     })
 
@@ -44,7 +44,7 @@ const validEventBot = async (req: any, res: any) => {
         }
 
         const endTimeRes = checkEventTime(eventData.endTime)
-        if(endTimeRes && endTimeRes.status === 400){
+        if (endTimeRes && endTimeRes.status === 400){
             res.status(endTimeRes.status)
             res.send(endTimeRes.response)
             return;
@@ -67,33 +67,96 @@ const validEventBot = async (req: any, res: any) => {
         const choosenBots = chooseBots(bots.data, numberOfValids, eventData['publicEvents/parcipiantsAnswer'])
         const trueAnswers = countTrueAnswers(numberOfValids)
 
+        const firstValidBotRes = await firstValidBot(choosenBots[0], eventData, eventId, trueAnswerNumber)
+        if (firstValidBotRes && firstValidBotRes.status === 400) {
+            res.status(firstValidBotRes.status)
+            res.send(firstValidBotRes.response)
+            return;
+        }
 
-        for (let i = 0; i < choosenBots.length; i++) {
-            const indexAnswerRandom = Math.floor(Math.random() * (eventData.answers.length))
-            const answerValue = eventData.answers[indexAnswerRandom]
-            const getTransect = await setToNetworkValidation(choosenBots[i].expertReputPoins, eventId, answerValue, choosenBots[i].seedPhrase)
-            
-            if (getTransect && getTransect.transact) {
+        setTimeout (async () => {
+
+            const eventAfterTimeout = await axios.post(`${path}/query`, eventParams).catch((err) => {
+                res.status(400);
+                res.send(err.toJSON().message);
+                return;
+            })
+            if (eventAfterTimeout && eventAfterTimeout.data[0]) {
+
+                if (eventAfterTimeout.data[0].status !== 'finished' && eventAfterTimeout.data[0].status !== 'deployed') {
+                    res.status(400)
+                    res.send('Event status is reverted or cancel')
+                    return;
+                }
+
+                const startValidateRes = await startValidate(choosenBots, trueAnswers, eventData, eventId, trueAnswerNumber)
                 
-                if (i < trueAnswers) {
-                    validateCendToDB(eventId, choosenBots[i]._id, choosenBots[i].expertReputPoins, getTransect.transact, trueAnswerNumber)
-                } else {
-                    const falseAnswerNumber = Math.floor(Math.random() * eventData.answers.length)
-                    validateCendToDB(eventId, choosenBots[i]._id, choosenBots[i].expertReputPoins, getTransect.transact, falseAnswerNumber)
+                if (startValidateRes && startValidateRes.status === 400) {
+                    res.status(startValidateRes.status)
+                    res.send(startValidateRes.response)
+                    return;
                 }
 
             } else {
-                res.status(getTransect.status)
-                res.send(getTransect.response)
+                res.status(400)
+                res.send('Event id is invalid')
                 return;
             }
-        }
+
+        }, 120000)
 
     } else {
         res.status(400)
         res.send('Event id is invalid')
         return;
-    } 
+    }
+}
+
+const startValidate = async (choosenBots: any, trueAnswers: any, eventData: any, eventId: any, trueAnswerNumber: any) => {
+    for (let i = 1; i < choosenBots.length; i++) {
+
+        if (i < trueAnswers) {
+            const answerValue = eventData.answers[trueAnswerNumber]
+            const getTransect = await setToNetworkValidation(choosenBots[i].expertReputPoins, eventId, answerValue, choosenBots[i].seedPhrase)
+            
+            if (getTransect && getTransect.transact) {
+                validateCendToDB(eventId, choosenBots[i]._id, choosenBots[i].expertReputPoins, getTransect.transact, trueAnswerNumber)
+            } else {
+                return {
+                    status: getTransect.status,
+                    response: getTransect.response
+                }
+            }
+
+        } else {
+            const falseAnswerNumber = Math.floor(Math.random() * eventData.answers.length)
+            const answerValue = eventData.answers[falseAnswerNumber]
+            const getTransect = await setToNetworkValidation(choosenBots[i].expertReputPoins, eventId, answerValue, choosenBots[i].seedPhrase)
+                        
+            if (getTransect && getTransect.transact) {
+                validateCendToDB(eventId, choosenBots[i]._id, choosenBots[i].expertReputPoins, getTransect.transact, falseAnswerNumber)
+            } else {
+                return {
+                    status: getTransect.status,
+                    response: getTransect.response
+                }
+            }
+        }
+    }
+}
+
+const firstValidBot = async (choosenBot: any, eventData: any, eventId: any, trueAnswerNumber: any) => {
+    const answerValue = eventData.answers[trueAnswerNumber]
+    const getTransect = await setToNetworkValidation(choosenBot.expertReputPoins, eventId, answerValue, choosenBot.seedPhrase)
+
+    if (getTransect && getTransect.transact) {
+        validateCendToDB(eventId, choosenBot._id, choosenBot.expertReputPoins, getTransect.transact, trueAnswerNumber)
+    } else {
+        return {
+            status: getTransect.status,
+            response: getTransect.response
+        }
+    }
 }
 
 const shuffle = (array: any[]) => {
@@ -104,9 +167,9 @@ const shuffle = (array: any[]) => {
     return array
 }
 
-const chooseBots = (botsData: any, numberOfValids: number, answers:any) => {
+const chooseBots = (botsData: any, numberOfValids: number, answers: any) => {
     let botsForValidate: any[] = [];
-    
+
     for (let answer of answers) {
         for (let bot of botsData) {
             if (answer.from._id !== bot._id) {
@@ -191,7 +254,7 @@ const setToNetworkValidation = async (reput: any, eventId: number, answerValue: 
 
 const connectToSign = async (memonic: string) => {
     const types = [
-        ["/VoroshilovMax.bettery.publicevents.MsgCreateValidPubEvents", MsgCreatePartPubEvents],
+        ["/VoroshilovMax.bettery.publicevents.MsgCreateValidPubEvents", MsgCreateValidPubEvents],
     ];
     const registry = new Registry(<any>types);
 
