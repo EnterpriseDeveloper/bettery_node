@@ -76,14 +76,12 @@ const participateSendToDB = async (answerIndex: any, userId: any, transactionHas
 }
 
 const validate = async (req: any, res: any) => {
-    let setAnswer = []
-
     let eventId = Number(req.body.event_id);
     let from = Number(req.body.dataFromRedis.id)
     let reputation = req.body.reputation
     let transactionHash = req.body.transactionHash
-
     let answer = Number(req.body.answer);
+    
     if (eventId == undefined ||
         answer == undefined ||
         from == undefined) {
@@ -91,6 +89,17 @@ const validate = async (req: any, res: any) => {
         res.send("Structure is incorrect");
         return;
     }
+
+    let { status, response } = await validateCendToDB(eventId, from, reputation, transactionHash, answer)
+
+    if (response) {
+        res.status(status)
+        res.send(response)
+    }
+}
+
+const validateCendToDB = async (eventId: any, from: any, reputation: any, transactionHash: any, answer: any) => {
+    let setAnswer = []
 
     // add to the publicActivites table
     let publicActivites = {
@@ -121,20 +130,23 @@ const validate = async (req: any, res: any) => {
     setAnswer.push(user)
 
     await axios.post(`${path}/transact`, setAnswer).catch((err) => {
-        res.status(400);
-        res.send(err.response.data.message);
         console.log("DB error: " + err.response.data.message)
-        return;
+        return {
+            status: 400,
+            response: err.response.data.message
+        }
     })
 
-    res.status(200);
-    res.send({ done: "ok" });
-
+    return {
+        status: 200,
+        response: { done: "ok" }
+    }
 }
 
 
 export {
     participate,
     validate,
-    participateSendToDB
+    participateSendToDB,
+    validateCendToDB
 }

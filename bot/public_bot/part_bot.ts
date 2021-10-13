@@ -178,8 +178,8 @@ const sendToDemonParticipate = async (randomBet: any, eventId: number, answerVal
                 response: {status: String(transact)}
             }
         }
-    } catch (err) {
-        console.log(`Error sendToDemonPart 2 ${String(err)} 2`)
+    } catch (err: any) {
+        console.log(`Error sendToDemonPart 2 ${String(err.error)}`)
         return {
             status: 400,
             response: {status: String(err.message)}
