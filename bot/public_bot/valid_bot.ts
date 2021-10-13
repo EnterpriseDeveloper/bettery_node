@@ -65,13 +65,20 @@ const validEventBot = async (req: any, res: any) => {
         const numberOfValids = eventData.validatorsAmount - eventData.validatorsAnswer.length
 
         const choosenBots = chooseBots(bots.data, numberOfValids, eventData['publicEvents/parcipiantsAnswer'])
+        if (choosenBots && choosenBots[0].status){
+            res.status(choosenBots[0].status)
+            res.send(choosenBots[0].response)
+            return;
+        }
         const trueAnswers = countTrueAnswers(numberOfValids)
 
         const firstValidBotRes = await firstValidBot(choosenBots[0], eventData, eventId, trueAnswerNumber)
-        if (firstValidBotRes && firstValidBotRes.status === 400) {
+        if (firstValidBotRes && firstValidBotRes.status) {
             res.status(firstValidBotRes.status)
             res.send(firstValidBotRes.response)
-            return;
+            if (firstValidBotRes.status === 400) {
+                return;
+            }
         }
 
         setTimeout (async () => {
@@ -151,6 +158,10 @@ const firstValidBot = async (choosenBot: any, eventData: any, eventId: any, true
 
     if (getTransect && getTransect.transact) {
         validateCendToDB(eventId, choosenBot._id, choosenBot.expertReputPoins, getTransect.transact, trueAnswerNumber)
+        return {
+            status: 200,
+            response: 'Validation started'
+        }
     } else {
         return {
             status: getTransect.status,
@@ -177,6 +188,11 @@ const chooseBots = (botsData: any, numberOfValids: number, answers: any) => {
                     bot.expertReputPoins = 0
                 }
                 botsForValidate.push(bot)
+            } else {
+                return [{
+                    status: 400,
+                    response: 'Event was validated'
+                }]
             }
         }
     }
