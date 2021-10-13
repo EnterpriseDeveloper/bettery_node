@@ -18,9 +18,11 @@ let part_bot = async (req: any, res: any) => {
         res.send({message: "enter the correct number of bots ( bots > 0 && bots <= 150)"})
     } else {
         const eventParams = {
-            "select": ["publicEvents/answers", "publicEvents/endTime", { "publicEvents/parcipiantsAnswer": [
+            "select": ["publicEvents/answers", "publicEvents/endTime", {
+                "publicEvents/parcipiantsAnswer": [
                     {"publicActivites/from": ["users/isBot"]}
-                ]} ],
+                ]
+            }],
             "from": Number(eventId)
         }
         const botParams = {
@@ -41,71 +43,66 @@ let part_bot = async (req: any, res: any) => {
         })
         if (bots && bots.data.length && event && event.data.length) {
             let endTime = event.data[0]["publicEvents/endTime"]
-            let  parc = event.data[0]["publicEvents/parcipiantsAnswer"]
+            let parc = event.data[0]["publicEvents/parcipiantsAnswer"]
 
             let index: any
-            if(parc){
+            if (parc) {
                 index = parc.findIndex((el: any) => {
-                    return  el["publicActivites/from"]["users/isBot"]
+                    return el["publicActivites/from"]["users/isBot"]
                 })
             }
+            if (!checkEndTime(endTime)) {
+                res.status(400)
+                res.send({message: 'the time for participation in the event has expired, or there is less than 45 minutes left'})
+                return
+            }
 
-           if(index == -1 || index == undefined){
-               if (checkEndTime(endTime)) {
-                   let response = await botParc(bots.data, event.data[0], eventId, botAmount)
-                   if (response && response.status == 400) {
-                       res.status(response.status)
-                       res.send(response.response)
-                   } else {
-                       res.status(200)
-                       res.send({done: 'OK'})
-                   }
-               } else {
-                   res.status(400)
-                   res.send({message: 'the time for participation in the event has expired, or there is less than 45 minutes left'})
-               }
-           } else {
-               res.status(400)
-               res.send({message: 'bots have already been applied for this event'})
-           }
+            if (index >= 0) {
+                res.status(400)
+                res.send({message: 'bots have already been applied for this event'})
+                return
+            }
+
+            let botsPartic = letsChooseRandomBots(botAmount, bots.data)
+            if (!botsPartic || !botsPartic.length) {
+                res.status(400)
+                res.send({status: 'no bots in the database'})
+                return
+            } else {
+                res.status(200)
+                res.send({status: 'OK'})
+            }
+
+            for (let i = 0; i < botsPartic.length; i++) {
+                let botId = botsPartic[i]._id
+                let mnemonic = botsPartic[i]["users/seedPhrase"]
+                let wallet = botsPartic[i]["users/wallet"]
+                let indexAnswerRandom = Math.floor(Math.random() * (event.data[0]["publicEvents/answers"].length))
+                let answerValue = event.data[0]["publicEvents/answers"][indexAnswerRandom]
+                let randomBet = letsChooseRandomBet(0.1, 1)
+                let {bet} = await balanceCheck(wallet)
+
+                if (bet && bet > randomBet) {
+                    let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
+                    if (result) {
+                        console.log(`From part_bot: ${result}`)
+                        return
+                    }
+                }
+                if (!bet) {
+                    let mintResult = await mintTokens(wallet, 100, botId)
+                    if (mintResult) {
+                        let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
+                        if (result) {
+                            console.log(`From part_bot: ${result}`)
+                            return
+                        }
+                    }
+                }
+            }
         } else {
             res.status(400)
             res.send({message: "id not correct "})
-        }
-    }
-}
-
-const botParc = async (bots: any, event: any, eventId: number, botAmount: number) => {
-    let botsPartic = letsChooseRandomBots(botAmount, bots)
-    if (!botsPartic || !botsPartic.length) {
-        return {
-            status: 400,
-            response: {status: 'no bots in the database'}
-        }
-    }
-    for (let i = 0; i < botsPartic.length; i++) {
-        let botId = botsPartic[i]._id
-        let mnemonic = botsPartic[i]["users/seedPhrase"]
-        let wallet = botsPartic[i]["users/wallet"]
-        let indexAnswerRandom = Math.floor(Math.random() * (event["publicEvents/answers"].length))
-        let answerValue = event["publicEvents/answers"][indexAnswerRandom]
-        let randomBet = letsChooseRandomBet(0.1, 1)
-        let {bet} = await balanceCheck(wallet)
-
-        if (bet && bet > randomBet) {
-            let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
-            if (result) {
-                return result
-            }
-        }
-        if (!bet) {
-            let mintResult = await mintTokens(wallet, 100, botId)
-            if (mintResult) {
-                let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
-                if (result) {
-                    return result
-                }
-            }
         }
     }
 }
@@ -208,7 +205,6 @@ const connectToSign = async (memonic: string) => {
     } else {
         console.log("error getting memonic")
     }
-
 }
 
 
