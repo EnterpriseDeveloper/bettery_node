@@ -17,7 +17,7 @@ import userAnswerMiddleware from "../../middlewares/find-user-answer";
 import checkToken from '../../middlewares/check-token'
 
 export default function Events(app: any) {
-    app.get("/publicEvents/create_event_id", checkToken, eventLimitPublic, async (req: any, res: any) => {
+    app.get("/publicEvents/create_event_id", checkToken, async (req: any, res: any) => {
         createEventID(req, res);
     })
 
@@ -25,7 +25,7 @@ export default function Events(app: any) {
         deleteEvent(req, res);
     })
 
-    app.post("/publicEvents/createEvent", checkToken, eventLimitPublic, async (req: any, res: any) => {
+    app.post("/publicEvents/createEvent", checkToken, async (req: any, res: any) => {
         createEvent(req, res);
     })
 
@@ -49,7 +49,7 @@ export default function Events(app: any) {
         validate(req, res);
     })
 
-    app.post("/privateEvents/createEvent", checkToken, eventLimitPrivate, async (req: any, res: any) => {
+    app.post("/privateEvents/createEvent", checkToken, async (req: any, res: any) => {
         createPrivateEvent(req, res);
     })
 
@@ -83,7 +83,7 @@ export default function Events(app: any) {
         res.send({ status: "OK" });
     })
 
-    app.get("/privateEvents/create_event_id", checkToken, eventLimitPublic, async (req: any, res: any) => {
+    app.get("/privateEvents/create_event_id", checkToken, async (req: any, res: any) => {
         await createPrivateEventID(req, res);
     })
 
