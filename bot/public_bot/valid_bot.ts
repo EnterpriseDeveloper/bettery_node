@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-import { demonAPI, path } from "../../config/path";
+import { path } from "../../config/path";
 import { validateCendToDB } from '../../services/events/publicActivites';
-import { DirectSecp256k1HdWallet, Registry } from "@cosmjs/proto-signing";
 import { MsgCreateValidPubEvents } from "../../contract-services/publicEvents/tx";
-import { SigningStargateClient } from '@cosmjs/stargate';
+import { connectToSign } from "../../helpers/connectToSign";
+
 
 const validEventBot = async (req: any, res: any) => {
     const eventId = req.body.id;
@@ -225,14 +225,20 @@ const countTrueAnswers = (numberOfValids: number) => {
 }
 
 const setToNetworkValidation = async (reput: any, eventId: number, answerValue: any, mnemonic: string) => {
-    let memonic, address, client
-
-    let data: any = await connectToSign(mnemonic)
-    if (data.memonic) {
-        memonic = data.memonic
-        address = data.address
-        client = data.client
+    const types = [
+        ["/VoroshilovMax.bettery.publicevents.MsgCreateValidPubEvents", MsgCreateValidPubEvents],
+    ];
+    const data: any = await connectToSign(mnemonic, types)
+    if (!data.memonic || !data.address || !data.client) {
+        return {
+            status: 400,
+            response: 'Connect to sign error'
+        }
     }
+    const memonic = data.memonic
+    const address = data.address
+    const client = data.client
+    
     const msg = {
         typeUrl: "/VoroshilovMax.bettery.publicevents.MsgCreateValidPubEvents",
         value: {
@@ -266,27 +272,6 @@ const setToNetworkValidation = async (reput: any, eventId: number, answerValue: 
             response: { status: String(err.error) }
         }
     }
-}
-
-const connectToSign = async (memonic: string) => {
-    const types = [
-        ["/VoroshilovMax.bettery.publicevents.MsgCreateValidPubEvents", MsgCreateValidPubEvents],
-    ];
-    const registry = new Registry(<any>types);
-
-    if (memonic) {
-        const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
-            memonic
-        );
-
-        let addr = `${demonAPI}:26657`;
-        const [{ address }] = await wallet.getAccounts();
-        const client = await SigningStargateClient.connectWithSigner(addr, wallet, { registry });
-        return { memonic, address, client }
-    } else {
-        console.log("error getting memonic")
-    }
-
 }
 
 export {

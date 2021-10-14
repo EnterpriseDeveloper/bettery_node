@@ -1,13 +1,12 @@
 import axios from "axios";
 import Web3 from "web3";
-import {demonAPI, path} from "../../config/path";
-import {SigningStargateClient} from "@cosmjs/stargate";
-import {DirectSecp256k1HdWallet, Registry} from "@cosmjs/proto-signing";
+import {path} from "../../config/path";
 import {MsgCreatePartPubEvents} from "../../contract-services/publicEvents/tx";
 
 import {mintTokens} from "../../services/funds/betteryToken";
 import {balanceCheck} from "../../services/funds/userTokens";
 import {participateSendToDB} from "../../services/events/publicActivites";
+import {connectToSign} from "../../helpers/connectToSign";
 
 let part_bot = async (req: any, res: any) => {
     const eventId = req.body.id
@@ -144,14 +143,21 @@ const callSendToDemon = async (randomBet: number, eventId: number, answerValue: 
 const sendToDemonParticipate = async (randomBet: any, eventId: number, answerValue: any, mnemonic: string) => {
     let web3 = new Web3();
     var _money = web3.utils.toWei(String(randomBet), 'ether')
-    let memonic, address, client
+    const types = [
+        ["/VoroshilovMax.bettery.publicevents.MsgCreatePartPubEvents", MsgCreatePartPubEvents],
+    ];
 
-    let data: any = await connectToSign(mnemonic)
-    if (data.memonic) {
-        memonic = data.memonic
-        address = data.address
-        client = data.client
+    const data: any = await connectToSign(mnemonic, types)
+    if (!data.memonic || !data.address || !data.client) {
+        return {
+            status: 400,
+            response: 'Connect to sign error'
+        }
     }
+    const memonic = data.memonic
+    const address = data.address
+    const client = data.client
+
     const msg = {
         typeUrl: "/VoroshilovMax.bettery.publicevents.MsgCreatePartPubEvents",
         value: {
@@ -186,27 +192,6 @@ const sendToDemonParticipate = async (randomBet: any, eventId: number, answerVal
         }
     }
 }
-
-const connectToSign = async (memonic: string) => {
-    const types = [
-        ["/VoroshilovMax.bettery.publicevents.MsgCreatePartPubEvents", MsgCreatePartPubEvents],
-    ];
-    const registry = new Registry(<any>types);
-
-    if (memonic) {
-        const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
-            memonic
-        );
-
-        let addr = `${demonAPI}:26657`;
-        const [{address}] = await wallet.getAccounts();
-        const client = await SigningStargateClient.connectWithSigner(addr, wallet, {registry});
-        return {memonic, address, client}
-    } else {
-        console.log("error getting memonic")
-    }
-}
-
 
 export {
     part_bot
