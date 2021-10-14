@@ -1,13 +1,12 @@
 import axios from "axios";
 import Web3 from "web3";
-import {demonAPI, path} from "../../config/path";
-import {SigningStargateClient} from "@cosmjs/stargate";
-import {DirectSecp256k1HdWallet, Registry} from "@cosmjs/proto-signing";
+import {path} from "../../config/path";
 import {MsgCreatePartPubEvents} from "../../contract-services/publicEvents/tx";
 
 import {mintTokens} from "../../services/funds/betteryToken";
 import {balanceCheck} from "../../services/funds/userTokens";
 import {participateSendToDB} from "../../services/events/publicActivites";
+import {connectToSign} from "../../helpers/connectToSign";
 
 let part_bot = async (req: any, res: any) => {
     const eventId = req.body.id
@@ -18,9 +17,11 @@ let part_bot = async (req: any, res: any) => {
         res.send({message: "enter the correct number of bots ( bots > 0 && bots <= 150)"})
     } else {
         const eventParams = {
-            "select": ["publicEvents/answers", "publicEvents/endTime", { "publicEvents/parcipiantsAnswer": [
+            "select": ["publicEvents/answers", "publicEvents/endTime", {
+                "publicEvents/parcipiantsAnswer": [
                     {"publicActivites/from": ["users/isBot"]}
-                ]} ],
+                ]
+            }],
             "from": Number(eventId)
         }
         const botParams = {
@@ -41,71 +42,66 @@ let part_bot = async (req: any, res: any) => {
         })
         if (bots && bots.data.length && event && event.data.length) {
             let endTime = event.data[0]["publicEvents/endTime"]
-            let  parc = event.data[0]["publicEvents/parcipiantsAnswer"]
+            let parc = event.data[0]["publicEvents/parcipiantsAnswer"]
 
             let index: any
-            if(parc){
+            if (parc) {
                 index = parc.findIndex((el: any) => {
-                    return  el["publicActivites/from"]["users/isBot"]
+                    return el["publicActivites/from"]["users/isBot"]
                 })
             }
+            if (!checkEndTime(endTime)) {
+                res.status(400)
+                res.send({message: 'the time for participation in the event has expired, or there is less than 45 minutes left'})
+                return
+            }
 
-           if(index == -1 || index == undefined){
-               if (checkEndTime(endTime)) {
-                   let response = await botParc(bots.data, event.data[0], eventId, botAmount)
-                   if (response && response.status == 400) {
-                       res.status(response.status)
-                       res.send(response.response)
-                   } else {
-                       res.status(200)
-                       res.send({done: 'OK'})
-                   }
-               } else {
-                   res.status(400)
-                   res.send({message: 'the time for participation in the event has expired, or there is less than 45 minutes left'})
-               }
-           } else {
-               res.status(400)
-               res.send({message: 'bots have already been applied for this event'})
-           }
+            if (index >= 0) {
+                res.status(400)
+                res.send({message: 'bots have already been applied for this event'})
+                return
+            }
+
+            let botsPartic = letsChooseRandomBots(botAmount, bots.data)
+            if (!botsPartic || !botsPartic.length) {
+                res.status(400)
+                res.send({status: 'no bots in the database'})
+                return
+            } else {
+                res.status(200)
+                res.send({status: 'OK'})
+            }
+
+            for (let i = 0; i < botsPartic.length; i++) {
+                let botId = botsPartic[i]._id
+                let mnemonic = botsPartic[i]["users/seedPhrase"]
+                let wallet = botsPartic[i]["users/wallet"]
+                let indexAnswerRandom = Math.floor(Math.random() * (event.data[0]["publicEvents/answers"].length))
+                let answerValue = event.data[0]["publicEvents/answers"][indexAnswerRandom]
+                let randomBet = letsChooseRandomBet(0.1, 1)
+                let {bet} = await balanceCheck(wallet)
+
+                if (bet && bet > randomBet) {
+                    let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
+                    if (result) {
+                        console.log(`From part_bot: ${result}`)
+                        return
+                    }
+                }
+                if (!bet) {
+                    let mintResult = await mintTokens(wallet, 100, botId)
+                    if (mintResult) {
+                        let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
+                        if (result) {
+                            console.log(`From part_bot: ${result}`)
+                            return
+                        }
+                    }
+                }
+            }
         } else {
             res.status(400)
             res.send({message: "id not correct "})
-        }
-    }
-}
-
-const botParc = async (bots: any, event: any, eventId: number, botAmount: number) => {
-    let botsPartic = letsChooseRandomBots(botAmount, bots)
-    if (!botsPartic || !botsPartic.length) {
-        return {
-            status: 400,
-            response: {status: 'no bots in the database'}
-        }
-    }
-    for (let i = 0; i < botsPartic.length; i++) {
-        let botId = botsPartic[i]._id
-        let mnemonic = botsPartic[i]["users/seedPhrase"]
-        let wallet = botsPartic[i]["users/wallet"]
-        let indexAnswerRandom = Math.floor(Math.random() * (event["publicEvents/answers"].length))
-        let answerValue = event["publicEvents/answers"][indexAnswerRandom]
-        let randomBet = letsChooseRandomBet(0.1, 1)
-        let {bet} = await balanceCheck(wallet)
-
-        if (bet && bet > randomBet) {
-            let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
-            if (result) {
-                return result
-            }
-        }
-        if (!bet) {
-            let mintResult = await mintTokens(wallet, 100, botId)
-            if (mintResult) {
-                let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
-                if (result) {
-                    return result
-                }
-            }
         }
     }
 }
@@ -147,14 +143,21 @@ const callSendToDemon = async (randomBet: number, eventId: number, answerValue: 
 const sendToDemonParticipate = async (randomBet: any, eventId: number, answerValue: any, mnemonic: string) => {
     let web3 = new Web3();
     var _money = web3.utils.toWei(String(randomBet), 'ether')
-    let memonic, address, client
+    const types = [
+        ["/VoroshilovMax.bettery.publicevents.MsgCreatePartPubEvents", MsgCreatePartPubEvents],
+    ];
 
-    let data: any = await connectToSign(mnemonic)
-    if (data.memonic) {
-        memonic = data.memonic
-        address = data.address
-        client = data.client
+    const data: any = await connectToSign(mnemonic, types)
+    if (!data.memonic || !data.address || !data.client) {
+        return {
+            status: 400,
+            response: 'Connect to sign error'
+        }
     }
+    const memonic = data.memonic
+    const address = data.address
+    const client = data.client
+
     const msg = {
         typeUrl: "/VoroshilovMax.bettery.publicevents.MsgCreatePartPubEvents",
         value: {
@@ -182,35 +185,13 @@ const sendToDemonParticipate = async (randomBet: any, eventId: number, answerVal
             }
         }
     } catch (err: any) {
-        console.log(`Error sendToDemonPart 2 ${String(err)} 2`)
+        console.log(`Error sendToDemonPart 2 ${String(err.error)}`)
         return {
             status: 400,
             response: {status: String(err.message)}
         }
     }
 }
-
-const connectToSign = async (memonic: string) => {
-    const types = [
-        ["/VoroshilovMax.bettery.publicevents.MsgCreatePartPubEvents", MsgCreatePartPubEvents],
-    ];
-    const registry = new Registry(<any>types);
-
-    if (memonic) {
-        const wallet = await DirectSecp256k1HdWallet.fromMnemonic(
-            memonic
-        );
-
-        let addr = `${demonAPI}:26657`;
-        const [{address}] = await wallet.getAccounts();
-        const client = await SigningStargateClient.connectWithSigner(addr, wallet, {registry});
-        return {memonic, address, client}
-    } else {
-        console.log("error getting memonic")
-    }
-
-}
-
 
 export {
     part_bot
