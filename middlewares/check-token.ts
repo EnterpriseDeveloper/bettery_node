@@ -37,7 +37,7 @@ export default async (req: any, res: any, next: any) => {
         fromRedis.key = data
         req.body.dataFromRedis = fromRedis;
         next()
-    } catch (e) {
+    } catch (e: any) {
         res.send(e.message);
         next(e)
     }

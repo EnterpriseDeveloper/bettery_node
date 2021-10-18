@@ -37,6 +37,11 @@ const analytics24h = async (req: any, res: any) => {
             parcipiants: parc.length,
             validators: val.length
         })
+    } else {
+        res.status(200)
+        res.send({
+            status: 'No activities'
+        })
     }
 }
 
