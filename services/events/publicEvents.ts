@@ -296,7 +296,7 @@ const getBetteryEvent = async (req: any, res: any) => {
         if (getUserInfo) {
             let id = getUserInfo.data[0]._id;
             let conf = {
-                "select": ["publicEvents/question", "_id", "publicEvents/startTime", "room"],
+                "select": ["publicEvents/question", "_id", "publicEvents/startTime","publicEvents/status", "room"],
                 "where": `publicEvents/host = ${id}`,
                 "opts": { "orderBy": ["DESC", "publicEvents/startTime"] }
             }
@@ -306,7 +306,11 @@ const getBetteryEvent = async (req: any, res: any) => {
                 return
             })
             if (data) {
-                let getLast = data.data.slice(Math.max(data.data.length - 5, 0))
+                let filterData = data.data.filter((el: any)=> {
+                    return el['publicEvents/status'] !== "finished" && !el['publicEvents/status'].includes('reverted')
+                })
+
+                let getLast = filterData.slice(Math.max(filterData.length - 5, 0))
                 res.status(200);
                 res.send(getLast);
             }
