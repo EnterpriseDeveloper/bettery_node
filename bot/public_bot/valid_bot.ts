@@ -11,7 +11,7 @@ const validEventBot = async (req: any, res: any) => {
     const trueAnswerNumber = req.body.answer;
 
     const eventParams = {
-        "select": ['answers', 'endTime', 'status', 'validatorsAmount', 'validatorsAnswer', { "publicEvents/parcipiantsAnswer": ["from"] }],
+        "select": ['answers', 'endTime', 'status', 'validatorsAmount', { "publicEvents/validatorsAnswer": ["from"] }],
         "from": eventId,
     }
     const botParams = {
@@ -33,8 +33,8 @@ const validEventBot = async (req: any, res: any) => {
     if (event && event.data[0] && bots) {
         const eventData = event.data[0]
 
-        if (eventData.validatorsAnswer == undefined){
-            eventData.validatorsAnswer = []
+        if (eventData["publicEvents/validatorsAnswer"] == undefined){
+            eventData["publicEvents/validatorsAnswer"] = []
         }
 
         if (trueAnswerNumber >= eventData.answers.length) {
@@ -50,29 +50,26 @@ const validEventBot = async (req: any, res: any) => {
             return;
         }
 
-        if (eventData.validatorsAnswer.length >= eventData.validatorsAmount){
+        if (eventData["publicEvents/validatorsAnswer"].length >= eventData.validatorsAmount && eventData.validatorsAmount !== 0){
             res.status(400)
             res.send('Event is valid')
             return;
         }
 
-        if (eventData.status !== 'finished' && eventData.status !== 'deployed') {
+        if (eventData.status !== 'deployed') {
             res.status(400)
-            res.send('Event status is reverted or cancel')
+            res.send('Event status is reverted or finished')
             return;
         }
 
-        const numberOfValids = eventData.validatorsAmount - eventData.validatorsAnswer.length
-
-        const choosenBots = chooseBots(bots.data, numberOfValids, eventData['publicEvents/parcipiantsAnswer'])
-        if (choosenBots && choosenBots[0].status){
-            res.status(choosenBots[0].status)
-            res.send(choosenBots[0].response)
+        const choosenBot = chooseBots(bots.data, 1, eventData['publicEvents/validatorsAnswer'], true)
+        if (choosenBot && choosenBot[0].status){
+            res.status(choosenBot[0].status)
+            res.send(choosenBot[0].response)
             return;
-        }
-        const trueAnswers = countTrueAnswers(numberOfValids)
+        }        
 
-        const firstValidBotRes = await firstValidBot(choosenBots[0], eventData, eventId, trueAnswerNumber)
+        const firstValidBotRes = await firstValidBot(choosenBot[0], eventData, eventId, trueAnswerNumber)
         if (firstValidBotRes && firstValidBotRes.status) {
             res.status(firstValidBotRes.status)
             res.send(firstValidBotRes.response)
@@ -90,12 +87,20 @@ const validEventBot = async (req: any, res: any) => {
             })
             if (eventAfterTimeout && eventAfterTimeout.data[0]) {
 
-                if (eventAfterTimeout.data[0].status !== 'finished' && eventAfterTimeout.data[0].status !== 'deployed') {
+                if (eventAfterTimeout.data[0].status !== 'deployed') {
                     res.status(400)
-                    res.send('Event status is reverted or cancel')
+                    res.send('Event status is reverted or finished')
                     return;
                 }
 
+                const numberOfValids = eventAfterTimeout.data[0].validatorsAmount - eventAfterTimeout.data[0]["publicEvents/validatorsAnswer"].length                
+                const trueAnswers = countTrueAnswers(numberOfValids)
+                const choosenBots = chooseBots(bots.data, numberOfValids, eventAfterTimeout.data[0]['publicEvents/validatorsAnswer'], false)
+                if (choosenBots && choosenBots[0].status) {
+                    res.status(choosenBots[0].status)
+                    res.send(choosenBots[0].response)
+                    return;
+                }
                 const startValidateRes = await startValidate(choosenBots, trueAnswers, eventData, eventId, trueAnswerNumber)
                 
                 if (startValidateRes && startValidateRes.status === 400) {
@@ -120,7 +125,7 @@ const validEventBot = async (req: any, res: any) => {
 }
 
 const startValidate = async (choosenBots: any, trueAnswers: any, eventData: any, eventId: any, trueAnswerNumber: any) => {
-    for (let i = 1; i < choosenBots.length; i++) {
+    for (let i = 0; i < choosenBots.length; i++) {
 
         if (i < trueAnswers) {
             const answerValue = eventData.answers[trueAnswerNumber]
@@ -178,22 +183,31 @@ const shuffle = (array: any[]) => {
     return array
 }
 
-const chooseBots = (botsData: any, numberOfValids: number, answers: any) => {
+const chooseBots = (botsData: any, numberOfValids: number, answers: any, checkEventValid: boolean) => {
     let botsForValidate: any[] = [];
 
-    for (let answer of answers) {
-        for (let bot of botsData) {
-            if (answer.from._id !== bot._id) {
-                if (bot.expertReputPoins == undefined) {
-                    bot.expertReputPoins = 0
+  
+    for (let bot of botsData) {
+        if (answers[0]){
+            for (let answer of answers) {            
+                if (checkEventValid && answer.from._id == bot._id){
+                    return [{
+                        status: 400,
+                        response: 'Event was validated'
+                    }]
                 }
-                botsForValidate.push(bot)
-            } else {
-                return [{
-                    status: 400,
-                    response: 'Event was validated'
-                }]
+                if (answer.from._id !== bot._id){
+                    if (bot.expertReputPoins == undefined) {
+                        bot.expertReputPoins = 0
+                    }
+                    botsForValidate.push(bot)
+                }                
             }
+        } else {
+            if (bot.expertReputPoins == undefined) {
+                bot.expertReputPoins = 0
+            }
+            botsForValidate.push(bot)
         }
     }
 
