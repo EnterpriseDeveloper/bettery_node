@@ -1,6 +1,30 @@
 import axios from "axios";
 import {path} from "../config/path";
 
+const usersAmount = async (req: any, res: any) => {
+    let params: any = {
+        select: ["_id", 'isBot'],
+        from: "users"
+    }
+
+    let data: any = await axios.post(`${path}/query`, params).catch((err) => {
+        res.status(400)
+        res.send(`Error from DB: ${err.response.statusText}`)
+        return
+    })
+
+    if (data.data.length) {
+        let pureDate = data.data.filter((el: any) => {
+            return el.isBot == undefined
+        })
+        res.status(200)
+        res.send({amount: pureDate.length})
+    }else {
+        res.status(400)
+        res.send(`no users`)
+    }
+}
+
 const analytics24h = async (req: any, res: any) => {
     let time = new Date().setHours(0, 0, 0, 0) / 1000
     let day = 86400
@@ -18,13 +42,29 @@ const analytics24h = async (req: any, res: any) => {
         "where": `publicEvents/dateCreation > ${time - day}`
     }
 
+    let usersParams: any = {
+        select: ["_id", "isBot","registered"],
+        from: "users"
+    }
+
     let data: any = await axios.post(`${path}/query`, params).catch((err) => {
         res.status(400)
         res.send(`Error from DB: ${err.response.statusText}`)
         return
     })
 
-    if (data.data.length) {
+    let usersData: any = await axios.post(`${path}/query`, usersParams).catch((err) => {
+        res.status(400)
+        res.send(`Error from DB: ${err.response.statusText}`)
+        return
+    })
+
+    if (data.data.length && usersData.data.length) {
+
+        let userPureDate = usersData.data.filter((el: any) => {
+            return el.isBot == undefined && el.registered && el.registered > (time - day) && el.registered < time
+        })
+
         let pureData = data.data.filter((el: any) => {
             return el['publicEvents/dateCreation'] < time
         })
@@ -33,9 +73,10 @@ const analytics24h = async (req: any, res: any) => {
 
         res.status(200)
         res.send({
-            eventAmount: pureData.length,
+            eventsCreated: pureData.length,
             parcipiants: parc.length,
-            validators: val.length
+            validators: val.length,
+            newUser: userPureDate.length
         })
     } else {
         res.status(200)
@@ -120,9 +161,8 @@ const analyticsByEventId = async (req: any, res: any) => {
 }
 
 
-
-
 export {
     analytics24h,
-    analyticsByEventId
+    analyticsByEventId,
+    usersAmount
 }
