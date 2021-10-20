@@ -19,7 +19,7 @@ const usersAmount = async (req: any, res: any) => {
         })
         res.status(200)
         res.send({amount: pureDate.length})
-    }else {
+    } else {
         res.status(400)
         res.send(`no users`)
     }
@@ -43,7 +43,7 @@ const analytics24h = async (req: any, res: any) => {
     }
 
     let usersParams: any = {
-        select: ["_id", "isBot","registered"],
+        select: ["_id", "isBot", "registered"],
         from: "users"
     }
 
@@ -160,9 +160,42 @@ const analyticsByEventId = async (req: any, res: any) => {
     })
 }
 
+const checkBalance = async (req: any, res: any) => {
+    let email = req.body.email
+    if(!email){
+        res.status(400)
+        res.send('enter correct email')
+        return
+    }
+
+    let params = {
+        "select": ["bty", "bet"],
+        "from": ["users/email", email]
+    }
+
+    let data: any = await axios.post(`${path}/query`, params).catch((err: any) => {
+       if(err){
+           return {status: `Error from DB: ${err.response.statusText}`}
+       }
+    })
+
+    if(data.status != 200 || !data.data.length){
+        res.status(400)
+        res.send('Error from DB: check your email for correctness')
+        return
+    }
+
+    if (data && data.data.length) {
+        let pureData = data.data[0]
+        res.status(200)
+        res.send(pureData)
+    }
+}
+
 
 export {
     analytics24h,
     analyticsByEventId,
-    usersAmount
+    usersAmount,
+    checkBalance
 }
