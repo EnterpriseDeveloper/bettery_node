@@ -8,7 +8,7 @@ import { connectToSign } from "../../helpers/connectToSign";
 
 const validEventBot = async (req: any, res: any) => {
     const eventId = req.body.id;
-    const trueAnswerNumber = req.body.answer;
+    const trueAnswerNumber = req.body.answer - 1;
 
     const eventParams = {
         "select": ['answers', 'endTime', 'status', 'validatorsAmount', { "publicEvents/validatorsAnswer": ["from"] }],
@@ -37,7 +37,7 @@ const validEventBot = async (req: any, res: any) => {
             eventData["publicEvents/validatorsAnswer"] = []
         }
 
-        if (trueAnswerNumber >= eventData.answers.length) {
+        if (trueAnswerNumber >= eventData.answers.length || trueAnswerNumber < 0) {
             res.status(400)
             res.send('Answer number is invalid')
             return;
