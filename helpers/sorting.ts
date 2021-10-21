@@ -1,5 +1,5 @@
 const trendingSorting = (data: any) => {
-    let events = data.sort((x: any) => { return x.answerAmount })
+    let events = data.sort((x: any, b: any) => { return x.answerAmount - b.answerAmount })
     return events.reverse();
 }
 
