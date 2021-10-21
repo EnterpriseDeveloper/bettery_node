@@ -191,14 +191,14 @@ const checkBalance = async (req: any, res: any) => {
         let pureData = data.data[0]
 
         let { bet, bty } = await balanceCheck(pureData.wallet)
-        let addData = await getAdditionalBalance(pureData._id)
+        let addData = await getMintBalance(pureData._id)
 
         res.status(200)
         res.send({ _id: pureData._id, bty, bet, addData })
     }
 }
 
-const getAdditionalBalance = async (id: string) => {
+const getMintBalance = async (id: string) => {
     let balance: any = await axios.get(`${demonAPI}:1317/VoroshilovMax/bettery/funds/mintBet/${id}`).catch((err) => {
         return {
             status: 400,
@@ -221,5 +221,6 @@ export {
     analytics24h,
     analyticsByEventId,
     usersAmount,
-    checkBalance
+    checkBalance,
+    getMintBalance
 }
