@@ -1,6 +1,7 @@
 import axios from "axios";
-import {path} from "../config/path";
-import {balanceCheck} from "../services/funds/userTokens";
+import { path, demonAPI } from "../config/path";
+import { balanceCheck } from "../services/funds/userTokens";
+import Web3 from "web3";
 
 const usersAmount = async (req: any, res: any) => {
     let params: any = {
@@ -19,7 +20,7 @@ const usersAmount = async (req: any, res: any) => {
             return el.isBot == undefined
         })
         res.status(200)
-        res.send({amount: pureDate.length})
+        res.send({ amount: pureDate.length })
     } else {
         res.status(400)
         res.send(`no users`)
@@ -33,13 +34,13 @@ const analytics24h = async (req: any, res: any) => {
     let params: any = {
         "select": ["publicEvents/dateCreation", {
             "publicEvents/parcipiantsAnswer": [
-                {"publicActivites/from": ["users/isBot"]}
+                { "publicActivites/from": ["users/isBot"] }
             ]
         }, {
-            "publicEvents/validatorsAnswer": [
-                {"publicActivites/from": ["users/isBot"]}
-            ]
-        }],
+                "publicEvents/validatorsAnswer": [
+                    { "publicActivites/from": ["users/isBot"] }
+                ]
+            }],
         "where": `publicEvents/dateCreation > ${time - day}`
     }
 
@@ -70,7 +71,7 @@ const analytics24h = async (req: any, res: any) => {
             return el['publicEvents/dateCreation'] < time
         })
 
-        let {parc, val} = await letsFindRealUsers(pureData)
+        let { parc, val } = await letsFindRealUsers(pureData)
 
         res.status(200)
         res.send({
@@ -112,7 +113,7 @@ let letsFindRealUsers = async (pureData: any) => {
     parc = unique(parc)
     val = unique(val)
 
-    return {parc, val}
+    return { parc, val }
 }
 
 let unique = (arr: any) => {
@@ -132,13 +133,13 @@ const analyticsByEventId = async (req: any, res: any) => {
     let params = {
         "select": ["publicEvents/status", {
             "publicEvents/parcipiantsAnswer": [
-                {"publicActivites/from": ["users/isBot"]}
+                { "publicActivites/from": ["users/isBot"] }
             ]
         }, {
-            "publicEvents/validatorsAnswer": [
-                {"publicActivites/from": ["users/isBot"]}
-            ]
-        }],
+                "publicEvents/validatorsAnswer": [
+                    { "publicActivites/from": ["users/isBot"] }
+                ]
+            }],
         "from": eventId
     }
 
@@ -149,7 +150,7 @@ const analyticsByEventId = async (req: any, res: any) => {
     })
 
     let event = data.data
-    let {parc, val} = await letsFindRealUsers(event)
+    let { parc, val } = await letsFindRealUsers(event)
 
 
     res.status(200)
@@ -163,7 +164,7 @@ const analyticsByEventId = async (req: any, res: any) => {
 
 const checkBalance = async (req: any, res: any) => {
     let email = req.body.email
-    if(!email){
+    if (!email) {
         res.status(400)
         res.send('enter correct email')
         return
@@ -175,12 +176,12 @@ const checkBalance = async (req: any, res: any) => {
     }
 
     let data: any = await axios.post(`${path}/query`, params).catch((err: any) => {
-       if(err){
-           return {status: `Error from DB: ${err.response.statusText}`}
-       }
+        if (err) {
+            return { status: `Error from DB: ${err.response.statusText}` }
+        }
     })
 
-    if(data.status != 200 || !data.data.length){
+    if (data.status != 200 || !data.data.length) {
         res.status(400)
         res.send('Error from DB: check your email for correctness')
         return
@@ -189,10 +190,30 @@ const checkBalance = async (req: any, res: any) => {
     if (data && data.data.length) {
         let pureData = data.data[0]
 
-        let {bet, bty} = await balanceCheck(pureData.wallet)
+        let { bet, bty } = await balanceCheck(pureData.wallet)
+        let addData = await getAdditionalBalance(pureData._id)
+
         res.status(200)
-        res.send({_id: pureData._id, bty, bet})
+        res.send({ _id: pureData._id, bty, bet, addData })
     }
+}
+
+const getAdditionalBalance = async (id: string) => {
+    let balance: any = await axios.get(`${demonAPI}:1317/VoroshilovMax/bettery/funds/mintBet/${id}`).catch((err) => {
+        return {
+            status: 400,
+            response: err.response,
+        }
+    })
+    let web3 = new Web3();
+    return balance.data.MintBet.map((x: any) => {
+        return {
+            userId: x.userId,
+            amount: Number(Number(web3.utils.fromWei(x.amount, "ether")).toFixed(2)),
+            creator: x.creator,
+            userWallet: x.reciever
+        }
+    })
 }
 
 
