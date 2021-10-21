@@ -1,12 +1,12 @@
 import axios from "axios";
 import Web3 from "web3";
-import {path} from "../../config/path";
-import {MsgCreatePartPubEvents} from "../../contract-services/publicEvents/tx";
+import { path } from "../../config/path";
+import { MsgCreatePartPubEvents } from "../../contract-services/publicEvents/tx";
 
-import {mintTokens} from "../../services/funds/betteryToken";
-import {balanceCheck} from "../../services/funds/userTokens";
-import {participateSendToDB} from "../../services/events/publicActivites";
-import {connectToSign} from "../../helpers/connectToSign";
+import { mintTokens } from "../../services/funds/betteryToken";
+import { balanceCheck } from "../../services/funds/userTokens";
+import { participateSendToDB } from "../../services/events/publicActivites";
+import { connectToSign } from "../../helpers/connectToSign";
 
 let part_bot = async (req: any, res: any) => {
     const eventId = req.body.id
@@ -14,12 +14,12 @@ let part_bot = async (req: any, res: any) => {
 
     if (!botAmount || botAmount <= 0 || botAmount > 150 || typeof botAmount != "number") {
         res.status(400)
-        res.send({message: "enter the correct number of bots ( bots > 0 && bots <= 150)"})
+        res.send({ message: "enter the correct number of bots ( bots > 0 && bots <= 150)" })
     } else {
         const eventParams = {
             "select": ["publicEvents/answers", "publicEvents/endTime", {
                 "publicEvents/parcipiantsAnswer": [
-                    {"publicActivites/from": ["users/isBot"]}
+                    { "publicActivites/from": ["users/isBot"] }
                 ]
             }],
             "from": Number(eventId)
@@ -52,24 +52,24 @@ let part_bot = async (req: any, res: any) => {
             }
             if (!checkEndTime(endTime)) {
                 res.status(400)
-                res.send({message: 'the time for participation in the event has expired, or there is less than 45 minutes left'})
+                res.send({ message: 'the time for participation in the event has expired, or there is less than 45 minutes left' })
                 return
             }
 
             if (index >= 0) {
                 res.status(400)
-                res.send({message: 'bots have already been applied for this event'})
+                res.send({ message: 'bots have already been applied for this event' })
                 return
             }
 
             let botsPartic = letsChooseRandomBots(botAmount, bots.data)
             if (!botsPartic || !botsPartic.length) {
                 res.status(400)
-                res.send({status: 'no bots in the database'})
+                res.send({ status: 'no bots in the database' })
                 return
             } else {
                 res.status(200)
-                res.send({status: 'OK'})
+                res.send({ status: 'OK' })
             }
 
             for (let i = 0; i < botsPartic.length; i++) {
@@ -79,7 +79,7 @@ let part_bot = async (req: any, res: any) => {
                 let indexAnswerRandom = Math.floor(Math.random() * (event.data[0]["publicEvents/answers"].length))
                 let answerValue = event.data[0]["publicEvents/answers"][indexAnswerRandom]
                 let randomBet = letsChooseRandomBet(0.1, 1)
-                let {bet} = await balanceCheck(wallet)
+                let { bet } = await balanceCheck(wallet)
 
                 if (bet && bet > randomBet) {
                     let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
@@ -101,7 +101,7 @@ let part_bot = async (req: any, res: any) => {
             }
         } else {
             res.status(400)
-            res.send({message: "id not correct "})
+            res.send({ message: "id not correct " })
         }
     }
 }
@@ -127,7 +127,7 @@ const callSendToDemon = async (randomBet: number, eventId: number, answerValue: 
         if (result.status == 400) {
             return {
                 status: 400,
-                response: {status: result.response}
+                response: { status: result.response }
             }
         }
     }
@@ -135,7 +135,7 @@ const callSendToDemon = async (randomBet: number, eventId: number, answerValue: 
     if (getTransect.status == 400) {
         return {
             status: getTransect.status,
-            response: {status: getTransect.response}
+            response: { status: getTransect.response }
         }
     }
 }
@@ -181,18 +181,21 @@ const sendToDemonParticipate = async (randomBet: any, eventId: number, answerVal
             console.log(`Error sendToDemonPart 1 ${String(transact)}`)
             return {
                 status: 400,
-                response: {status: String(transact)}
+                response: { status: String(transact) }
             }
         }
     } catch (err: any) {
         console.log(`Error sendToDemonPart 2 ${String(err.error)}`)
         return {
             status: 400,
-            response: {status: String(err.message)}
+            response: { status: String(err.message) }
         }
     }
 }
 
 export {
-    part_bot
+    part_bot,
+    callSendToDemon,
+    checkEndTime,
+    letsChooseRandomBots
 }
