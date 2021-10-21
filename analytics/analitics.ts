@@ -1,5 +1,6 @@
 import axios from "axios";
 import {path} from "../config/path";
+import {balanceCheck} from "../services/funds/userTokens";
 
 const usersAmount = async (req: any, res: any) => {
     let params: any = {
@@ -169,7 +170,7 @@ const checkBalance = async (req: any, res: any) => {
     }
 
     let params = {
-        "select": ["bty", "bet"],
+        "select": ["wallet"],
         "from": ["users/email", email]
     }
 
@@ -187,8 +188,10 @@ const checkBalance = async (req: any, res: any) => {
 
     if (data && data.data.length) {
         let pureData = data.data[0]
+
+        let {bet, bty} = await balanceCheck(pureData.wallet)
         res.status(200)
-        res.send(pureData)
+        res.send({_id: pureData._id, bty, bet})
     }
 }
 
