@@ -19,15 +19,12 @@ const mintTokenOnCrowdedEvent = async (id: number) => {
         let part = data.data[0].parcipiantsAnswer.length
         if (part >= 10) {
             let userId = data.data[0].host._id
-            console.log(userId)
-            // let balance = await getMintBalance(userId)
-            // console.log(balance)
-            // let index = balance.findIndex((x: any) => { return x.amount == 77 })
-            // console.log(index)
-            // if (index == -1) {
-            //     let userWallet = data.data[0].host.wallet
-            //     await mintTokens(userWallet, 77, userId);
-            // }
+            let balance = await getMintBalance(userId, undefined)
+            let index = balance.findIndex((x: any) => { return x.purpose == "events with 10 users is reached" })
+            if (index == -1) {
+                let userWallet = data.data[0].host.wallet
+                await mintTokens(userWallet, 77, userId, "events with 10 users is reached");
+            }
         }
     }
 }
@@ -35,5 +32,3 @@ const mintTokenOnCrowdedEvent = async (id: number) => {
 export {
     mintTokenOnCrowdedEvent
 }
-
-//mintTokenOnCrowdedEvent(422212465066053)

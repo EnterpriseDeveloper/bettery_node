@@ -1,7 +1,6 @@
 import axios from "axios";
 import { path, demonAPI } from "../config/path";
 import { balanceCheck } from "../services/funds/userTokens";
-import Web3 from "web3";
 
 const usersAmount = async (req: any, res: any) => {
     let params: any = {
@@ -204,15 +203,16 @@ const getMintBalance = async (id: string, res: any) => {
         "from": id
     }
     let balance: any = await axios.post(`${path}/query`, params).catch((err: any) => {
-        res.status(400)
-        res.send('Error from DB: check your email for correctness')
+        if (res) {
+            res.status(400)
+            res.send('Error from DB: check your email for correctness')
+        }
         return
     })
 
     if (balance.data[0]["users/minted"] == undefined) {
         return null
     } else {
-        console.log(balance.data[0]["users/minted"]);
         return balance.data[0]["users/minted"].map((x: any) => {
             return {
                 userId: x['mint/user']["_id"],
