@@ -23,15 +23,15 @@ const authLogin = async (req: any, res: any) => {
             res.send(err.response.data.message);
             return;
         })
-    if (user.data.length === 0 ) {
+    if (user.data.length === 0) {
         res.send()
     } else {
         !pubKeyFromLS ? pubKeyFromLS = req.body.pubKeyActual : false;
 
-        if(user.data[0]['users/wallet'] != pubKeyFromLS || !pubKeyFromLS){ //? not valid
-            res.send({walletVerif : 'failure', wallet: user.data[0]['users/wallet'] })
+        if (user.data[0]['users/wallet'] != pubKeyFromLS || !pubKeyFromLS) { //? not valid
+            res.send({ walletVerif: 'failure', wallet: user.data[0]['users/wallet'] })
         }
-        if(user.data[0]['users/wallet'] == pubKeyFromLS){ //? valid
+        if (user.data[0]['users/wallet'] == pubKeyFromLS) { //? valid
 
             let wallet = pubKeyFromLS
 
@@ -98,7 +98,7 @@ const authRegister = async (req: any, res: any) => {
 
     let userID = x.data.tempids['users$newUser']
 
-     await mintTokens(wallet, 10, userID); 
+    await mintTokens(wallet, 10, userID, "registration");
     // // TODO add session token from Redis
     const dataFromRedis = [{
         email: email ? email : 'undefined',

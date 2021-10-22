@@ -33,7 +33,7 @@ const validEventBot = async (req: any, res: any) => {
     if (event && event.data[0] && bots) {
         const eventData = event.data[0]
 
-        if (eventData["publicEvents/validatorsAnswer"] == undefined){
+        if (eventData["publicEvents/validatorsAnswer"] == undefined) {
             eventData["publicEvents/validatorsAnswer"] = []
         }
 
@@ -43,14 +43,7 @@ const validEventBot = async (req: any, res: any) => {
             return;
         }
 
-        const endTimeRes = checkEventTime(eventData.endTime)
-        if (endTimeRes && endTimeRes.status === 400){
-            res.status(endTimeRes.status)
-            res.send(endTimeRes.response)
-            return;
-        }
-
-        if (eventData["publicEvents/validatorsAnswer"].length >= eventData.validatorsAmount && eventData.validatorsAmount !== 0){
+        if (eventData["publicEvents/validatorsAnswer"].length >= eventData.validatorsAmount && eventData.validatorsAmount !== 0) {
             res.status(400)
             res.send('Event is valid')
             return;
@@ -62,12 +55,19 @@ const validEventBot = async (req: any, res: any) => {
             return;
         }
 
+        const endTimeRes = checkEventTime(eventData.endTime)
+        if (endTimeRes && endTimeRes.status === 400) {
+            res.status(endTimeRes.status)
+            res.send(endTimeRes.response)
+            return;
+        }
+
         const choosenBot = chooseBots(bots.data, 1, eventData['publicEvents/validatorsAnswer'], true)
-        if (choosenBot && choosenBot[0].status){
+        if (choosenBot && choosenBot[0].status) {
             res.status(choosenBot[0].status)
             res.send(choosenBot[0].response)
             return;
-        }        
+        }
 
         const firstValidBotRes = await firstValidBot(choosenBot[0], eventData, eventId, trueAnswerNumber)
         if (firstValidBotRes && firstValidBotRes.status) {
@@ -78,7 +78,7 @@ const validEventBot = async (req: any, res: any) => {
             }
         }
 
-        setTimeout (async () => {
+        setTimeout(async () => {
 
             const eventAfterTimeout = await axios.post(`${path}/query`, eventParams).catch((err) => {
                 res.status(400);
@@ -93,7 +93,7 @@ const validEventBot = async (req: any, res: any) => {
                     return;
                 }
 
-                const numberOfValids = eventAfterTimeout.data[0].validatorsAmount - eventAfterTimeout.data[0]["publicEvents/validatorsAnswer"].length                
+                const numberOfValids = eventAfterTimeout.data[0].validatorsAmount - eventAfterTimeout.data[0]["publicEvents/validatorsAnswer"].length
                 const trueAnswers = countTrueAnswers(numberOfValids)
                 const choosenBots = chooseBots(bots.data, numberOfValids, eventAfterTimeout.data[0]['publicEvents/validatorsAnswer'], false)
                 if (choosenBots && choosenBots[0].status) {
@@ -102,7 +102,7 @@ const validEventBot = async (req: any, res: any) => {
                     return;
                 }
                 const startValidateRes = await startValidate(choosenBots, trueAnswers, eventData, eventId, trueAnswerNumber)
-                
+
                 if (startValidateRes && startValidateRes.status === 400) {
                     res.status(startValidateRes.status)
                     res.send(startValidateRes.response)
@@ -130,7 +130,7 @@ const startValidate = async (choosenBots: any, trueAnswers: any, eventData: any,
         if (i < trueAnswers) {
             const answerValue = eventData.answers[trueAnswerNumber]
             const getTransect = await setToNetworkValidation(choosenBots[i].expertReputPoins, eventId, answerValue, choosenBots[i].seedPhrase)
-            
+
             if (getTransect && getTransect.transact) {
                 validateCendToDB(eventId, choosenBots[i]._id, choosenBots[i].expertReputPoins, getTransect.transact, trueAnswerNumber)
             } else {
@@ -144,7 +144,7 @@ const startValidate = async (choosenBots: any, trueAnswers: any, eventData: any,
             const falseAnswerNumber = Math.floor(Math.random() * eventData.answers.length)
             const answerValue = eventData.answers[falseAnswerNumber]
             const getTransect = await setToNetworkValidation(choosenBots[i].expertReputPoins, eventId, answerValue, choosenBots[i].seedPhrase)
-                        
+
             if (getTransect && getTransect.transact) {
                 validateCendToDB(eventId, choosenBots[i]._id, choosenBots[i].expertReputPoins, getTransect.transact, falseAnswerNumber)
             } else {
@@ -183,25 +183,25 @@ const shuffle = (array: any[]) => {
     return array
 }
 
-const chooseBots = (botsData: any, numberOfValids: number, answers: any, checkEventValid: boolean) => {
+const chooseBots = (botsData: any[], numberOfValids: number, answers: any[], checkEventValid: boolean) => {
     let botsForValidate: any[] = [];
 
-  
+
     for (let bot of botsData) {
-        if (answers[0]){
-            for (let answer of answers) {            
-                if (checkEventValid && answer.from._id == bot._id){
+        if (answers[0]) {
+            for (let answer of answers) {
+                if (checkEventValid && answer.from._id == bot._id) {
                     return [{
                         status: 400,
                         response: 'Event was validated'
                     }]
                 }
-                if (answer.from._id !== bot._id){
+                if (answer.from._id !== bot._id) {
                     if (bot.expertReputPoins == undefined) {
                         bot.expertReputPoins = 0
                     }
                     botsForValidate.push(bot)
-                }                
+                }
             }
         } else {
             if (bot.expertReputPoins == undefined) {
@@ -230,8 +230,14 @@ const checkEventTime = (endTime: number) => {
 }
 
 const countTrueAnswers = (numberOfValids: number) => {
-    if (numberOfValids == 1){
+    if (numberOfValids == 1) {
         return 1
+    }
+    if (numberOfValids <= 0) {
+        return {
+            status: 400,
+            response: { status: 'Number of valids < 1' }
+        }
     }
     const trueAnswers = Math.floor((numberOfValids / 10) * 6);
 
@@ -252,7 +258,7 @@ const setToNetworkValidation = async (reput: any, eventId: number, answerValue: 
     const memonic = data.memonic
     const address = data.address
     const client = data.client
-    
+
     const msg = {
         typeUrl: "/VoroshilovMax.bettery.publicevents.MsgCreateValidPubEvents",
         value: {
