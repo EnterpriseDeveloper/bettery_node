@@ -295,10 +295,6 @@ const setToNetworkValidation = async (reput: any, eventId: number, answerValue: 
 }
 
 export {
-    validEventBot,
-    chooseBots,
-    checkEventTime,
-    countTrueAnswers,
-    setToNetworkValidation
+    validEventBot
 }
 
