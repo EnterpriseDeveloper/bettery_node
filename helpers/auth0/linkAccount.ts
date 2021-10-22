@@ -62,7 +62,7 @@ const linkAccount = async (req: any, res: any) => {
         })
         if (z) {
             let wallet = req.body.dataFromRedis.wallet
-            await mintTokens(wallet, 10, userID)
+            await mintTokens(wallet, 10, userID, "link account")
             res.status(200)
             res.send({ status: "done" })
         }

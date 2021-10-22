@@ -89,7 +89,7 @@ let part_bot = async (req: any, res: any) => {
                     }
                 }
                 if (!bet) {
-                    let mintResult = await mintTokens(wallet, 100, botId)
+                    let mintResult = await mintTokens(wallet, 100, botId, "bot part additional tokens")
                     if (mintResult) {
                         let result = await callSendToDemon(randomBet, eventId, answerValue, indexAnswerRandom, botId, mnemonic)
                         if (result) {

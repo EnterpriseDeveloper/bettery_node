@@ -191,29 +191,40 @@ const checkBalance = async (req: any, res: any) => {
         let pureData = data.data[0]
 
         let { bet, bty } = await balanceCheck(pureData.wallet)
-        let addData = await getMintBalance(pureData._id)
+        let addData = await getMintBalance(pureData._id, res)
 
         res.status(200)
         res.send({ _id: pureData._id, bty, bet, addData })
     }
 }
 
-const getMintBalance = async (id: string) => {
-    let balance: any = await axios.get(`${demonAPI}:1317/VoroshilovMax/bettery/funds/mintBet/${id}`).catch((err) => {
-        return {
-            status: 400,
-            response: err.response,
-        }
+const getMintBalance = async (id: string, res: any) => {
+    let params = {
+        "select": [{ "users/minted": ["*"] }],
+        "from": id
+    }
+    let balance: any = await axios.post(`${path}/query`, params).catch((err: any) => {
+        res.status(400)
+        res.send('Error from DB: check your email for correctness')
+        return
     })
-    let web3 = new Web3();
-    return balance.data.MintBet.map((x: any) => {
-        return {
-            userId: x.userId,
-            amount: Number(Number(web3.utils.fromWei(x.amount, "ether")).toFixed(2)),
-            creator: x.creator,
-            userWallet: x.reciever
-        }
-    })
+
+    if (balance.data[0]["users/minted"] == undefined) {
+        return null
+    } else {
+        console.log(balance.data[0]["users/minted"]);
+        return balance.data[0]["users/minted"].map((x: any) => {
+            return {
+                userId: x['mint/user']["_id"],
+                amount: x['mint/amount'],
+                purpose: x['mint/purpose'],
+                date: new Date(x['mint/date'] * 1000),
+                tx: x['mint/tx']
+            }
+        })
+    }
+
+
 }
 
 

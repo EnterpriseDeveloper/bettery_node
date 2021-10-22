@@ -60,7 +60,7 @@ const mintTokensAllBots = async (params: any) => {
     if (params && params.length) {
         for (let i = 0; i < params.length; i++) {
             // console.log(params[i].wallet)
-            await mintTokens(params[i].wallet, 100, params[i]._id)
+            await mintTokens(params[i].wallet, 100, params[i]._id, "bot init")
         }
     }
 }

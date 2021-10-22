@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { path } from "../../config/path"
 import Web3 from "web3";
-import {connectToSign} from '../../contract-services/connectToChain'
+import { connectToSign } from '../../contract-services/connectToChain'
 
-const mintTokens = async (resiever: string, amount: number, userId: number) => {
+const mintTokens = async (resiever: string, amount: number, userId: number, purpose: string) => {
     let web3 = new Web3();
     let token = web3.utils.toWei(String(amount), "ether");
     let { memonic, address, client } = await connectToSign()
@@ -12,7 +12,7 @@ const mintTokens = async (resiever: string, amount: number, userId: number) => {
         typeUrl: "/VoroshilovMax.bettery.funds.MsgCreateMintBet",
         value: {
             creator: address,
-            reciever: resiever,   
+            reciever: resiever,
             amount: token,
             userId: userId,
         }
@@ -21,10 +21,30 @@ const mintTokens = async (resiever: string, amount: number, userId: number) => {
         amount: [],
         gas: "1000000",
     };
-    try{
-        return await client.signAndBroadcast(address, [msg], fee, memonic);
-    }catch(err){
-        console.log(err)
+    try {
+        let tx = await client.signAndBroadcast(address, [msg], fee, memonic);
+
+        let data = [{
+            _id: "mint$newMint",
+            tx: "0x" + tx.transactionHash,
+            amount: amount,
+            date: Math.floor(Date.now() / 1000),
+            purpose: purpose,
+            user: userId
+        },
+        {
+            _id: userId,
+            minted: ["mint$newMint"]
+        }]
+
+        await axios.post(`${path}/transact`, data).catch(err => {
+            console.log("from mint DB", err)
+            return err
+        })
+        return tx;
+    } catch (err) {
+        console.log("from mint", err)
+        return err
     }
 }
 
@@ -43,7 +63,7 @@ const getBTYToken = async (req: any, res: any) => {
             if (getWallet.data.length != 0) {
                 let wallet = getWallet.data[0].wallet;
                 let id = getWallet.data[0]["_id"]
-                let data = await mintTokens(wallet, 10, id)
+                let data = await mintTokens(wallet, 10, id, "API call")
                 res.status(200);
                 res.send(data);
             } else {
