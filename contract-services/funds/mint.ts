@@ -20,10 +20,12 @@ const mintTokenOnCrowdedEvent = async (id: number) => {
         if (part >= 10) {
             let userId = data.data[0].host._id
             let balance = await getMintBalance(userId, undefined)
-            let index = balance.findIndex((x: any) => { return x.purpose == "events with 10 users is reached" })
-            if (index == -1) {
-                let userWallet = data.data[0].host.wallet
-                await mintTokens(userWallet, 77, userId, "events with 10 users is reached");
+            if (balance) {
+                let index = balance.findIndex((x: any) => { return x.purpose == "events with 10 users is reached" })
+                if (index == -1) {
+                    let userWallet = data.data[0].host.wallet
+                    await mintTokens(userWallet, 77, userId, "events with 10 users is reached");
+                }
             }
         }
     }
