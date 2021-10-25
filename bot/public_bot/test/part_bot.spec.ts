@@ -42,7 +42,7 @@ describe('Test part_bot endpoint', () => {
     const nowTime = Math.floor(Date.now() / 1000);
     const checkEndTimeData = [
         { input: nowTime + 180000, output: true },
-        { input: nowTime + 190000, output: true },
+        { input: nowTime + 200000, output: true },
         { input: nowTime, output: false }
     ]
     test('test checkEndTime func', () => {
