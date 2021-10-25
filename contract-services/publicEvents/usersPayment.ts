@@ -212,7 +212,6 @@ const sendToDB = async (params: any, eventId: any, dataForCorrectAnswer: any, mi
     axios.post(path + '/transact', params).catch(err => {
         console.log('error in usersPayment: ' + err.response.statusText)
     })
-    console.log("usersPayment: data sent successfully")
     await setCorrectAnswer(dataForCorrectAnswer)
     await eventEnd({ id: dataForCorrectAnswer.id })
     // lets pay to refferalls

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { checkIsTokenValid } from '../check-is-token-valid';
 
 describe('Test checkIsTokenValid middleware', () => {
+    jest.setTimeout(30000);
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;
     let nextFunction: NextFunction = jest.fn();
