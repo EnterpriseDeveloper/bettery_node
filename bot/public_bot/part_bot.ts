@@ -194,5 +194,8 @@ const sendToDemonParticipate = async (randomBet: any, eventId: number, answerVal
 }
 
 export {
-    part_bot
+    part_bot,
+    checkEndTime,
+    letsChooseRandomBots,
+    letsChooseRandomBet
 }

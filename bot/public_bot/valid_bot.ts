@@ -141,7 +141,7 @@ const startValidate = async (choosenBots: any, trueAnswers: any, eventData: any,
             }
 
         } else {
-            const falseAnswerNumber = Math.floor(Math.random() * eventData.answers.length)
+            const falseAnswerNumber = generateFalseAnswerNumber(eventData.answers.length)
             const answerValue = eventData.answers[falseAnswerNumber]
             const getTransect = await setToNetworkValidation(choosenBots[i].expertReputPoins, eventId, answerValue, choosenBots[i].seedPhrase)
 
@@ -173,6 +173,10 @@ const firstValidBot = async (choosenBot: any, eventData: any, eventId: any, true
             response: getTransect.response
         }
     }
+}
+
+const generateFalseAnswerNumber = (answers: number) => {
+    return Math.floor(Math.random() * answers)
 }
 
 const shuffle = (array: any[]) => {
@@ -295,6 +299,11 @@ const setToNetworkValidation = async (reput: any, eventId: number, answerValue: 
 }
 
 export {
-    validEventBot
+    validEventBot,
+    chooseBots,
+    checkEventTime,
+    countTrueAnswers,
+    generateFalseAnswerNumber,
+    shuffle
 }
 
