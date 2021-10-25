@@ -58,9 +58,6 @@ async function pubEventFinished(demonPath: string) {
         if (err) {
             console.log("pubEvents finished", err)
         }
-        console.log("test pub event finished")
-        console.log(event)
-
         usersPayment(event)
     })
 }
