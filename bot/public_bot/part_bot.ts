@@ -52,7 +52,7 @@ let part_bot = async (req: any, res: any) => {
             }
             if (!checkEndTime(endTime)) {
                 res.status(400)
-                res.send({ message: 'the time for participation in the event has expired, or there is less than 45 minutes left' })
+                res.send({ message: 'the time for participation in the event has expired, or there is less than 5 minutes left' })
                 return
             }
 
@@ -117,7 +117,7 @@ const letsChooseRandomBet = (min: number, max: number) => {
 
 const checkEndTime = (time: number) => {
     let endTime: any = (time * 1000).toFixed(0)
-    return (endTime - 2700000) > Date.now()
+    return (endTime - 300000) > Date.now()
 }
 
 const callSendToDemon = async (randomBet: number, eventId: number, answerValue: any, indexAnswerRandom: number, botId: number, mnemonic: string) => {
