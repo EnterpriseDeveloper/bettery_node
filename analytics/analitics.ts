@@ -68,7 +68,7 @@ const analytics24h = async (req: any, res: any) => {
             "room/publicEventsId": ["publicEvents/dateCreation"]
         }, {
             "room/privateEventsId": ["privateEvents/dateCreation"]
-        }],
+            }, "room/dateCreation"],
         "from": "room"
     }
 
@@ -191,18 +191,24 @@ const filterRooms = (roomData: any, time: number, day: number) => {
     const privateRoom: any = [];
 
     for (let room of roomData){
-        if (room["room/publicEventsId"] 
-            && !room["room/privateEventsId"]
+        if (room["room/publicEventsId"] && !room["room/privateEventsId"]){
+            if (room["room/dateCreation"] && room["room/dateCreation"] > time && room["room/dateCreation"] < time + day) {
+                publicRoom.push(room)
+            } else if (!room["room/dateCreation"] 
             && room["room/publicEventsId"][0]["publicEvents/dateCreation"] > time
             && room["room/publicEventsId"][0]["publicEvents/dateCreation"] < time + day){
-            publicRoom.push(room)
+                publicRoom.push(room)
+            }
         }
 
-        if (room["room/privateEventsId"]
-            && !room["room/publicEventsId"]
+        if (room["room/privateEventsId"] && !room["room/publicEventsId"]) {
+            if (room["room/dateCreation"] && room["room/dateCreation"] > time && room["room/dateCreation"] < time + day){
+                privateRoom.push(room)
+            } else if (!room["room/dateCreation"] 
             && room["room/privateEventsId"][0]["privateEvents/dateCreation"] > time
-            && room["room/privateEventsId"][0]["privateEvents/dateCreation"] < time + day) {
-            privateRoom.push(room)
+            && room["room/privateEventsId"][0]["privateEvents/dateCreation"] < time + day){
+                privateRoom.push(room)
+            }
         }
     }
     return {
