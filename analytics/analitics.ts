@@ -27,7 +27,9 @@ const usersAmount = async (req: any, res: any) => {
 }
 
 const analytics24h = async (req: any, res: any) => {
-    let time = new Date().setHours(0, 0, 0, 0) / 1000
+    const { date } = req.body
+
+    let time = new Date(date).setHours(0, 0, 0, 0) / 1000
     let day = 86400
 
     let params: any = {
@@ -36,11 +38,24 @@ const analytics24h = async (req: any, res: any) => {
                 { "publicActivites/from": ["users/isBot"] }
             ]
         }, {
-                "publicEvents/validatorsAnswer": [
-                    { "publicActivites/from": ["users/isBot"] }
-                ]
-            }],
-        "where": `publicEvents/dateCreation > ${time - day}`
+            "publicEvents/validatorsAnswer": [
+                { "publicActivites/from": ["users/isBot"] }
+            ]
+        }, "publicEvents/status", "publicEvents/mintedTokens"],
+        "where": `publicEvents/dateCreation > ${time}`
+    }
+
+    let privateParams: any = {
+        "select": ["privateEvents/dateCreation", {
+            "privateEvents/parcipiantsAnswer": [
+                { "privateActivites/from": ["users/isBot"] }
+            ]
+        }, {
+            "privateEvents/validatorsAnswer": [
+            { "privateActivites/from": ["users/isBot"] }
+            ]
+        }, "privateEvents/status", "privateEvents/mintedTokens"],
+        "from": "privateEvents"
     }
 
     let usersParams: any = {
@@ -48,7 +63,22 @@ const analytics24h = async (req: any, res: any) => {
         from: "users"
     }
 
+    let roomParams: any = {
+        "select": [{
+            "room/publicEventsId": ["publicEvents/dateCreation"]
+        }, {
+            "room/privateEventsId": ["privateEvents/dateCreation"]
+        }],
+        "from": "room"
+    }
+
     let data: any = await axios.post(`${path}/query`, params).catch((err) => {
+        res.status(400)
+        res.send(`Error from DB: ${err.response.statusText}`)
+        return
+    })
+
+    let privateData: any = await axios.post(`${path}/query`, privateParams).catch((err) => {
         res.status(400)
         res.send(`Error from DB: ${err.response.statusText}`)
         return
@@ -60,59 +90,89 @@ const analytics24h = async (req: any, res: any) => {
         return
     })
 
-    if (data.data.length && usersData.data.length) {
+    let roomData: any = await axios.post(`${path}/query`, roomParams).catch((err) => {
+        res.status(400)
+        res.send(`Error from DB: ${err.response.statusText}`)
+        return
+    })
 
-        let userPureDate = usersData.data.filter((el: any) => {
-            return el.isBot == undefined && el.registered && el.registered > (time - day) && el.registered < time
-        })
+    let userPureDate = usersData.data.filter((el: any) => {
+        return el.isBot == undefined && el.registered && el.registered > (time) && el.registered < time + day
+    })
 
-        let pureData = data.data.filter((el: any) => {
-            return el['publicEvents/dateCreation'] < time
-        })
+    let pureData = data.data.filter((el: any) => {
+        return el['publicEvents/dateCreation'] < time + day
+    })
+    
+    let privatePureData = privateData.data.filter((el: any) => {
+        return el['privateEvents/dateCreation'] < time + day && el['privateEvents/dateCreation'] > time
+    })
 
-        let { parc, val } = await letsFindRealUsers(pureData)
+    let { parc, val, finished, cancel, mintTokens } = await letsFindRealUsers(pureData, 'public')
+    let privateEventData = await letsFindRealUsers(privatePureData, 'private')
+    let { privateRoom, publicRoom } = filterRooms(roomData.data, time, day)
 
-        res.status(200)
-        res.send({
-            eventsCreated: pureData.length,
-            parcipiants: parc.length,
-            validators: val.length,
-            newUser: userPureDate.length
-        })
-    } else {
-        res.status(200)
-        res.send({
-            status: 'No activities'
-        })
-    }
+    res.status(200)
+    res.send({
+        newUser: userPureDate.length,
+        publicEvents_Created: pureData.length,
+        publicEvent_Parcipiants: parc.length,
+        publicEvent_Validators: val.length,
+        publicEvents_Finalized: finished.length,
+        publicEvents_Cancelled: cancel.length,
+        publicEvent_TokensMinted: mintTokens,
+        publicRooms_Created: publicRoom.length,
+        privateEvents_Created: privatePureData.length,
+        privateEvent_Parcipiants: privateEventData.parc.length,
+        privateEvent_Validators: privateEventData.val.length,
+        privateEvents_Finalized: privateEventData.finished.length,
+        privateEvents_Cancelled: privateEventData.cancel.length,
+        privateEvent_TokensMinted: privateEventData.mintTokens,
+        privateRooms_Created: privateRoom.length
+    })
+
 }
 
-let letsFindRealUsers = async (pureData: any) => {
+let letsFindRealUsers = async (pureData: any, state: string) => {
     let parc: any = []
     let val: any = []
+    let finished: any = []
+    let cancel: any = []
+    let mintTokens = 0
 
     for (let i = 0; i < pureData.length; i++) {
-        if (pureData[i]['publicEvents/parcipiantsAnswer'] != undefined) {
-            pureData[i]['publicEvents/parcipiantsAnswer'].map((el: any) => {
+        if (pureData[i][`${state}Events/parcipiantsAnswer`] != undefined) {
+            pureData[i][`${state}Events/parcipiantsAnswer`].map((el: any) => {
 
-                if (!el['publicActivites/from']['users/isBot']) {
-                    parc.push(el['publicActivites/from']._id)
+                if (!el[`${state}Activites/from`]['users/isBot']) {
+                    parc.push(el[`${state}Activites/from`]._id)
                 }
             })
         }
-        if (pureData[i]['publicEvents/validatorsAnswer'] != undefined) {
-            pureData[i]['publicEvents/validatorsAnswer'].map((el: any) => {
+        if (pureData[i][`${state}Events/validatorsAnswer`] != undefined) {
+            pureData[i][`${state}Events/validatorsAnswer`].map((el: any) => {
 
-                if (!el['publicActivites/from']['users/isBot']) {
-                    val.push(el['publicActivites/from']._id)
+                if (!el[`${state}Activites/from`]['users/isBot']) {
+                    val.push(el[`${state}Activites/from`]._id)
                 }
             })
+        }
+
+        if (pureData[i][`${state}Events/status`] === 'cancel') {
+            cancel.push(pureData[i])
+        }
+        if (pureData[i][`${state}Events/status`] === 'finished') {
+            finished.push(pureData[i])
+        }
+
+        if (pureData[i][`${state}Events/mintedTokens`]) {
+            mintTokens = mintTokens + pureData[i][`${state}Events/mintedTokens`]
         }
     }
     parc = unique(parc)
     val = unique(val)
 
-    return { parc, val }
+    return { parc, val, finished, cancel, mintTokens }
 }
 
 let unique = (arr: any) => {
@@ -124,6 +184,31 @@ let unique = (arr: any) => {
         }
     }
     return result;
+}
+
+const filterRooms = (roomData: any, time: number, day: number) => {
+    const publicRoom: any = [];
+    const privateRoom: any = [];
+
+    for (let room of roomData){
+        if (room["room/publicEventsId"] 
+            && !room["room/privateEventsId"]
+            && room["room/publicEventsId"][0]["publicEvents/dateCreation"] > time
+            && room["room/publicEventsId"][0]["publicEvents/dateCreation"] < time + day){
+            publicRoom.push(room)
+        }
+
+        if (room["room/privateEventsId"]
+            && !room["room/publicEventsId"]
+            && room["room/privateEventsId"][0]["privateEvents/dateCreation"] > time
+            && room["room/privateEventsId"][0]["privateEvents/dateCreation"] < time + day) {
+            privateRoom.push(room)
+        }
+    }
+    return {
+        privateRoom,
+        publicRoom
+    };
 }
 
 const analyticsByEventId = async (req: any, res: any) => {
@@ -149,7 +234,7 @@ const analyticsByEventId = async (req: any, res: any) => {
     })
 
     let event = data.data
-    let { parc, val } = await letsFindRealUsers(event)
+    let { parc, val } = await letsFindRealUsers(event, 'public')
 
 
     res.status(200)
