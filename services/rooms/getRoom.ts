@@ -39,8 +39,6 @@ const getAllRooms = async (req: any, res: any) => {
     // filter rooms with private events    
     let filterData = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
     let data = sortRooms(filterData)
-
-    console.log(data);
     
     for (let i = 0; i < data.length; i++) {
         data[i].publicEventsId = data[i].publicEventsId.reverse();
