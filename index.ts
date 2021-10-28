@@ -7,10 +7,6 @@ import { loadHandler } from "./contract-services/events";
 import https from 'https';
 import http from 'http';
 import comments from './services/comments/index';
-const prerender = require('prerender-node')
-
-app.use(prerender.set('prerenderToken', 'd4zzouFZ6lPLGFZLAV4e').set('protocol', 'https'))
-app.use(express.static('public'))
 
 if (process.env.NODE_TEST == 'false') {
 
