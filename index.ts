@@ -44,6 +44,7 @@ app.use(bodyParser.urlencoded({
     limit: '50mb',
     extended: true
 }));
+app.use(require('prerender-node').set('prerenderToken', 'M1S7bgnGtpNcUOX5AYPe'));
 var httpServer = http.createServer(app);
 
 if (process.env.NODE_TEST != 'false') {
