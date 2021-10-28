@@ -33,84 +33,65 @@ const analytics24h = async (req: any, res: any) => {
     let day = 86400
 
     let params: any = {
-        "select": ["publicEvents/dateCreation", {
-            "publicEvents/parcipiantsAnswer": [
-                { "publicActivites/from": ["users/isBot"] }
-            ]
-        }, {
-            "publicEvents/validatorsAnswer": [
-                { "publicActivites/from": ["users/isBot"] }
-            ]
-        }, "publicEvents/status", "publicEvents/mintedTokens"],
-        "where": `publicEvents/dateCreation > ${time}`
-    }
-
-    let privateParams: any = {
-        "select": ["privateEvents/dateCreation", {
-            "privateEvents/parcipiantsAnswer": [
-                { "privateActivites/from": ["users/isBot"] }
-            ]
-        }, {
-            "privateEvents/validatorsAnswer": [
-            { "privateActivites/from": ["users/isBot"] }
-            ]
-        }, "privateEvents/status", "privateEvents/mintedTokens"],
-        "from": "privateEvents"
-    }
-
-    let usersParams: any = {
-        select: ["_id", "isBot", "registered"],
-        from: "users"
-    }
-
-    let roomParams: any = {
-        "select": [{
-            "room/publicEventsId": ["publicEvents/dateCreation"]
-        }, {
-            "room/privateEventsId": ["privateEvents/dateCreation"]
+        publicData: {
+            "select": ["publicEvents/dateCreation", {
+                "publicEvents/parcipiantsAnswer": [
+                    { "publicActivites/from": ["users/isBot"] }
+                ]
+            }, {
+                    "publicEvents/validatorsAnswer": [
+                        { "publicActivites/from": ["users/isBot"] }
+                    ]
+                }, "publicEvents/status", "publicEvents/mintedTokens"],
+            "where": `publicEvents/dateCreation > ${time}`
+        },
+        privateData: {
+            "select": ["privateEvents/dateCreation", {
+                "privateEvents/parcipiantsAnswer": [
+                    { "privateActivites/from": ["users/isBot"] }
+                ]
+            }, {
+                    "privateEvents/validatorsAnswer": [
+                        { "privateActivites/from": ["users/isBot"] }
+                    ]
+                }, "privateEvents/status", "privateEvents/mintedTokens"],
+            "from": "privateEvents"
+        },
+        usersData: {
+            select: ["_id", "isBot", "registered"],
+            from: "users"
+        },
+        roomData: {
+            "select": [{
+                "room/publicEventsId": ["publicEvents/dateCreation"]
+            }, {
+                "room/privateEventsId": ["privateEvents/dateCreation"]
             }, "room/dateCreation"],
-        "from": "room"
+            "from": "room"
+        }
     }
 
-    let data: any = await axios.post(`${path}/query`, params).catch((err) => {
+    let { data: { publicData, privateData, usersData, roomData }}: any = await axios.post(`${path}/multi-query`, params).catch((err) => {
         res.status(400)
         res.send(`Error from DB: ${err.response.statusText}`)
         return
     })
 
-    let privateData: any = await axios.post(`${path}/query`, privateParams).catch((err) => {
-        res.status(400)
-        res.send(`Error from DB: ${err.response.statusText}`)
-        return
-    })
-
-    let usersData: any = await axios.post(`${path}/query`, usersParams).catch((err) => {
-        res.status(400)
-        res.send(`Error from DB: ${err.response.statusText}`)
-        return
-    })
-
-    let roomData: any = await axios.post(`${path}/query`, roomParams).catch((err) => {
-        res.status(400)
-        res.send(`Error from DB: ${err.response.statusText}`)
-        return
-    })
-
-    let userPureDate = usersData.data.filter((el: any) => {
+    let userPureDate = usersData.filter((el: any) => {
         return el.isBot == undefined && el.registered && el.registered > (time) && el.registered < time + day
     })
 
-    let pureData = data.data.filter((el: any) => {
+    let pureData = publicData.filter((el: any) => {
         return el['publicEvents/dateCreation'] < time + day
     })
     
-    let privatePureData = privateData.data.filter((el: any) => {
+    let privatePureData = privateData.filter((el: any) => {
         return el['privateEvents/dateCreation'] < time + day && el['privateEvents/dateCreation'] > time
     })
 
     let { parc, val, finished, cancel, mintTokens } = await letsFindRealUsers(pureData, 'public')
     let privateEventData = await letsFindRealUsers(privatePureData, 'private')
-    let { privateRoom, publicRoom } = filterRooms(roomData.data, time, day)
+    let { privateRoom, publicRoom } = filterRooms(roomData, time, day)
 
     res.status(200)
     res.send({

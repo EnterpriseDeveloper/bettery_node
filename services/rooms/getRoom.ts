@@ -5,7 +5,7 @@ import { roomStruct } from '../../structure/room.struct';
 const getByUserId = async (req: any, res: any) => {
     let userId = req.body.dataFromRedis.id
     let getRooms = {
-        "select": ["*", { 'room/owner': ["users/nickName", "users/avatar"] }],
+        "select": ["*", { "room/publicEventsId": ["publicEvents/status"], 'room/owner': ["users/nickName", "users/avatar"] }],
         "where": `room/owner = ${Number(userId)}`
     }
 
@@ -17,7 +17,8 @@ const getByUserId = async (req: any, res: any) => {
     })
     let obj = roomStruct(rooms.data)
     // filter rooms with private events
-    let data = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
+    let filterData = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
+    let data = sortRooms(filterData)
     res.status(200)
     res.send(data)
 
@@ -99,7 +100,8 @@ const getJoinedRoom = async (req: any, res: any) => {
 
         let obj = roomStruct(allRooms);
         // filter rooms with private events
-        let data = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
+        let filterData = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
+        let data = sortRooms(filterData)
         res.status(200)
         res.send(data)
     } else {
