@@ -5,7 +5,7 @@ import { roomStruct } from '../../structure/room.struct';
 const getByUserId = async (req: any, res: any) => {
     let userId = req.body.dataFromRedis.id
     let getRooms = {
-        "select": ["*", { 'room/owner': ["users/nickName", "users/avatar"] }],
+        "select": ["*", { "room/publicEventsId": ["publicEvents/status"], 'room/owner': ["users/nickName", "users/avatar"] }],
         "where": `room/owner = ${Number(userId)}`
     }
 
@@ -17,7 +17,8 @@ const getByUserId = async (req: any, res: any) => {
     })
     let obj = roomStruct(rooms.data)
     // filter rooms with private events
-    let data = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
+    let filterData = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
+    let data = sortRooms(filterData)
     res.status(200)
     res.send(data)
 
@@ -25,7 +26,7 @@ const getByUserId = async (req: any, res: any) => {
 
 const getAllRooms = async (req: any, res: any) => {
     let getRooms = {
-        "select": ["*", { 'room/owner': ["users/nickName", "users/avatar"] }],
+        "select": ["*", { "room/publicEventsId": ["publicEvents/status"], "room/owner": ["users/nickName", "users/avatar"] }],
         "from": "room"
     }
 
@@ -36,9 +37,10 @@ const getAllRooms = async (req: any, res: any) => {
         return;
     })
     let obj = roomStruct(rooms.data);
-    // filter rooms with private events
-    let data = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
-
+    // filter rooms with private events    
+    let filterData = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
+    let data = sortRooms(filterData)
+    
     for (let i = 0; i < data.length; i++) {
         data[i].publicEventsId = data[i].publicEventsId.reverse();
     }
@@ -98,7 +100,8 @@ const getJoinedRoom = async (req: any, res: any) => {
 
         let obj = roomStruct(allRooms);
         // filter rooms with private events
-        let data = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
+        let filterData = obj.filter((x: any) => { return x.publicEventsId.length != 0 })
+        let data = sortRooms(filterData)
         res.status(200)
         res.send(data)
     } else {
@@ -121,6 +124,25 @@ const getRoomColor = async (id: any) => {
     return data.data[0]["room/roomColor"]
 }
 
+const sortRooms = (rooms: any[]) => {
+    rooms.sort((a:any, b:any) => {
+        a.deployed = 0
+        b.deployed = 0
+
+        for (let value of a['publicEventsId']) {
+            if (value["publicEvents/status"] == 'deployed') {
+                a.deployed ++
+            }
+        }
+        for (let value of b['publicEventsId']) {
+            if (value["publicEvents/status"] == 'deployed') {
+                b.deployed ++
+            }
+        }
+        return b.deployed - a.deployed
+    })
+    return rooms
+}
 
 
 export {

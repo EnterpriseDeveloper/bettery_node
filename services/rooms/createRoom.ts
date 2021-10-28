@@ -2,13 +2,15 @@ import axios from 'axios';
 import {path} from "../../config/path";
 
 const createRoom = (data: any, type: any) => {
+    const date = Math.floor(Date.now() / 1000)
     return {
         _id: "room$newRoom",
         [type]: [data._id],
         name: data.roomName,
         image: data.roomImage,
         color: data.roomColor,
-        owner: data.host
+        owner: data.host,
+        dateCreation: date
     }
 }
 
