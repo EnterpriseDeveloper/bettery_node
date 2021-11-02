@@ -44,7 +44,6 @@ app.use(bodyParser.urlencoded({
     limit: '50mb',
     extended: true
 }));
-app.use(require('prerender-node').set('prerenderToken', 'M1S7bgnGtpNcUOX5AYPe').set('protocol', 'https').set('host', 'matic-network.d2f172wsk4mtv2.amplifyapp.com'));
 var httpServer = http.createServer(app);
 
 if (process.env.NODE_TEST != 'false') {
