@@ -4,11 +4,9 @@ import { mintTokenOnCrowdedEvent } from '../funds/mint';
 let send: number = 0;
 const findCorrectAnswer = async (data: any) => {
     let eventData = data.events.find((x: any) => { return x.type == "pub.event" })
-    console.log("from findCorrectAnswer", eventData);
     let id = eventData.attributes.find((x: any) => { return x.key == "id" })
     if (Number(id.value) != send) {
         sendToBlockChain(Number(id.value))
-        mintTokenOnCrowdedEvent(Number(id.value))
     }
 }
 
@@ -27,8 +25,9 @@ const sendToBlockChain = async (id: number) => {
         gas: "100000000000000000000",
     };
     try {
-        let tx = await client.signAndBroadcast(address, [msg], fee, memonic);
-        console.log(tx);
+        let tx: any = await client.signAndBroadcast(address, [msg], fee, memonic);
+        console.log("from sendToBlockChain", tx.code, tx.transactionHash);
+        mintTokenOnCrowdedEvent(id);
     } catch (err) {
         console.log(err)
     }

@@ -26,6 +26,9 @@ const mintTokenOnCrowdedEvent = async (id: number) => {
                     let userWallet = data.data[0].host.wallet
                     await mintTokens(userWallet, 77, userId, "events with 10 users is reached");
                 }
+            } else {
+                let userWallet = data.data[0].host.wallet
+                await mintTokens(userWallet, 77, userId, "events with 10 users is reached");
             }
         }
     }
