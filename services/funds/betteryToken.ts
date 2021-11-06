@@ -19,7 +19,7 @@ const mintTokens = async (resiever: string, amount: number, userId: number, purp
     };
     const fee = {
         amount: [],
-        gas: "1000000",
+        gas: "10000000000000",
     };
     try {
         let tx = await client.signAndBroadcast(address, [msg], fee, memonic);
