@@ -60,7 +60,7 @@ const revertEvent = async (eventId: any, participant: any, purpose: any, res: an
         };
         const fee = {
             amount: [],
-            gas: "1000000",
+            gas: "10000000000000",
         };
         try {
             await client.signAndBroadcast(address, [msg], fee, memonic);
