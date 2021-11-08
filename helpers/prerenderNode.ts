@@ -1,14 +1,14 @@
 import axios from "axios";
-import {prerenderToken} from "../config/key";
+import {prerenderToken, proxyUrl} from "../config/key";
 
-const prerenderNode = (path: string, id: string) => {
-
+const prerenderNode = (param: string, id: string) => {
+    let url = proxyUrl + '/' + param
 
     let data = {
         prerenderToken: prerenderToken,
-        url: `${path}/${id}`
+        url: `${url}/${id}`
     }
-    console.log(data, 'data')
+
     axios.post('https://api.prerender.io/recache', data).catch(err => {
         console.log(`Error from preview link:${err}`)
     })

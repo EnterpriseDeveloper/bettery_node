@@ -152,7 +152,7 @@ const createEvent = async (req: any, res: any) => {
     })
     let dataPost = JSON.parse(fromDB.config.data)
 
-    prerenderNode('https://test.bettery.io/public_event', dataPost[1]._id)
+    prerenderNode('public_event', dataPost[1]._id)
 
     if (whichRoom == 'new') {
         let roomId = await getRoomId(id, res);

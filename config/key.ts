@@ -16,7 +16,8 @@ const testDemon = "54.255.226.141";
 const demon = "13.213.38.183";
 const testMemo = "basic curious upset exhaust explain element ritual rent toward fit high fee any gaze path glove poem tired valid depart ginger sentence truck bamboo"
 const prodMemo = "window repair debris arrest example honey ethics review despair arctic upgrade idle cancel beef basket describe saddle vehicle beauty edit decrease garbage track shoot"
-const prerenderToken = 'd4zzouFZ6lPLGFZLAV4e'
+const prerenderToken = process.env.NODE_ENV == "production" ? 'M1S7bgnGtpNcUOX5AYPe' : 'd4zzouFZ6lPLGFZLAV4e'
+const proxyUrl = process.env.NODE_ENV == "production" ? 'https://bettery.io' : 'https://test.bettery.io'
 
 export {
    apiKey,
@@ -37,5 +38,6 @@ export {
    demon,
    testMemo,
    prodMemo,
-   prerenderToken
+   prerenderToken,
+   proxyUrl
 }
