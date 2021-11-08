@@ -14,10 +14,12 @@ const auth0ClientId = "by3kXEWyBmVBWrAxrd5fVE97HRAQf1Wk";
 const auth0Secret = "uyXFkmokkGIJp4Wx9DngoBUkyarBXzUQ_9-hEGXCibIx8v5R6WuyYLz3fI6udHGe";
 const testDemon = "54.255.226.141";
 const demon = "13.213.38.183";
-const demonEndPointTest = "https://demon_test.bettery.io"
-const demonEndPointProd = "https://demon.bettery.io"
-const testMemo = "basic curious upset exhaust explain element ritual rent toward fit high fee any gaze path glove poem tired valid depart ginger sentence truck bamboo"
-const prodMemo = "basket opinion enrich where input lemon fee penalty leisure coach sea helmet tide match pipe jaguar aunt math sunny just imitate garbage more machine"
+const demonEndPointTest = "https://demon_test.bettery.io";
+const demonEndPointProd = "https://demon.bettery.io";
+const testMemo = "basic curious upset exhaust explain element ritual rent toward fit high fee any gaze path glove poem tired valid depart ginger sentence truck bamboo";
+const prodMemo = "basket opinion enrich where input lemon fee penalty leisure coach sea helmet tide match pipe jaguar aunt math sunny just imitate garbage more machine";
+const prerenderToken = process.env.NODE_ENV == "production" ? 'M1S7bgnGtpNcUOX5AYPe' : 'd4zzouFZ6lPLGFZLAV4e';
+const proxyUrl = process.env.NODE_ENV == "production" ? 'https://bettery.io' : 'https://test.bettery.io';
 
 export {
    apiKey,
@@ -39,5 +41,7 @@ export {
    testMemo,
    prodMemo,
    demonEndPointTest,
-   demonEndPointProd
+   demonEndPointProd,
+   prerenderToken,
+   proxyUrl
 }

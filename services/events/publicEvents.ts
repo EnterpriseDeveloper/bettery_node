@@ -1,13 +1,14 @@
 import axios from "axios";
-import { path } from "../../config/path";
-import { createRoom } from '../rooms/createRoom';
-import { getRoomColor } from "../rooms/getRoom";
-import { publicEventStructure } from '../../structure/event.struct';
-import { searchData } from '../../helpers/filter';
-import { trendingSorting, controversialSorting } from '../../helpers/sorting';
-import { getAdditionalData, getAnswers } from '../../helpers/additionalData';
-import { sendNotificationToUser } from '../rooms/notification';
-import { uploadImage } from "../../helpers/helpers";
+import {path} from "../../config/path";
+import {createRoom} from '../rooms/createRoom';
+import {getRoomColor} from "../rooms/getRoom";
+import {publicEventStructure} from '../../structure/event.struct';
+import {searchData} from '../../helpers/filter';
+import {trendingSorting, controversialSorting} from '../../helpers/sorting';
+import {getAdditionalData, getAnswers} from '../../helpers/additionalData';
+import {sendNotificationToUser} from '../rooms/notification';
+import {uploadImage} from "../../helpers/helpers";
+import {prerenderNode} from "../../helpers/prerenderNode";
 
 const createEventID = async (req: any, res: any) => {
     // create event id
@@ -25,7 +26,7 @@ const createEventID = async (req: any, res: any) => {
 
     let id = eventData.data.tempids["publicEvents$newEvents"];
     res.status(200);
-    res.send({ id: id });
+    res.send({id: id});
 }
 
 const deleteEvent = (req: any, res: any) => {
@@ -43,7 +44,7 @@ const deleteEvent = (req: any, res: any) => {
             return
         })
     res.status(200)
-    res.send({ "status": "ok" })
+    res.send({"status": "ok"})
 }
 
 const createEvent = async (req: any, res: any) => {
@@ -143,12 +144,16 @@ const createEvent = async (req: any, res: any) => {
         _id: hostId,
         hostPublicEvents: [id],
     })
-    await axios.post(path + "/transact", data).catch((err) => {
+    let fromDB: any = await axios.post(path + "/transact", data).catch((err) => {
         console.log("DB error: " + err.response.data.message)
         res.status(400);
         res.send(err.response.data.message);
         return;
     })
+    let dataPost = JSON.parse(fromDB.config.data)
+
+    prerenderNode('public_event', dataPost[1]._id)
+
     if (whichRoom == 'new') {
         let roomId = await getRoomId(id, res);
         res.status(200).send({
@@ -165,7 +170,7 @@ const createEvent = async (req: any, res: any) => {
 
 const getRoomId = async (eventId: any, res: any) => {
     let conf = {
-        "select": [{ "room": ["_id"] }],
+        "select": [{"room": ["_id"]}],
         "from": eventId
     }
 
@@ -184,10 +189,10 @@ const getById = (req: any, res: any) => {
 
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
-            { 'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet'] },
-            { 'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId'] }
+            {'publicEvents/parcipiantsAnswer': ["*", {"publicActivites/from": ['users/avatar']}]},
+            {'publicEvents/validatorsAnswer': ["*", {"publicActivites/from": ['users/avatar']}]},
+            {'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet']},
+            {'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId']}
         ],
         "from": id
     }
@@ -200,7 +205,7 @@ const getById = (req: any, res: any) => {
             res.send(obj[0])
         } else {
             res.status(404);
-            res.send({ message: "event not found" });
+            res.send({message: "event not found"});
         }
 
     }).catch((err) => {
@@ -220,10 +225,15 @@ const getAll = async (req: any, res: any) => {
     let userId = req.body.userId;
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*",{"_as": "publicEvents/parcipiantsAnswer", "_limit": 1000}, { "publicActivites/from": ['users/avatar'] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
-            { 'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet'] },
-            { 'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId'] }
+            {
+                'publicEvents/parcipiantsAnswer': ["*", {
+                    "_as": "publicEvents/parcipiantsAnswer",
+                    "_limit": 1000
+                }, {"publicActivites/from": ['users/avatar']}]
+            },
+            {'publicEvents/validatorsAnswer': ["*", {"publicActivites/from": ['users/avatar']}]},
+            {'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet']},
+            {'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId']}
         ],
         "from": "publicEvents"
     }
@@ -243,7 +253,9 @@ const getAll = async (req: any, res: any) => {
 
 
     if (!finished) {
-        dataEvetns = dataEvetns.filter((e: any) => { return e.finalAnswer === null && e.status.search("reverted") == -1 })
+        dataEvetns = dataEvetns.filter((e: any) => {
+            return e.finalAnswer === null && e.status.search("reverted") == -1
+        })
     }
 
     let soringData;
@@ -266,7 +278,6 @@ const sendResponceAllEvents = async (res: any, dataEvetns: any, from: any, to: a
     for (let i = 0; i < eventsAddit.length; i++) {
         eventsAddit[i].usersAnswers = getAnswers(eventsAddit[i], userId);
     }
-
 
 
     let events = {
@@ -296,9 +307,9 @@ const getBetteryEvent = async (req: any, res: any) => {
         if (getUserInfo) {
             let id = getUserInfo.data[0]._id;
             let conf = {
-                "select": ["publicEvents/question", "_id", "publicEvents/startTime","publicEvents/status", "room"],
+                "select": ["publicEvents/question", "_id", "publicEvents/startTime", "publicEvents/status", "room"],
                 "where": `publicEvents/host = ${id}`,
-                "opts": { "orderBy": ["DESC", "publicEvents/startTime"] }
+                "opts": {"orderBy": ["DESC", "publicEvents/startTime"]}
             }
             let data = await axios.post(path + "/query", conf).catch((err) => {
                 res.status(400);
@@ -306,7 +317,7 @@ const getBetteryEvent = async (req: any, res: any) => {
                 return
             })
             if (data) {
-                let filterData = data.data.filter((el: any)=> {
+                let filterData = data.data.filter((el: any) => {
                     return el['publicEvents/status'] !== "finished" && !el['publicEvents/status'].includes('reverted')
                 })
 
@@ -321,10 +332,10 @@ const getBetteryEvent = async (req: any, res: any) => {
 const getAllForTest = async (req: any, res: any) => {
     let conf = {
         "select": ["*",
-            { 'publicEvents/parcipiantsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
-            { 'publicEvents/validatorsAnswer': ["*", { "publicActivites/from": ['users/avatar'] }] },
-            { 'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet'] },
-            { 'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId'] }
+            {'publicEvents/parcipiantsAnswer': ["*", {"publicActivites/from": ['users/avatar']}]},
+            {'publicEvents/validatorsAnswer': ["*", {"publicActivites/from": ['users/avatar']}]},
+            {'publicEvents/host': ["users/nickName", 'users/avatar', 'users/wallet']},
+            {'publicEvents/room': ["room/name", 'room/color', 'room/owner', 'room/publicEventsId']}
         ],
         "from": "publicEvents"
     }
